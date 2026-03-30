@@ -1,0 +1,246 @@
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section {
+  background: var(--off-white);
+  padding: 100px 0;
+  overflow: hidden;
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+/* ── HEADER ROW ── */
+.headerRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* ── NAV ARROWS ── */
+.navDesktop {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.navMobile {
+  display: none;
+}
+
+.navBtn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(17, 17, 17, 0.15);
+  background: transparent;
+  color: var(--ink);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.navBtn:hover {
+  background: var(--ink);
+  color: var(--off-white);
+  border-color: var(--ink);
+}
+
+.counter {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a7068;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* ── CAROUSEL ── */
+.carousel {
+  margin-top: 48px;
+  min-height: 220px;
+}
+
+.card {
+  max-width: 640px;
+  padding: 40px;
+  position: relative;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.darkCard {
+  background: var(--ink);
+  border: 1px solid rgba(245, 240, 232, 0.1);
+  color: var(--off-white);
+}
+
+.lightCard {
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  color: var(--ink);
+}
+
+.cardTag {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(201, 150, 58, 0.2);
+  padding: 4px 10px;
+}
+
+.lightCard .cardTag {
+  color: var(--orange);
+  border-color: rgba(255, 92, 26, 0.25);
+}
+
+.quote {
+  font-family: var(--font-elegant);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.55;
+  margin-bottom: 24px;
+}
+
+.quote::before {
+  content: '"';
+  font-size: 3rem;
+  color: var(--orange);
+  line-height: 0;
+  vertical-align: -1rem;
+  margin-right: 4px;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--surface2);
+  clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.lightCard .avatar {
+  background: #e8e2d6;
+  color: var(--orange);
+}
+
+.name {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+}
+
+.city {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.lightCard .city { color: #7a7068; }
+
+/* ── DOTS ── */
+.dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(17, 17, 17, 0.12);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.25s, transform 0.25s;
+}
+
+.dot:hover {
+  background: rgba(17, 17, 17, 0.3);
+}
+
+.dotActive {
+  background: var(--orange) !important;
+  transform: scale(1.3);
+}
+
+/* ── MOBILE ── */
+@media (max-width: 900px) {
+  .inner {
+    padding: 0 20px;
+  }
+
+  .section {
+    padding: 70px 0;
+  }
+
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navDesktop {
+    display: none;
+  }
+
+  .navMobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .carousel {
+    margin-top: 32px;
+    min-height: 200px;
+  }
+
+  .card {
+    max-width: 100%;
+    padding: 28px 24px;
+  }
+
+  .quote {
+    font-size: 1.05rem;
+  }
+
+  .quote::before {
+    font-size: 2rem;
+    vertical-align: -0.6rem;
+  }
+
+  .dots {
+    justify-content: center;
+  }
+}

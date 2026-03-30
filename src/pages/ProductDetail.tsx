@@ -1,0 +1,131 @@
+import { useParams, Link } from 'react-router-dom'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import Navbar from '../components/layout/Navbar'
+import Footer from '../components/layout/Footer'
+import CustomiserPanel from '../components/product/CustomiserPanel'
+import { formatPrice } from '../lib/formatters'
+import styles from './ProductDetail.module.css'
+
+export default function ProductDetail() {
+  const { slug } = useParams<{ slug: string }>()
+  const product = useQuery(api.products.getBySlug, slug ? { slug } : 'skip')
+
+  if (product === undefined) {
+    return (
+      <>
+        <Navbar />
+        <div className={styles.loading}>
+          <div className={styles.spinner} />
+          <span>Loading product...</span>
+        </div>
+      </>
+    )
+  }
+
+  if (!product) {
+    return (
+      <>
+        <Navbar />
+        <div className={styles.notFound}>
+          <h1>Product Not Found</h1>
+          <p>This product doesn't exist or has been removed.</p>
+          <Link to="/products" className={styles.backLink}>← Back to Collection</Link>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Navbar />
+      {/* ── BREADCRUMB BAR ── */}
+      <div className={styles.breadcrumbBar}>
+        <div className={styles.breadcrumb}>
+          <Link to="/">Home</Link>
+          <span>/</span>
+          <Link to="/products">Collection</Link>
+          <span>/</span>
+          <span className={styles.breadcrumbActive}>{product.name}</span>
+        </div>
+      </div>
+
+      <div className={styles.page}>
+        {/* LEFT — DARK Product Visual (50%) */}
+        <div className={styles.darkHalf}>
+          <div className={styles.visualSticky}>
+            <div className={styles.visualBox}>
+              {product.images && product.images.length > 0 ? (
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className={styles.productImage}
+                />
+              ) : (
+                <div className={styles.shape}>
+                  <div className={styles.shapeInner}>
+                    <div className={styles.shapeCore} />
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Thumbnail gallery for multiple images */}
+            {product.images && product.images.length > 1 && (
+              <div className={styles.thumbRow}>
+                {product.images.map((img, i) => (
+                  <div key={i} className={styles.thumbItem}>
+                    <img src={img} alt={`${product.name} ${i + 1}`} />
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className={styles.visualMeta}>
+              <span className={styles.metaStock}>
+                {product.stock > 0 ? `${product.stock} in stock` : 'Made to order'}
+              </span>
+              <span className={styles.metaDot} />
+              <span>Ships in 7 days</span>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT — OFF-WHITE Product Info (50%) */}
+        <div className={styles.lightHalf}>
+          <div className={styles.categoryBadge}>
+            {product.category}
+          </div>
+          <h1 className={styles.productName}>{product.name}</h1>
+          <p className={styles.tagline}>{product.shortTagline}</p>
+
+          <div className={styles.priceBlock}>
+            <span className={styles.price}>
+              {product.price ? formatPrice(product.price) : 'Custom'}
+            </span>
+            <span className={styles.priceNote}>incl. GST · Free shipping over ₹999</span>
+          </div>
+
+          <div className={styles.divider} />
+
+          <p className={styles.description}>{product.description}</p>
+
+          <div className={styles.emotionalQuote}>
+            <span className={styles.quoteIcon}>"</span>
+            {product.emotionalAngle}
+          </div>
+
+          <div className={styles.divider} />
+
+          {/* Dynamic Customiser (off-white version) */}
+          <CustomiserPanel
+            config={product.customisationConfig}
+            productId={product._id}
+            productName={product.name}
+            variant="light"
+          />
+        </div>
+      </div>
+      <Footer />
+    </>
+  )
+}

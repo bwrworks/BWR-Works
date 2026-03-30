@@ -1,0 +1,64 @@
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import Navbar from '../components/layout/Navbar'
+import Footer from '../components/layout/Footer'
+import Ticker from '../components/home/Ticker'
+import ProductGrid from '../components/product/ProductGrid'
+import styles from './Products.module.css'
+
+export default function Products() {
+  const products = useQuery(api.products.listActive)
+
+  return (
+    <>
+      <Navbar />
+      <Ticker
+        variant="top"
+        items={[
+          'Customised Keychains',
+          'Car Garage Key Holder',
+          'Photo Frames',
+          'Made to Order',
+          'Premium Quality',
+          'Designed in Bengaluru',
+        ]}
+      />
+
+      {/* ── DARK HEADER (Top 50%) ── */}
+      <div className={styles.darkSection}>
+        <div className={styles.headerInner}>
+          <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>
+            Our Collection
+          </div>
+          <h1 className={styles.title}>
+            EVERY PIECE<br />
+            <span className={styles.outlineDark}>TELLS A STORY.</span>
+          </h1>
+          <p className={styles.subtitleDark}>
+            Premium 3D-designed objects crafted with Bambu Lab P1S precision.
+            Each piece made to order — never mass-produced.
+          </p>
+        </div>
+      </div>
+
+      {/* ── OFF-WHITE PRODUCTS GRID (Bottom 50%) ── */}
+      <div className={styles.lightSection}>
+        <div className={styles.gridContainer}>
+          <ProductGrid products={products} />
+        </div>
+      </div>
+
+      <Ticker
+        variant="bottom"
+        items={[
+          'Made With Intention',
+          'Bambu Lab P1S Precision',
+          '0.12mm Layer Resolution',
+          'Ships in 7 Days',
+          'Each Piece Unique',
+        ]}
+      />
+      <Footer />
+    </>
+  )
+}

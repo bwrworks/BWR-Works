@@ -1,0 +1,453 @@
+/* ═══════════════════════════════════════════════════
+   BWR WORKS — Admin Pricing Calculator
+   Clean light system UI, orange accents
+   ═══════════════════════════════════════════════════ */
+
+.page {
+  min-height: 100vh;
+  background: #f4f4f4;
+  font-family: var(--font-body);
+}
+
+/* ── Header ── */
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e2e2e2;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.backBtn {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.backBtn:hover { color: var(--ink); }
+
+.headerDivider {
+  width: 1px;
+  height: 20px;
+  background: #ddd;
+}
+
+.headerTitle {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.headerSpacer { flex: 1; }
+
+.recalcBtn {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--off-white);
+  border: none;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.recalcBtn:hover:not(:disabled) { background: #333; }
+.recalcBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Layout ── */
+.content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ── Section Card ── */
+.card {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  padding: 32px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.cardTitle {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cardSubtitle {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Fields Grid ── */
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.fieldInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e2e2;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink);
+  background: #fafafa;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.fieldInput:focus {
+  outline: none;
+  border-color: var(--orange);
+  background: #fff;
+}
+
+/* ── B2B Slabs table ── */
+.slabsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.slabsTable th {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.slabsTable td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.slabsTable input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #e2e2e2;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.slabsTable input:focus {
+  outline: none;
+  border-color: var(--orange);
+}
+
+/* ── Save button ── */
+.saveBtn {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  padding: 10px 28px;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: background 0.2s;
+}
+
+.saveBtn:hover:not(:disabled) { background: var(--orange-hover); }
+.saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Products grid ── */
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ── Product pricing card ── */
+.productCard {
+  border: 1px solid #e2e2e2;
+  background: #fafafa;
+}
+
+.productCardHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.productCardName {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  font-weight: 600;
+}
+
+.productCardCategory {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--orange);
+  border: 1px solid rgba(255, 92, 26, 0.3);
+  padding: 2px 8px;
+}
+
+.productCardBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.productField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.productFieldLabel {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.productFieldInput {
+  padding: 8px 10px;
+  border: 1px solid #e2e2e2;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  background: #fff;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.productFieldInput:focus {
+  outline: none;
+  border-color: var(--orange);
+}
+
+/* ── Cost breakdown panel ── */
+.breakdown {
+  background: var(--ink);
+  padding: 16px 20px;
+  margin: 0 -20px;
+}
+
+.breakdownTitle {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.breakdownRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: rgba(245, 240, 232, 0.55);
+  padding: 3px 0;
+}
+
+.breakdownRowTotal {
+  composes: breakdownRow;
+  color: var(--off-white);
+  font-weight: 600;
+  border-top: 1px solid rgba(245, 240, 232, 0.1);
+  margin-top: 6px;
+  padding-top: 8px;
+}
+
+.breakdownRowB2C {
+  composes: breakdownRow;
+  color: var(--orange);
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.breakdownValue {
+  color: var(--off-white);
+}
+
+.productSaveBtn {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  padding: 9px 20px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 4px;
+  transition: background 0.2s;
+}
+
+.productSaveBtn:hover:not(:disabled) { background: var(--orange-hover); }
+.productSaveBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Price Preview Table ── */
+.priceTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.priceTable th {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 2px solid #eee;
+  background: #fafafa;
+}
+
+.priceTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.priceTable tr:hover td { background: #fafafa; }
+
+.priceB2C {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--orange) !important;
+}
+
+.priceB2B {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted) !important;
+}
+
+/* ── Toast / Status ── */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--ink);
+  color: var(--off-white);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  z-index: 9999;
+  animation: slideInToast 0.3s ease;
+}
+
+.toastSuccess { border-left: 3px solid #22c55e; }
+.toastError { border-left: 3px solid var(--error); }
+
+@keyframes slideInToast {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Loading / Empty ── */
+.loading {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.noDefaults {
+  background: #fff8f5;
+  border: 1px dashed rgba(255, 92, 26, 0.3);
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .fieldsGrid { grid-template-columns: repeat(3, 1fr); }
+  .productsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .content { padding: 20px 16px; }
+  .fieldsGrid { grid-template-columns: 1fr 1fr; }
+  .productsGrid { grid-template-columns: 1fr; }
+}

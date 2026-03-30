@@ -1,0 +1,76 @@
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.wrap {
+  overflow: hidden;
+  padding: 10px 0;
+  white-space: nowrap;
+  position: relative;
+}
+
+
+.top {
+  background: var(--orange);
+  margin-top: 57px;
+}
+
+.light {
+  background: var(--off-white);
+  border-top: 1px solid rgba(17, 17, 17, 0.1);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.bottom {
+  background: var(--surface);
+}
+
+.track {
+  display: inline-block;
+  animation: ticker 28s linear infinite;
+}
+
+.reverse {
+  animation-direction: reverse;
+}
+
+.item {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0 32px;
+}
+
+.top .item {
+  color: #fff;
+}
+
+.light .item {
+  color: var(--ink);
+}
+
+.bottom .item {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.dot {
+  margin: 0 4px;
+}
+
+.top .dot {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.light .dot {
+  color: var(--orange);
+}
+
+.bottom .dot {
+  color: rgba(245, 240, 232, 0.15);
+}

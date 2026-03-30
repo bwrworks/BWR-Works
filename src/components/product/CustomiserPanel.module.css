@@ -1,0 +1,359 @@
+.panel {
+  margin-top: 8px;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--off-white);
+  margin-bottom: 24px;
+}
+
+/* ── FIELD GROUP ── */
+.fieldGroup {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.required {
+  color: var(--orange);
+  margin-left: 4px;
+}
+
+/* ── SELECT OPTIONS ── */
+.optionsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.optionBtn {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px solid rgba(245, 240, 232, 0.12);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.optionBtn:hover {
+  border-color: rgba(245, 240, 232, 0.3);
+  color: var(--off-white);
+}
+
+.optionActive {
+  border-color: var(--orange) !important;
+  color: var(--orange) !important;
+  background: rgba(255, 92, 26, 0.1) !important;
+}
+
+/* ── TEXT INPUT ── */
+.textWrap {
+  position: relative;
+}
+
+.textInput {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 14px 16px;
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px solid rgba(245, 240, 232, 0.12);
+  color: var(--off-white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.textInput:focus {
+  border-color: var(--orange);
+}
+
+.textInput::placeholder {
+  color: rgba(245, 240, 232, 0.2);
+}
+
+.charCount {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  color: rgba(245, 240, 232, 0.2);
+}
+
+/* ── QUANTITY ── */
+.qtyWrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.qtyBtn {
+  width: 44px;
+  height: 44px;
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px solid rgba(245, 240, 232, 0.12);
+  color: var(--off-white);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.qtyBtn:hover {
+  background: rgba(245, 240, 232, 0.1);
+}
+
+.qtyValue {
+  width: 60px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--off-white);
+  background: rgba(245, 240, 232, 0.02);
+  border-top: 1px solid rgba(245, 240, 232, 0.12);
+  border-bottom: 1px solid rgba(245, 240, 232, 0.12);
+}
+
+.qtyMax {
+  margin-left: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: rgba(245, 240, 232, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── TOGGLE ── */
+.toggleWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle {
+  width: 48px;
+  height: 26px;
+  background: rgba(245, 240, 232, 0.1);
+  border: 1px solid rgba(245, 240, 232, 0.15);
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+  padding: 0;
+}
+
+.toggleOn {
+  background: var(--orange);
+  border-color: var(--orange);
+}
+
+.toggleKnob {
+  width: 20px;
+  height: 20px;
+  background: var(--off-white);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.25s;
+}
+
+.toggleOn .toggleKnob {
+  transform: translateX(22px);
+}
+
+.togglePrice {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+}
+
+/* ── FILE UPLOAD ── */
+.fileWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fileLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px dashed rgba(245, 240, 232, 0.15);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.fileLabel:hover {
+  border-color: var(--orange);
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileIcon {
+  font-size: 1.1rem;
+}
+
+.fileHint {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  color: rgba(245, 240, 232, 0.2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── ADD TO CART ── */
+.addToCart {
+  width: 100%;
+  margin-top: 28px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  padding: 18px 32px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+
+.addToCart:hover {
+  background: var(--orange-hover);
+  transform: scale(1.02);
+}
+
+.guarantee {
+  margin-top: 16px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.25);
+}
+
+.guarantee span {
+  color: var(--gold);
+}
+
+/* ═══════════════════════════════════════
+   LIGHT VARIANT — for off-white backgrounds
+   ═══════════════════════════════════════ */
+.light .sectionTitle {
+  color: var(--ink);
+}
+
+.light .label {
+  color: #7a7068;
+}
+
+.light .optionBtn {
+  background: rgba(17, 17, 17, 0.03);
+  border-color: rgba(17, 17, 17, 0.15);
+  color: #7a7068;
+}
+
+.light .optionBtn:hover {
+  border-color: rgba(17, 17, 17, 0.4);
+  color: var(--ink);
+}
+
+.light .textInput {
+  background: #fff;
+  border-color: rgba(17, 17, 17, 0.12);
+  color: var(--ink);
+}
+
+.light .textInput::placeholder {
+  color: rgba(17, 17, 17, 0.25);
+}
+
+.light .charCount {
+  color: rgba(17, 17, 17, 0.25);
+}
+
+.light .qtyBtn {
+  background: rgba(17, 17, 17, 0.04);
+  border-color: rgba(17, 17, 17, 0.12);
+  color: var(--ink);
+}
+
+.light .qtyBtn:hover {
+  background: rgba(17, 17, 17, 0.1);
+}
+
+.light .qtyValue {
+  color: var(--ink);
+  background: #fff;
+  border-color: rgba(17, 17, 17, 0.12);
+}
+
+.light .qtyMax {
+  color: rgba(17, 17, 17, 0.3);
+}
+
+.light .toggle {
+  background: rgba(17, 17, 17, 0.08);
+  border-color: rgba(17, 17, 17, 0.15);
+}
+
+.light .toggleKnob {
+  background: #fff;
+}
+
+.light .togglePrice {
+  color: var(--ink);
+}
+
+.light .fileLabel {
+  background: #fff;
+  border-color: rgba(17, 17, 17, 0.15);
+  color: #7a7068;
+}
+
+.light .fileHint {
+  color: rgba(17, 17, 17, 0.3);
+}
+
+.light .guarantee {
+  color: rgba(17, 17, 17, 0.3);
+}
+
+.light .guarantee span {
+  color: var(--orange);
+}

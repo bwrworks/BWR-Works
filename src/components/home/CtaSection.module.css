@@ -1,0 +1,100 @@
+.section {
+  background: var(--off-white);
+  padding: 120px 60px;
+  position: relative;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(255, 92, 26, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+.ctaTitle {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(3rem, 7vw, 7rem);
+  text-transform: uppercase;
+  line-height: 0.92;
+  margin-bottom: 28px;
+  color: var(--ink);
+}
+
+.outline {
+  -webkit-text-stroke: 1.5px var(--ink);
+  color: transparent;
+}
+
+.filled {
+  color: var(--orange);
+}
+
+.sub {
+  font-size: 1rem;
+  color: #6a6058;
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 0 auto 48px;
+}
+
+.buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.whatsapp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: #25D366;
+  color: #fff;
+  border: none;
+  padding: 16px 32px;
+  transition: background 0.2s, transform 0.2s;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.whatsapp:hover { background: #128C7E; transform: scale(1.04); }
+
+.instagram {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid rgba(17, 17, 17, 0.25);
+  padding: 16px 32px;
+  transition: border-color 0.2s;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.instagram:hover { border-color: var(--ink); }
+
+@media (max-width: 900px) {
+  .section { padding: 80px 24px; }
+}
