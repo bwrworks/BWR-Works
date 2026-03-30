@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Email } from "@convex-dev/auth/providers/Email";
 import { Resend as ResendAPI } from "resend";
 

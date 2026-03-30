@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthActions } from '@convex-dev/auth/react'
-import { useQuery } from 'convex/react'
-import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import styles from './Auth.module.css'

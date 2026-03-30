@@ -143,8 +143,7 @@ export default function PricingCalculator() {
           packagingCost: p.packagingCost != null ? String(p.packagingCost) : '',
         }
       }
-      setProductParams(prev => ({ ...DEFAULT_PRODUCT_PARAMS, ...map, ...prev.length ? prev : {} }))
-      setProductParams(map)
+      setProductParams(prev => ({ ...prev, ...map }))
     }
   }, [allPricing, products])
 

@@ -101,7 +101,7 @@ export default function Dashboard() {
                           <span className={styles.badgeOrange}>{order.status}</span>
                         </div>
                         <div className={styles.cardBody}>
-                          Total Amount: ₹{order.totalAmount}
+                          Total Amount: ₹{(order.total / 100).toFixed(2)}
                         </div>
                       </div>
                     ))}
