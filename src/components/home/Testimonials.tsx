@@ -68,11 +68,11 @@ export default function Testimonials() {
       onMouseLeave={() => setIsPaused(false)}
     >
       <div className={styles.inner}>
-        <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
+        <div className="section-eyebrow reveal" style={{ color: 'var(--orange)', justifyContent: 'center' }}>
           Real People. Real Reactions.
         </div>
-        <div className={styles.headerRow}>
-          <h2 className="section-title reveal">
+        <div className={styles.headerRow} style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '20px' }}>
+          <h2 className="section-title reveal" style={{ textAlign: 'center', margin: 0 }}>
             THEY SAID<br />
             <span className="outline">WHAT?</span>
           </h2>

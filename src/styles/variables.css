@@ -5,7 +5,8 @@
 
 :root {
   /* ── PRIMARY PALETTE ── */
-  --off-white: #F5F0E8;
+  --off-white: #FFFFFF;
+  --subtle-off-white: #F5F0E8;
   --white: #FFFFFF;
   --ink: #111111;
   --black-soft: #222222;

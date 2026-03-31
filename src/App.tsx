@@ -8,6 +8,10 @@ import Contact from './pages/Contact'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
 import CartDrawer from './components/cart/CartDrawer'
+import CustomCursor from './components/ui/CustomCursor'
+import { AuthGuard } from './components/auth/AuthGuard'
+import { AdminGuard } from './components/auth/AdminGuard'
+import PricingCalculator from './pages/admin/PricingCalculator'
 
 function App() {
   return (
@@ -23,11 +27,16 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         
         {/* ── SECURE ROUTES ── */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+        
+        {/* ── ADMIN ROUTES ── */}
+        {/* ── FUNC ROUTES ── */}
+        <Route path="/admin/pricing" element={<AdminGuard><PricingCalculator /></AdminGuard>} />
       </Routes>
 
       {/* Cart drawer available on every page */}
       <CartDrawer />
+      <CustomCursor />
     </>
   )
 }

@@ -11,6 +11,15 @@ export default defineSchema({
   ...authTables,
 
   // ─────────────────────────────────────────────────
+  // RATE LIMITS (Auth)
+  // ─────────────────────────────────────────────────
+  rateLimits: defineTable({
+    identifier: v.string(), // e.g. email or ip
+    attempts: v.number(),
+    lastAttempt: v.number(),
+  }).index("identifier", ["identifier"]),
+
+  // ─────────────────────────────────────────────────
   // USERS
   // ─────────────────────────────────────────────────
   users: defineTable({

@@ -183,10 +183,60 @@
 .perk p {
   color: #5a5248;
   font-size: 1.05rem;
+  font-weight: 500;
   line-height: 1.6;
 }
 
-/* ── MOBILE ── */
+/* ── GOOGLE BUTTON & DIVIDER ── */
+.formWrapper {
+  width: 100%;
+}
+
+.googleBtn {
+  width: 100%;
+  padding: 14px;
+  background: var(--white);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all var(--transition-base);
+  margin-bottom: 24px;
+}
+
+.googleBtn:hover {
+  background: var(--off-white);
+  border-color: var(--muted);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--line);
+}
+
+.divider span {
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+/* ── RIGHT (LIGHT) ── */
 @media (max-width: 900px) {
   .splitLayout {
     flex-direction: column;

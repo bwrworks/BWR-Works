@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthActions } from '@convex-dev/auth/react'
-import { useQuery } from 'convex/react'
+import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
@@ -14,8 +14,15 @@ export default function Dashboard() {
   const user = useQuery(api.users.current)
   const addresses = useQuery(api.addresses.getMyAddresses)
   const orders = useQuery(api.orders.getMyOrders)
+  const ensureAdmin = useMutation(api.admin.ensureAdminRole)
 
   const [activeTab, setActiveTab] = useState<'commissions' | 'addresses' | 'profile'>('commissions')
+
+  useEffect(() => {
+    if (user?.email === 'bwrworks.in@gmail.com' && user.role !== 'admin') {
+      ensureAdmin()
+    }
+  }, [user, ensureAdmin])
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -55,6 +62,15 @@ export default function Dashboard() {
               <p className={styles.userEmail}>{user.email}</p>
               <p className={styles.userSince}>MEMBER SINCE {new Date(user._creationTime).getFullYear()}</p>
             </div>
+
+            {user.role === 'admin' && (
+              <button 
+                onClick={() => navigate('/admin/pricing')} 
+                className={styles.navBtnActive} 
+                style={{marginBottom: '24px', width: '100%', background: 'var(--orange)', color: 'var(--white)', borderColor: 'var(--orange)'}}>
+                ⚡ Admin Pricing Engine
+              </button>
+            )}
 
             <nav className={styles.navMenu}>
               <button 

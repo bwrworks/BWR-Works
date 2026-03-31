@@ -1,0 +1,28 @@
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background: var(--orange);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  transform-origin: center center;
+  transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+  mix-blend-mode: exclusion;
+  /* Shift top/left so the center maps to the pointer */
+  margin-top: -8px;
+  margin-left: -8px;
+  will-change: transform;
+}
+
+.hovering {
+  width: 48px;
+  height: 48px;
+  background: var(--orange);
+  margin-top: -24px;
+  margin-left: -24px;
+  opacity: 0.8;
+  mix-blend-mode: overlay;
+}

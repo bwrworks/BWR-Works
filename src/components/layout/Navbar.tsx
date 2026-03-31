@@ -25,7 +25,7 @@ export default function Navbar() {
   return (
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
       <Link to="/" className={styles.logo}>
-        BW<span className={styles.logoAccent}>R</span>
+        B.W.<span className={styles.logoAccent}>R</span> <span className={styles.logoWorks}>Works</span>
       </Link>
 
       <ul className={`${styles.links} ${mobileOpen ? styles.linksOpen : ''}`}>
@@ -33,14 +33,27 @@ export default function Navbar() {
         <li><Link to="/featured-drop" onClick={() => setMobileOpen(false)}>Featured Drop</Link></li>
         <li><Link to="/the-craft" onClick={() => setMobileOpen(false)}>The Craft</Link></li>
         <li><Link to="/contact" onClick={() => setMobileOpen(false)}>Contact</Link></li>
+        {/* Mobile only links */}
+        <li className={styles.mobileOnly}>
+          {isAuthenticated ? (
+            <Link to="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+          ) : (
+            <Link to="/auth" onClick={() => setMobileOpen(false)}>Login</Link>
+          )}
+        </li>
+        <li className={styles.mobileOnly} style={{ marginTop: '8px' }}>
+          <Link to="/#contact" onClick={() => setMobileOpen(false)} style={{ color: 'var(--orange)' }}>Enquire Now</Link>
+        </li>
       </ul>
 
       <div className={styles.actions}>
-        {isAuthenticated ? (
-          <Link to="/dashboard" className={styles.navLink}>Dashboard</Link>
-        ) : (
-          <Link to="/auth" className={styles.navLink}>Login</Link>
-        )}
+        <div className={styles.desktopOnly}>
+          {isAuthenticated ? (
+            <Link to="/dashboard" className={styles.navLink}>Dashboard</Link>
+          ) : (
+            <Link to="/auth" className={styles.navLink}>Login</Link>
+          )}
+        </div>
         {/* Cart button */}
         <button
           className={styles.cartBtn}
@@ -58,7 +71,7 @@ export default function Navbar() {
         </button>
 
         {/* Enquire CTA */}
-        <Link to="/#contact" className={styles.cta}>Enquire Now</Link>
+        <Link to="/#contact" className={`${styles.cta} ${styles.desktopOnly}`}>Enquire Now</Link>
 
         {/* Mobile burger */}
         <button

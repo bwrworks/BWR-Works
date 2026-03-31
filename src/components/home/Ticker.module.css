@@ -5,15 +5,17 @@
 
 .wrap {
   overflow: hidden;
-  padding: 10px 0;
+  padding: 14px 0;
   white-space: nowrap;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 
 .top {
   background: var(--orange);
-  margin-top: 57px;
+  margin-top: 72px;
 }
 
 .light {
@@ -27,7 +29,8 @@
 }
 
 .track {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   animation: ticker 28s linear infinite;
 }
 
@@ -36,7 +39,8 @@
 }
 
 .item {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.78rem;

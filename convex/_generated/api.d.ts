@@ -9,13 +9,16 @@
  */
 
 import type * as addresses from "../addresses.js";
+import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
 import type * as auth_ResendOTP from "../auth/ResendOTP.js";
+import type * as cloudinary from "../cloudinary.js";
 import type * as http from "../http.js";
 import type * as inquiries from "../inquiries.js";
 import type * as orders from "../orders.js";
 import type * as pricing from "../pricing.js";
 import type * as products from "../products.js";
+import type * as rateLimits from "../rateLimits.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 
@@ -27,13 +30,16 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   addresses: typeof addresses;
+  admin: typeof admin;
   auth: typeof auth;
   "auth/ResendOTP": typeof auth_ResendOTP;
+  cloudinary: typeof cloudinary;
   http: typeof http;
   inquiries: typeof inquiries;
   orders: typeof orders;
   pricing: typeof pricing;
   products: typeof products;
+  rateLimits: typeof rateLimits;
   seed: typeof seed;
   users: typeof users;
 }>;

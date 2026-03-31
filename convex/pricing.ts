@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./admin";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Cost-Based Pricing Engine
@@ -171,7 +172,7 @@ export const getProductPrice = query({
 export const getProductPricingAdmin = query({
   args: { productId: v.id("products") },
   handler: async (ctx, { productId }) => {
-    // TODO: Add admin role check when auth is implemented
+    await requireAdmin(ctx);
     const pricing = await ctx.db
       .query("productPricing")
       .withIndex("by_productId", (q) => q.eq("productId", productId))
@@ -186,7 +187,7 @@ export const getProductPricingAdmin = query({
 export const getAllProductPricingAdmin = query({
   args: {},
   handler: async (ctx) => {
-    // TODO: Add admin role check when auth is implemented
+    await requireAdmin(ctx);
     const allPricing = await ctx.db.query("productPricing").collect();
     return allPricing;
   },
@@ -221,7 +222,7 @@ export const savePricingDefaults = mutation({
     gstPercent: v.number(),
   },
   handler: async (ctx, args) => {
-    // TODO: Verify admin role from auth context
+    await requireAdmin(ctx);
 
     const existing = await ctx.db.query("pricingDefaults").first();
 
@@ -262,7 +263,7 @@ export const saveProductPricing = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    // TODO: Verify admin role from auth context
+    await requireAdmin(ctx);
 
     // Get global defaults
     const defaults = await ctx.db.query("pricingDefaults").first();
@@ -324,7 +325,7 @@ export const saveProductPricing = mutation({
 export const recalculateAllPrices = mutation({
   args: {},
   handler: async (ctx) => {
-    // TODO: Verify admin role from auth context
+    await requireAdmin(ctx);
 
     const defaults = await ctx.db.query("pricingDefaults").first();
     if (!defaults) {
