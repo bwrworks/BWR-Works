@@ -12,6 +12,7 @@ import CustomCursor from './components/ui/CustomCursor'
 import { AuthGuard } from './components/auth/AuthGuard'
 import { AdminGuard } from './components/auth/AdminGuard'
 import PricingCalculator from './pages/admin/PricingCalculator'
+import { Analytics } from "@vercel/analytics/next"
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
       {/* Cart drawer available on every page */}
       <CartDrawer />
       <CustomCursor />
+      <Analytics />
     </>
   )
 }
