@@ -1,4 +1,5 @@
-import { mutation, query, internalQuery, MutationCtx, QueryCtx } from "./_generated/server";
+import { mutation, internalQuery } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
 const ADMIN_EMAIL = "bwrworks.in@gmail.com";
