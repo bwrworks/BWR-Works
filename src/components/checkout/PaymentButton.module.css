@@ -4,6 +4,65 @@
   gap: var(--space-md);
 }
 
+/* ── PAYMENT MODE SELECTOR ── */
+.modeGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--space-sm);
+}
+
+.modeBtn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+.modeBtn:hover { border-color: var(--orange); background: #FFF8F5; }
+.modeBtnActive { border-color: var(--orange); background: #FFF8F5; }
+
+.modeIcon { font-size: 1.4rem; flex-shrink: 0; }
+
+.modeInfo { flex: 1; }
+.modeName { font-family: var(--font-body); font-size: 0.88rem; font-weight: 600; color: var(--ink); }
+.modeDesc { font-family: var(--font-mono); font-size: 0.58rem; color: var(--muted); margin-top: 2px; letter-spacing: 0.06em; }
+
+.modeAmount { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--orange); flex-shrink: 0; }
+
+.modeCheck {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+.modeCheckOn { border-color: var(--orange); background: var(--orange); }
+
+/* COD Breakdown */
+.codNote {
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.codRow {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: #166534;
+}
+
 .btn {
   width: 100%;
   background: var(--orange);
@@ -20,40 +79,20 @@
   transition: background var(--transition-fast), transform var(--transition-fast);
   position: relative;
 }
+.btn:hover:not(:disabled) { background: var(--orange-hover); transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.btn:hover:not(:disabled) {
-  background: var(--orange-hover);
-  transform: translateY(-1px);
-}
-
-.btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btnLoading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
+.btnLoading { display: flex; align-items: center; justify-content: center; gap: 10px; }
 
 .spinner {
-  width: 16px;
-  height: 16px;
+  width: 16px; height: 16px;
   border: 2px solid rgba(255,255,255,0.3);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .secureNote {
   font-family: var(--font-mono);
@@ -64,11 +103,11 @@
 }
 
 .errorBox {
-  background: var(--error-light);
-  border: 1px solid var(--error);
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
   border-radius: var(--radius-sm);
   padding: 12px 16px;
   font-family: var(--font-body);
   font-size: 0.85rem;
-  color: var(--error);
+  color: #991B1B;
 }

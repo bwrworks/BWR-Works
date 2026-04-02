@@ -84,7 +84,9 @@ export default function AdminCoupons() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.1em', color: 'var(--muted)' }}>EXPIRES <span style={{ opacity: 0.6 }}>optional</span></label>
             <input type="date" style={{ padding: '10px 14px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-body)', fontSize: '0.85rem', outline: 'none' }}
-              value={form.expiresAt} onChange={e => setForm(p => ({ ...p, expiresAt: e.target.value }))} />
+              value={form.expiresAt}
+              min={new Date().toISOString().split('T')[0]}
+              onChange={e => setForm(p => ({ ...p, expiresAt: e.target.value }))} />
           </div>
           <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 'var(--space-md)', alignItems: 'center' }}>
             <button type="submit" disabled={creating} className={styles.btnPrimary}>

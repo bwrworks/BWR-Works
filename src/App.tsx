@@ -19,6 +19,8 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminProducts from './pages/admin/AdminProducts'
+import AdminContent from './pages/admin/AdminContent'
+import AdminInventory from './pages/admin/AdminInventory'
 import PricingCalculator from './pages/admin/PricingCalculator'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from '@vercel/speed-insights/react'
@@ -50,10 +52,9 @@ function App() {
           <Route path="orders/:orderId" element={<AdminOrders />} />
           <Route path="coupons" element={<AdminCoupons />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="content" element={<AdminContent />} />
+          <Route path="inventory" element={<AdminInventory />} />
           <Route path="pricing" element={<PricingCalculator />} />
-          {/* TODO: <Route path="products" element={<AdminProducts />} /> */}
-          {/* TODO: <Route path="content" element={<AdminContent />} /> */}
-          {/* TODO: <Route path="inventory" element={<AdminInventory />} /> */}
         </Route>
       </Routes>
 

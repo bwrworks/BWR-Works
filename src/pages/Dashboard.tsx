@@ -39,7 +39,7 @@ export default function Dashboard() {
   const deleteAddress = useMutation(api.addresses.deleteAddress)
   const ensureAdmin = useMutation(api.admin.ensureAdminRole)
 
-  const [activeTab, setActiveTab] = useState<'orders' | 'addresses' | 'profile'>('orders')
+  const [activeTab, setActiveTab] = useState<'orders' | 'profile'>('orders')
   const [showAddressForm, setShowAddressForm] = useState(false)
 
   useEffect(() => {
@@ -144,15 +144,14 @@ export default function Dashboard() {
 
         {/* ── TABS ── */}
         <div className={styles.tabs}>
-          {(['orders', 'addresses', 'profile'] as const).map(tab => (
+          {(['orders', 'profile'] as const).map(tab => (
             <button
               key={tab}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
               onClick={() => setActiveTab(tab)}
             >
               {tab === 'orders' && '📦 My Orders'}
-              {tab === 'addresses' && '📍 Addresses'}
-              {tab === 'profile' && '👤 Profile'}
+              {tab === 'profile' && '👤 Profile & Addresses'}
             </button>
           ))}
         </div>
@@ -263,61 +262,13 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ── TAB: ADDRESSES ── */}
-        {activeTab === 'addresses' && (
-          <div className={styles.tabContent}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Saved Delivery Addresses</h2>
-              <button className={styles.addBtn} onClick={() => setShowAddressForm(!showAddressForm)}>
-                {showAddressForm ? '✕ Cancel' : '+ Add New'}
-              </button>
-            </div>
 
-            {showAddressForm && (
-              <div className={styles.formWrapper}>
-                <AddressForm
-                  onSave={() => setShowAddressForm(false)}
-                  onCancel={() => setShowAddressForm(false)}
-                />
-              </div>
-            )}
-
-            {addresses && addresses.length > 0 ? (
-              <div className={styles.addressGrid}>
-                {addresses.map(addr => (
-                  <div key={addr._id} className={`${styles.addressCard} ${addr.isDefault ? styles.addressCardDefault : ''}`}>
-                    {addr.isDefault && <div className={styles.defaultBadge}>✓ Default</div>}
-                    <h4 className={styles.addrName}>{addr.name}</h4>
-                    <p className={styles.addrText}>{addr.line1}</p>
-                    {addr.line2 && <p className={styles.addrText}>{addr.line2}</p>}
-                    <p className={styles.addrText}>{addr.city}, {addr.state} — {addr.pincode}</p>
-                    <p className={styles.addrPhone}>📱 {addr.phone}</p>
-                    <div className={styles.addrActions}>
-                      <button
-                        className={styles.addrDelete}
-                        onClick={() => deleteAddress({ id: addr._id })}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : !showAddressForm && (
-              <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>📍</div>
-                <h3 className={styles.emptyTitle}>No addresses saved</h3>
-                <p className={styles.emptyText}>Add a delivery address to speed up checkout.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── TAB: PROFILE ── */}
+        {/* ── TAB: PROFILE (includes addresses) ── */}
         {activeTab === 'profile' && (
           <div className={styles.tabContent}>
             <div className={styles.profileGrid}>
-              {/* Profile card */}
+
+              {/* Account info */}
               <div className={styles.profileCard}>
                 <h2 className={styles.sectionTitle}>Account Details</h2>
                 <div className={styles.profileFields}>
@@ -327,35 +278,68 @@ export default function Dashboard() {
                   </div>
                   <div className={styles.profileField}>
                     <span className={styles.fieldLabel}>MEMBER SINCE</span>
-                    <span className={styles.fieldValue}>{new Date(user._creationTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                    <span className={styles.fieldValue}>
+                      {new Date(user._creationTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
                   </div>
-                  <div className={styles.profileField}>
-                    <span className={styles.fieldLabel}>ACCOUNT TYPE</span>
-                    <span className={styles.fieldValue}>{user.role === 'admin' ? '⚡ Admin' : 'Customer'}</span>
-                  </div>
-                  <div className={styles.profileField}>
-                    <span className={styles.fieldLabel}>AUTH METHOD</span>
-                    <span className={styles.fieldValue}>Google / Email OTP</span>
-                  </div>
+                </div>
+
+                {/* Support */}
+                <div style={{ marginTop: 'var(--space-xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                  <a
+                    href="https://wa.me/917019427272?text=Hi%20BWR%20Works%2C%20I%20need%20help%20with%20my%20account"
+                    target="_blank" rel="noopener noreferrer"
+                    className={styles.waBtn}
+                  >
+                    💬 WhatsApp Support
+                  </a>
+                  <button onClick={() => navigate('/contact')} className={styles.contactBtn}>
+                    Contact Form →
+                  </button>
                 </div>
               </div>
 
-              {/* Help card */}
-              <div className={styles.helpCard}>
-                <h2 className={styles.sectionTitle}>Need Help?</h2>
-                <p className={styles.helpText}>Our team is available on WhatsApp for order queries, customisation advice, and support.</p>
-                <a
-                  href="https://wa.me/917019427272?text=Hi%20BWR%20Works%2C%20I%20need%20help%20with%20my%20account"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.waBtn}
-                >
-                  💬 WhatsApp Support
-                </a>
-                <button onClick={() => navigate('/contact')} className={styles.contactBtn}>
-                  Contact Form →
-                </button>
+              {/* Addresses in profile */}
+              <div className={styles.profileCard}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>Delivery Addresses</h2>
+                  <button className={styles.addBtn} onClick={() => setShowAddressForm(!showAddressForm)}>
+                    {showAddressForm ? '✕ Cancel' : '+ Add New'}
+                  </button>
+                </div>
+
+                {showAddressForm && (
+                  <div className={styles.formWrapper} style={{ marginTop: 'var(--space-lg)' }}>
+                    <AddressForm
+                      onSave={() => setShowAddressForm(false)}
+                      onCancel={() => setShowAddressForm(false)}
+                    />
+                  </div>
+                )}
+
+                {addresses && addresses.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginTop: 'var(--space-lg)' }}>
+                    {addresses.map(addr => (
+                      <div key={addr._id} className={`${styles.addressCard} ${addr.isDefault ? styles.addressCardDefault : ''}`}>
+                        {addr.isDefault && <div className={styles.defaultBadge}>✓ Default</div>}
+                        <h4 className={styles.addrName}>{addr.name}</h4>
+                        <p className={styles.addrText}>{addr.line1}</p>
+                        {addr.line2 && <p className={styles.addrText}>{addr.line2}</p>}
+                        <p className={styles.addrText}>{addr.city}, {addr.state} — {addr.pincode}</p>
+                        <p className={styles.addrPhone}>📱 {addr.phone}</p>
+                        <div className={styles.addrActions}>
+                          <button className={styles.addrDelete} onClick={() => deleteAddress({ id: addr._id })}>Remove</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : !showAddressForm && (
+                  <div style={{ padding: 'var(--space-xl) 0', textAlign: 'center', color: 'var(--muted)', fontFamily: 'var(--font-body)', fontSize: '0.85rem' }}>
+                    No addresses yet. Add one to speed up checkout.
+                  </div>
+                )}
               </div>
+
             </div>
           </div>
         )}
