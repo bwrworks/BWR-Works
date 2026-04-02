@@ -6,6 +6,13 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 // before checkout. NEVER trust frontend prices alone.
 // ═══════════════════════════════════════════════════
 
+export interface CostBreakdown {
+  material: number; electricity: number; machine: number
+  consumables: number; design: number; labour: number
+  packaging: number; overheads: number; subtotalCost: number
+  riskBuffer: number; trueCost: number; margin: number; sellingPrice: number
+}
+
 export interface CartItem {
   id: string // Random unique ID for this cart line
   productId: string
@@ -14,11 +21,13 @@ export interface CartItem {
   // Price displayed (from pricing engine), verified at checkout
   unitPrice: number // paise
   quantity: number
+  // Cost breakdown (for order record)
+  costBreakdown: CostBreakdown
   // Snapshot of user's customisations
   customisations: Record<string, string | number | boolean>
   customText?: Record<string, string>
   // Optional file reference (uploaded separately)
-  fileRef?: string
+  imageRef?: string
 }
 
 interface CartContextType {

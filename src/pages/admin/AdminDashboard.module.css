@@ -1,0 +1,87 @@
+/* Shared admin page styles */
+.page { display: flex; flex-direction: column; gap: var(--space-2xl); }
+
+.loading { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); padding: var(--space-2xl) 0; }
+
+.empty {
+  font-family: var(--font-body); font-size: 0.9rem; color: var(--muted);
+  text-align: center; padding: var(--space-3xl); background: var(--white);
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+}
+
+.pageHeader {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding-bottom: var(--space-xl); border-bottom: 1px solid var(--line);
+}
+
+.eyebrow { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.16em; color: var(--orange); }
+
+.title {
+  font-family: var(--font-display); font-size: 2rem; font-weight: 700;
+  letter-spacing: 0.04em; color: var(--ink); margin: 4px 0 0;
+}
+
+.statsGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
+@media (max-width: 900px) { .statsGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.statCard {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius-md); padding: var(--space-xl);
+}
+.statLabel { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+.statValue { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
+.statSub { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); }
+
+.section {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius-md); padding: var(--space-xl);
+}
+
+.sectionHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl); }
+.sectionTitle { font-family: var(--font-display); font-size: 1rem; font-weight: 700; letter-spacing: 0.06em; color: var(--ink); margin: 0 0 var(--space-xl); }
+.seeAll { font-family: var(--font-mono); font-size: 0.62rem; color: var(--orange); text-decoration: none; }
+
+.statusGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+.statusCard {
+  text-align: center; padding: var(--space-lg); border: 1px solid var(--line);
+  border-radius: var(--radius-md); text-decoration: none; transition: border-color var(--transition-fast);
+}
+.statusCard:hover { border-color: var(--orange); }
+.statusCount { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--ink); }
+.statusLabel { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; }
+
+/* Table */
+.table { display: flex; flex-direction: column; }
+.tableHead {
+  display: grid; grid-template-columns: 120px 1fr 100px 120px 100px 80px;
+  padding: 10px var(--space-md); background: #F9FAFB;
+  border-radius: var(--radius-sm); font-family: var(--font-mono);
+  font-size: 0.58rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase;
+}
+.tableRow {
+  display: grid; grid-template-columns: 120px 1fr 100px 120px 100px 80px;
+  padding: 14px var(--space-md); border-bottom: 1px solid var(--line);
+  align-items: center; transition: background var(--transition-fast);
+}
+.tableRow:hover { background: #F9FAFB; }
+
+.orderId { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; color: var(--ink); }
+.cell { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); }
+.badge { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; color: white; padding: 3px 8px; border-radius: 2px; }
+.viewLink { font-family: var(--font-mono); font-size: 0.62rem; color: var(--orange); text-decoration: none; }
+
+.headerActions { display: flex; gap: var(--space-md); }
+.btnOutline {
+  font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em;
+  background: transparent; color: var(--black-soft); border: 1px solid var(--line);
+  padding: 10px 20px; border-radius: var(--radius-sm); cursor: pointer;
+  text-decoration: none; transition: all var(--transition-fast);
+}
+.btnOutline:hover { border-color: var(--orange); color: var(--orange); }
+.btnPrimary {
+  font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em;
+  background: var(--orange); color: white; border: none;
+  padding: 10px 20px; border-radius: var(--radius-sm); cursor: pointer;
+  text-decoration: none; transition: background var(--transition-fast);
+}
+.btnPrimary:hover { background: var(--orange-hover); }

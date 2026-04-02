@@ -7,13 +7,20 @@ import Craft from './pages/Craft'
 import Contact from './pages/Contact'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
+import Checkout from './pages/Checkout'
+import OrderConfirm from './pages/OrderConfirm'
+import OrderTracking from './pages/OrderTracking'
 import CartDrawer from './components/cart/CartDrawer'
 import CustomCursor from './components/ui/CustomCursor'
 import { AuthGuard } from './components/auth/AuthGuard'
 import { AdminGuard } from './components/auth/AdminGuard'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminOrders from './pages/admin/AdminOrders'
+import AdminCoupons from './pages/admin/AdminCoupons'
 import PricingCalculator from './pages/admin/PricingCalculator'
 import { Analytics } from "@vercel/analytics/react"
-import { SpeedInsights } from '@vercel/speed-insights/react';
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 function App() {
   return (
@@ -27,16 +34,27 @@ function App() {
         <Route path="/the-craft" element={<Craft />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/auth" element={<Auth />} />
-        
-        {/* ── SECURE ROUTES ── */}
+
+        {/* ── CUSTOMER SECURE ROUTES ── */}
         <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
-        
-        {/* ── ADMIN ROUTES ── */}
-        {/* ── FUNC ROUTES ── */}
-        <Route path="/admin/pricing" element={<AdminGuard><PricingCalculator /></AdminGuard>} />
+        <Route path="/checkout" element={<AuthGuard><Checkout /></AuthGuard>} />
+        <Route path="/order-confirm" element={<AuthGuard><OrderConfirm /></AuthGuard>} />
+        <Route path="/order/:orderId" element={<AuthGuard><OrderTracking /></AuthGuard>} />
+
+        {/* ── ADMIN ROUTES (nested under AdminLayout) ── */}
+        <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="orders/:orderId" element={<AdminOrders />} />
+          <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="pricing" element={<PricingCalculator />} />
+          {/* TODO: <Route path="products" element={<AdminProducts />} /> */}
+          {/* TODO: <Route path="content" element={<AdminContent />} /> */}
+          {/* TODO: <Route path="inventory" element={<AdminInventory />} /> */}
+        </Route>
       </Routes>
 
-      {/* Cart drawer available on every page */}
+      {/* Global overlays — available on every page */}
       <CartDrawer />
       <CustomCursor />
       <Analytics />

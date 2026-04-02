@@ -64,6 +64,14 @@ export default function CustomiserPanel({ config, productId, productName, varian
       productName,
       unitPrice: priceData?.unitPrice ?? 0,
       quantity: qty,
+      costBreakdown: {
+        // Public pricing API intentionally hides cost breakdown.
+        // Real costs are stored in productPricing table server-side.
+        material: 0, electricity: 0, machine: 0, consumables: 0, design: 0,
+        labour: 0, packaging: 0, overheads: 0, subtotalCost: 0,
+        riskBuffer: 0, trueCost: 0, margin: 0,
+        sellingPrice: priceData?.unitPrice ?? 0,
+      },
       customisations: values,
     })
   }

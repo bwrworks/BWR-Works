@@ -13,14 +13,19 @@ import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
 import type * as auth_ResendOTP from "../auth/ResendOTP.js";
 import type * as cloudinary from "../cloudinary.js";
+import type * as coupons from "../coupons.js";
 import type * as http from "../http.js";
 import type * as inquiries from "../inquiries.js";
+import type * as notifications from "../notifications.js";
 import type * as orders from "../orders.js";
+import type * as payments from "../payments.js";
+import type * as paymentsInternal from "../paymentsInternal.js";
 import type * as pricing from "../pricing.js";
 import type * as products from "../products.js";
 import type * as rateLimits from "../rateLimits.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
+import type * as webhookHandler from "../webhookHandler.js";
 
 import type {
   ApiFromModules,
@@ -34,14 +39,19 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   "auth/ResendOTP": typeof auth_ResendOTP;
   cloudinary: typeof cloudinary;
+  coupons: typeof coupons;
   http: typeof http;
   inquiries: typeof inquiries;
+  notifications: typeof notifications;
   orders: typeof orders;
+  payments: typeof payments;
+  paymentsInternal: typeof paymentsInternal;
   pricing: typeof pricing;
   products: typeof products;
   rateLimits: typeof rateLimits;
   seed: typeof seed;
   users: typeof users;
+  webhookHandler: typeof webhookHandler;
 }>;
 
 /**

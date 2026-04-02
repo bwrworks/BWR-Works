@@ -1,0 +1,221 @@
+.page { min-height: 100vh; background: var(--subtle-off-white); }
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 100px var(--space-xl) var(--space-5xl);
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-3xl) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-xl);
+}
+
+.iconWrap { padding: var(--space-md) 0; }
+
+.checkIcon {
+  width: 72px;
+  height: 72px;
+  display: block;
+}
+
+.checkCircle {
+  fill: none;
+  stroke: var(--success);
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-miterlimit: 10;
+  animation: stroke 0.8s cubic-bezier(0.65,0,0.45,1) forwards;
+}
+
+.checkMark {
+  fill: none;
+  stroke: var(--success);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.5s cubic-bezier(0.65,0,0.45,1) 0.7s forwards;
+}
+
+@keyframes stroke {
+  100% { stroke-dashoffset: 0; }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  color: var(--success);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.accent { color: var(--orange); }
+
+.body {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 440px;
+  margin: 0;
+}
+
+.infoCard {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px var(--space-lg);
+  border-bottom: 1px solid var(--line);
+}
+.infoRow:last-child { border-bottom: none; }
+
+.infoLabel {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.infoValue {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--black-soft);
+  font-weight: 500;
+}
+
+.statusBadge {
+  background: var(--orange);
+  color: var(--white);
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  gap: 0;
+}
+
+.timelineStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.4;
+}
+
+.timelineActive { opacity: 1; }
+
+.timelineDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--white);
+}
+
+.timelineActive .timelineDot {
+  border-color: var(--orange);
+  background: var(--orange);
+}
+
+.timelineText {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.timelineActive .timelineText { color: var(--orange); }
+
+.timelineLine {
+  width: 60px;
+  height: 1px;
+  background: var(--line);
+  margin-bottom: 18px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.btnPrimary {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  background: var(--orange);
+  color: var(--white);
+  padding: 16px 32px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.btnPrimary:hover { background: var(--orange-hover); }
+
+.btnOutline {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 14px 32px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.btnOutline:hover { border-color: var(--black-soft); color: var(--black-soft); }
+
+.whatsapp {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.link { color: var(--orange); text-decoration: none; }
+.link:hover { text-decoration: underline; }
