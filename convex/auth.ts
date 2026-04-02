@@ -7,10 +7,7 @@ import Google from "@auth/core/providers/google";
 const authBundle = convexAuth({
   providers: [
     ResendOTP,
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    }),
+    Google,   // Auto-reads AUTH_GOOGLE_ID + AUTH_GOOGLE_SECRET from Convex env vars
   ],
   session: {
     totalDurationMs: 30 * 24 * 60 * 60 * 1000, // 30 Day Session Expiry
