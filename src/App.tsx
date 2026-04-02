@@ -18,9 +18,11 @@ import AdminLayout from './pages/admin/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminCoupons from './pages/admin/AdminCoupons'
+import AdminProducts from './pages/admin/AdminProducts'
 import PricingCalculator from './pages/admin/PricingCalculator'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from '@vercel/speed-insights/react'
+import WhatsAppFloat from './components/ui/WhatsAppFloat'
 
 function App() {
   return (
@@ -47,6 +49,7 @@ function App() {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="orders/:orderId" element={<AdminOrders />} />
           <Route path="coupons" element={<AdminCoupons />} />
+          <Route path="products" element={<AdminProducts />} />
           <Route path="pricing" element={<PricingCalculator />} />
           {/* TODO: <Route path="products" element={<AdminProducts />} /> */}
           {/* TODO: <Route path="content" element={<AdminContent />} /> */}
@@ -57,6 +60,7 @@ function App() {
       {/* Global overlays — available on every page */}
       <CartDrawer />
       <CustomCursor />
+      <WhatsAppFloat />
       <Analytics />
       <SpeedInsights />
     </>

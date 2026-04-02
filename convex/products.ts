@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./admin";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Product Queries & Mutations
@@ -68,8 +69,13 @@ export const getBySlug = query({
 export const listAll = query({
   args: {},
   handler: async (ctx) => {
-    // TODO: Add admin role check
-    return await ctx.db.query("products").collect();
+    await requireAdmin(ctx);
+    const products = await ctx.db.query("products").collect();
+    // Attach prices
+    return Promise.all(products.map(async (p) => {
+      const pricing = await ctx.db.query("productPricing").withIndex("by_productId", (q) => q.eq("productId", p._id)).first();
+      return { ...p, price: pricing?.calculatedB2CPrice ?? null };
+    }));
   },
 });
 
@@ -114,23 +120,10 @@ export const create = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    // TODO: Verify admin role from auth context
-
-    // Check slug uniqueness
-    const existing = await ctx.db
-      .query("products")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .first();
-
-    if (existing) {
-      throw new Error(`Product with slug "${args.slug}" already exists`);
-    }
-
-    return await ctx.db.insert("products", {
-      ...args,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    await requireAdmin(ctx);
+    const existing = await ctx.db.query("products").withIndex("by_slug", (q) => q.eq("slug", args.slug)).first();
+    if (existing) throw new Error(`Product with slug "${args.slug}" already exists`);
+    return await ctx.db.insert("products", { ...args, createdAt: Date.now(), updatedAt: Date.now() });
   },
 });
 
@@ -176,10 +169,7 @@ export const update = mutation({
     ),
   },
   handler: async (ctx, { id, ...updates }) => {
-    // TODO: Verify admin role from auth context
-    await ctx.db.patch(id, {
-      ...updates,
-      updatedAt: Date.now(),
-    });
+    await requireAdmin(ctx);
+    await ctx.db.patch(id, { ...updates, updatedAt: Date.now() });
   },
 });
