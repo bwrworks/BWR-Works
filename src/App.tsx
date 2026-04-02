@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
@@ -26,10 +26,11 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import WhatsAppFloat from './components/ui/WhatsAppFloat'
 
-function App() {
+function AnimatedRoutes() {
+  const location = useLocation()
   return (
-    <>
-      <Routes>
+    <div key={location.pathname} className="page-transition">
+      <Routes location={location}>
         {/* ── PUBLIC ROUTES ── */}
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
@@ -57,7 +58,14 @@ function App() {
           <Route path="pricing" element={<PricingCalculator />} />
         </Route>
       </Routes>
+    </div>
+  )
+}
 
+function App() {
+  return (
+    <>
+      <AnimatedRoutes />
       {/* Global overlays — available on every page */}
       <CartDrawer />
       <CustomCursor />

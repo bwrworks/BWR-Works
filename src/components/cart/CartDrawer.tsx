@@ -39,7 +39,17 @@ export default function CartDrawer() {
               {items.map((item) => (
                 <div key={item.id} className={styles.item}>
                   <div className={styles.itemVisual}>
-                    <div className={styles.itemShape} />
+                    {item.imageRef ? (
+                      <img
+                        src={item.imageRef}
+                        alt={item.productName}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                    ) : (
+                      <div className={styles.itemPlaceholder}>
+                        {item.productName.charAt(0)}
+                      </div>
+                    )}
                   </div>
                   <div className={styles.itemInfo}>
                     <div className={styles.itemName}>{item.productName}</div>

@@ -56,9 +56,17 @@ export default function FeaturedProducts() {
                   <div className={styles.hoverLine} />
                   <div className={`${styles.tag} ${styles[tag.class]}`}>{tag.label}</div>
                   <div className={styles.bg}>
-                    <div className={styles.shape}>
-                      <div className={styles.shapeInner} />
-                    </div>
+                    {p.images?.[0] ? (
+                      <img
+                        src={p.images[0]}
+                        alt={p.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                    ) : (
+                      <div className={styles.shape}>
+                        <div className={styles.shapeInner} />
+                      </div>
+                    )}
                   </div>
                   <div className={styles.content}>
                     <div className={styles.name}>

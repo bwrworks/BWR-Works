@@ -1,12 +1,17 @@
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
 import styles from './Hero.module.css'
 
 export default function Hero() {
+  const products = useQuery(api.products.listActive)
+  const featured = products?.[0]
+
   return (
     <section className={styles.hero}>
       <div className={styles.left}>
         <div className={styles.badge}>
           <span className={styles.badgeDot} />
-          <span>Drop #01 — Now Live</span>
+          <span>{featured ? `Drop #01 — ${featured.name}` : 'Drop #01 — Now Live'}</span>
         </div>
         <h1 className={styles.title}>
           Crafted.<br />
@@ -28,8 +33,8 @@ export default function Hero() {
         </div>
         <div className={styles.statBar}>
           <div className={styles.statItem}>
-            <span className={styles.statNum}>3</span>
-            <span className={styles.statLabel}>Hero Products</span>
+            <span className={styles.statNum}>{products?.length ?? '3'}</span>
+            <span className={styles.statLabel}>Products Live</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statNum}>7</span>
@@ -44,15 +49,25 @@ export default function Hero() {
       <div className={styles.right}>
         <div className={styles.productDisplay}>
           <div className={styles.productTag}>Featured Drop</div>
-          <div className={styles.productShape}>
-            <div className={styles.shapeMain}>
-              <div className={styles.shapeInner}>
-                <div className={styles.shapeCore} />
+          {featured?.images?.[0] ? (
+            <div className={styles.productImageWrap}>
+              <img
+                src={featured.images[0]}
+                alt={featured.name}
+                className={styles.productImage}
+              />
+            </div>
+          ) : (
+            <div className={styles.productShape}>
+              <div className={styles.shapeMain}>
+                <div className={styles.shapeInner}>
+                  <div className={styles.shapeCore} />
+                </div>
               </div>
             </div>
-          </div>
-          <div className={styles.productLabel}>Car Garage Key Holder</div>
-          <div className={styles.productSub}>Matte Black PLA · LED Accent</div>
+          )}
+          <div className={styles.productLabel}>{featured?.name ?? 'Car Garage Key Holder'}</div>
+          <div className={styles.productSub}>{featured?.shortTagline ?? 'Matte Black PLA · LED Accent'}</div>
         </div>
         <div className={styles.rightCorner}>
           BWR — Black &amp; White Rogue<br />

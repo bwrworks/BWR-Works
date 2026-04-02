@@ -616,3 +616,200 @@
   transition: all var(--transition-fast);
 }
 .contactBtn:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ═════════════════════════════════════════
+   ADMIN QUICK PANEL
+   ═════════════════════════════════════════ */
+.adminPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.adminBanner {
+  background: var(--ink);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl) var(--space-2xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.adminBannerLabel {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  color: var(--orange);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.adminBannerTitle {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.adminActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.adminActionBtn {
+  background: var(--orange);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  white-space: nowrap;
+}
+.adminActionBtn:hover { background: var(--orange-hover); }
+
+.adminActionBtnOutline {
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.adminActionBtnOutline:hover { border-color: rgba(255,255,255,0.5); color: white; }
+
+/* Stats grid — 3 columns */
+.adminStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+@media (max-width: 768px) { .adminStatsGrid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .adminStatsGrid { grid-template-columns: 1fr; } }
+
+.adminStatCard {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+.adminStatCard:hover { transform: translateY(-2px); border-color: var(--orange); }
+
+.adminStatIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.adminStatValue {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.adminStatLabel {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Recent orders panel */
+.adminRecentOrders {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.adminSectionTitle {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--line);
+  background: #F9FAFB;
+}
+
+.adminOrderTable { display: flex; flex-direction: column; }
+
+.adminOrderHead {
+  display: grid;
+  grid-template-columns: 130px 1fr 110px 100px 90px;
+  padding: 10px var(--space-xl);
+  background: #F9FAFB;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.adminOrderRow {
+  display: grid;
+  grid-template-columns: 130px 1fr 110px 100px 90px;
+  padding: 14px var(--space-xl);
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  color: var(--black-soft);
+}
+.adminOrderRow:hover { background: #FAFAFA; }
+.adminOrderRow:last-child { border-bottom: none; }
+
+.adminOrderId {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--orange);
+}
+
+.adminStatusBadge {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  padding: 3px 9px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .adminOrderHead, .adminOrderRow {
+    grid-template-columns: 110px 1fr 90px 70px;
+  }
+  .adminOrderHead :nth-child(5), .adminOrderRow :nth-child(5) { display: none; }
+}
