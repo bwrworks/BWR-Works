@@ -1,22 +1,46 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuthActions } from '@convex-dev/auth/react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
-import Footer from '../components/layout/Footer'
+import AddressForm from '../components/checkout/AddressForm'
 import styles from './Dashboard.module.css'
+
+const STATUS_META: Record<string, { label: string; color: string; icon: string }> = {
+  pending:   { label: 'Payment Pending', color: '#F59E0B', icon: '⏳' },
+  paid:      { label: 'Payment Received', color: '#3B82F6', icon: '✅' },
+  received:  { label: 'Order Received',   color: '#FF5C1A', icon: '📬' },
+  printing:  { label: 'Printing Now',     color: '#8B5CF6', icon: '🖨️' },
+  shipped:   { label: 'Shipped',          color: '#0EA5E9', icon: '🚚' },
+  delivered: { label: 'Delivered',        color: '#10B981', icon: '🎉' },
+}
+
+function fmt(paise: number) {
+  return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`
+}
+
+function Avatar({ name, email }: { name?: string; email?: string }) {
+  const initials = (name || email || 'U').split(/\s|@/)[0].slice(0, 2).toUpperCase()
+  return (
+    <div className={styles.avatar}>
+      <span>{initials}</span>
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const { signOut } = useAuthActions()
-  
+
   const user = useQuery(api.users.current)
   const addresses = useQuery(api.addresses.getMyAddresses)
   const orders = useQuery(api.orders.getMyOrders)
+  const deleteAddress = useMutation(api.addresses.deleteAddress)
   const ensureAdmin = useMutation(api.admin.ensureAdminRole)
 
-  const [activeTab, setActiveTab] = useState<'commissions' | 'addresses' | 'profile'>('commissions')
+  const [activeTab, setActiveTab] = useState<'orders' | 'addresses' | 'profile'>('orders')
+  const [showAddressForm, setShowAddressForm] = useState(false)
 
   useEffect(() => {
     if (user?.email === 'bwrworks.in@gmail.com' && user.role !== 'admin') {
@@ -24,9 +48,7 @@ export default function Dashboard() {
     }
   }, [user, ensureAdmin])
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+  useEffect(() => { window.scrollTo(0, 0) }, [])
 
   const handleLogout = async () => {
     await signOut()
@@ -34,7 +56,15 @@ export default function Dashboard() {
   }
 
   if (user === undefined) {
-    return <div className={styles.page}><Navbar /><div style={{padding:'120px 0', textAlign:'center', color: 'var(--off-white)'}}>Loading profile...</div></div>
+    return (
+      <div className={styles.page}>
+        <Navbar />
+        <div className={styles.loadingScreen}>
+          <div className={styles.spinner} />
+          <span>Loading your profile...</span>
+        </div>
+      </div>
+    )
   }
 
   if (user === null) {
@@ -42,186 +72,295 @@ export default function Dashboard() {
     return null
   }
 
+  const activeOrders = (orders || []).filter(o => o.status !== 'delivered')
+  const pastOrders = (orders || []).filter(o => o.status === 'delivered')
+  const totalSpend = (orders || []).reduce((s, o) => s + o.total, 0)
+
   return (
     <div className={styles.page}>
       <Navbar />
 
-      <div className={styles.splitLayout}>
-        
-        {/* ── LEFT: NAVIGATION & SUMMARY (DARK) ── */}
-        <div className={styles.leftHalf}>
-          <div className={styles.leftContent}>
-            
-            <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>CLIENT PROFILE</div>
-            <h1 className={styles.title}>
-              DASH<br />
-              <span className={styles.outline}>BOARD</span>
-            </h1>
+      <div className={styles.container}>
 
-            <div className={styles.userInfo}>
-              <p className={styles.userEmail}>{user.email}</p>
-              <p className={styles.userSince}>MEMBER SINCE {new Date(user._creationTime).getFullYear()}</p>
+        {/* ── PROFILE HEADER ── */}
+        <div className={styles.profileHeader}>
+          <div className={styles.profileLeft}>
+            <Avatar name={user.name} email={user.email} />
+            <div className={styles.profileMeta}>
+              <h1 className={styles.profileName}>{user.name || user.email?.split('@')[0] || 'Customer'}</h1>
+              <p className={styles.profileEmail}>{user.email}</p>
+              <div className={styles.memberBadge}>
+                <span className={styles.memberDot} />
+                Member since {new Date(user._creationTime).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+              </div>
+            </div>
+          </div>
+          <div className={styles.profileActions}>
+            {user.role === 'admin' && (
+              <Link to="/admin" className={styles.adminBtn}>
+                ⚡ Admin Panel
+              </Link>
+            )}
+            <button onClick={() => navigate('/products')} className={styles.shopBtn}>
+              Shop Now →
+            </button>
+            <button onClick={handleLogout} className={styles.logoutBtn}>
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        {/* ── STATS ROW ── */}
+        <div className={styles.statsRow}>
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}>📦</div>
+            <div className={styles.statInfo}>
+              <div className={styles.statValue}>{orders?.length ?? '—'}</div>
+              <div className={styles.statLabel}>Total Orders</div>
+            </div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}>🖨️</div>
+            <div className={styles.statInfo}>
+              <div className={styles.statValue}>{activeOrders.length}</div>
+              <div className={styles.statLabel}>In Progress</div>
+            </div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}>💰</div>
+            <div className={styles.statInfo}>
+              <div className={styles.statValue}>{orders ? fmt(totalSpend) : '—'}</div>
+              <div className={styles.statLabel}>Total Spent</div>
+            </div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statIcon}>📍</div>
+            <div className={styles.statInfo}>
+              <div className={styles.statValue}>{addresses?.length ?? '—'}</div>
+              <div className={styles.statLabel}>Saved Addresses</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── TABS ── */}
+        <div className={styles.tabs}>
+          {(['orders', 'addresses', 'profile'] as const).map(tab => (
+            <button
+              key={tab}
+              className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === 'orders' && '📦 My Orders'}
+              {tab === 'addresses' && '📍 Addresses'}
+              {tab === 'profile' && '👤 Profile'}
+            </button>
+          ))}
+        </div>
+
+        {/* ── TAB: ORDERS ── */}
+        {activeTab === 'orders' && (
+          <div className={styles.tabContent}>
+
+            {/* Active Orders */}
+            {activeOrders.length > 0 && (
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>🔥 Active Orders</h2>
+                <div className={styles.orderGrid}>
+                  {activeOrders.map(order => {
+                    const meta = STATUS_META[order.status] || STATUS_META.received
+                    return (
+                      <div key={order._id} className={styles.orderCard}>
+                        <div className={styles.orderCardTop}>
+                          <div>
+                            <div className={styles.orderIdLabel}>ORDER ID</div>
+                            <div className={styles.orderId}>{order.orderId}</div>
+                          </div>
+                          <div className={styles.statusBadge} style={{ background: meta.color + '20', color: meta.color, borderColor: meta.color + '40' }}>
+                            {meta.icon} {meta.label}
+                          </div>
+                        </div>
+
+                        <div className={styles.orderItems}>
+                          {order.items.slice(0, 2).map((item, i) => (
+                            <div key={i} className={styles.orderItem}>
+                              <span className={styles.orderItemName}>{item.productName}</span>
+                              <span className={styles.orderItemQty}>×{item.quantity}</span>
+                            </div>
+                          ))}
+                          {order.items.length > 2 && (
+                            <div className={styles.orderItemMore}>+{order.items.length - 2} more</div>
+                          )}
+                        </div>
+
+                        <div className={styles.orderCardBottom}>
+                          <div className={styles.orderTotal}>{fmt(order.total)}</div>
+                          <div className={styles.orderDate}>
+                            {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          </div>
+                          <Link to={`/order/${order.orderId}`} className={styles.trackBtn}>
+                            Track →
+                          </Link>
+                        </div>
+
+                        {/* Mini timeline */}
+                        <div className={styles.miniTimeline}>
+                          {['received', 'printing', 'shipped', 'delivered'].map((step, i) => {
+                            const steps = ['received', 'printing', 'shipped', 'delivered']
+                            const currentIdx = steps.indexOf(order.status)
+                            const isDone = i <= currentIdx
+                            return (
+                              <div key={step} className={styles.miniStep}>
+                                <div className={`${styles.miniDot} ${isDone ? styles.miniDotDone : ''}`} />
+                                {i < 3 && <div className={`${styles.miniLine} ${isDone && i < currentIdx ? styles.miniLineDone : ''}`} />}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Past Orders */}
+            {pastOrders.length > 0 && (
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>📋 Order History</h2>
+                <div className={styles.historyTable}>
+                  <div className={styles.historyHead}>
+                    <span>Order ID</span><span>Items</span><span>Total</span><span>Date</span><span>Status</span><span></span>
+                  </div>
+                  {pastOrders.map(order => (
+                    <div key={order._id} className={styles.historyRow}>
+                      <span className={styles.historyId}>{order.orderId}</span>
+                      <span className={styles.historyCell}>{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
+                      <span className={styles.historyCell}>{fmt(order.total)}</span>
+                      <span className={styles.historyCell}>{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
+                      <span>
+                        <span className={styles.historyBadge} style={{ background: STATUS_META[order.status]?.color + '20', color: STATUS_META[order.status]?.color }}>
+                          {order.status}
+                        </span>
+                      </span>
+                      <span>
+                        <Link to={`/order/${order.orderId}`} className={styles.historyLink}>View →</Link>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty */}
+            {(orders || []).length === 0 && (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>📦</div>
+                <h3 className={styles.emptyTitle}>No orders yet</h3>
+                <p className={styles.emptyText}>Your custom pieces will appear here once you place an order.</p>
+                <Link to="/products" className={styles.emptyBtn}>Start Shopping →</Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── TAB: ADDRESSES ── */}
+        {activeTab === 'addresses' && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Saved Delivery Addresses</h2>
+              <button className={styles.addBtn} onClick={() => setShowAddressForm(!showAddressForm)}>
+                {showAddressForm ? '✕ Cancel' : '+ Add New'}
+              </button>
             </div>
 
-            {user.role === 'admin' && (
-              <button 
-                onClick={() => navigate('/admin/pricing')} 
-                className={styles.navBtnActive} 
-                style={{marginBottom: '24px', width: '100%', background: 'var(--orange)', color: 'var(--white)', borderColor: 'var(--orange)'}}>
-                ⚡ Admin Pricing Engine
-              </button>
+            {showAddressForm && (
+              <div className={styles.formWrapper}>
+                <AddressForm
+                  onSave={() => setShowAddressForm(false)}
+                  onCancel={() => setShowAddressForm(false)}
+                />
+              </div>
             )}
 
-            <nav className={styles.navMenu}>
-              <button 
-                className={activeTab === 'commissions' ? styles.navBtnActive : styles.navBtn}
-                onClick={() => setActiveTab('commissions')}
-              >
-                Booking History
-              </button>
-              <button 
-                className={activeTab === 'addresses' ? styles.navBtnActive : styles.navBtn}
-                onClick={() => setActiveTab('addresses')}
-              >
-                Address Book
-              </button>
-              <button 
-                className={activeTab === 'profile' ? styles.navBtnActive : styles.navBtn}
-                onClick={() => setActiveTab('profile')}
-              >
-                Account Details
-              </button>
-            </nav>
-
-            <button onClick={handleLogout} className={styles.btnLogout}>
-              End Session →
-            </button>
-
+            {addresses && addresses.length > 0 ? (
+              <div className={styles.addressGrid}>
+                {addresses.map(addr => (
+                  <div key={addr._id} className={`${styles.addressCard} ${addr.isDefault ? styles.addressCardDefault : ''}`}>
+                    {addr.isDefault && <div className={styles.defaultBadge}>✓ Default</div>}
+                    <h4 className={styles.addrName}>{addr.name}</h4>
+                    <p className={styles.addrText}>{addr.line1}</p>
+                    {addr.line2 && <p className={styles.addrText}>{addr.line2}</p>}
+                    <p className={styles.addrText}>{addr.city}, {addr.state} — {addr.pincode}</p>
+                    <p className={styles.addrPhone}>📱 {addr.phone}</p>
+                    <div className={styles.addrActions}>
+                      <button
+                        className={styles.addrDelete}
+                        onClick={() => deleteAddress({ id: addr._id })}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : !showAddressForm && (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>📍</div>
+                <h3 className={styles.emptyTitle}>No addresses saved</h3>
+                <p className={styles.emptyText}>Add a delivery address to speed up checkout.</p>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
-        {/* ── RIGHT: CONTENT AREA (LIGHT) ── */}
-        <div className={styles.rightHalf}>
-          <div className={styles.rightContent}>
-
-            {/* TAB: BOOKING HISTORY */}
-            {activeTab === 'commissions' && (
-              <div className={styles.tabSection}>
-                <h2 className={styles.sectionTitle}>ACTIVE COMMISSIONS</h2>
-                {orders && orders.filter(o => ['pending', 'paid', 'printing'].includes(o.status)).length > 0 ? (
-                  <div className={styles.cardList}>
-                    {orders.filter(o => ['pending', 'paid', 'printing'].includes(o.status)).map(order => (
-                      <div key={order._id} className={styles.card}>
-                        <div className={styles.cardHeader}>
-                          <span>Order #{order._id.substring(0,6).toUpperCase()}</span>
-                          <span className={styles.badgeOrange}>{order.status}</span>
-                        </div>
-                        <div className={styles.cardBody}>
-                          Total Amount: ₹{(order.total / 100).toFixed(2)}
-                        </div>
-                      </div>
-                    ))}
+        {/* ── TAB: PROFILE ── */}
+        {activeTab === 'profile' && (
+          <div className={styles.tabContent}>
+            <div className={styles.profileGrid}>
+              {/* Profile card */}
+              <div className={styles.profileCard}>
+                <h2 className={styles.sectionTitle}>Account Details</h2>
+                <div className={styles.profileFields}>
+                  <div className={styles.profileField}>
+                    <span className={styles.fieldLabel}>EMAIL</span>
+                    <span className={styles.fieldValue}>{user.email}</span>
                   </div>
-                ) : (
-                  <div className={styles.emptyState}>
-                    <p>No active printing commissions found.</p>
+                  <div className={styles.profileField}>
+                    <span className={styles.fieldLabel}>MEMBER SINCE</span>
+                    <span className={styles.fieldValue}>{new Date(user._creationTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                   </div>
-                )}
-
-                <h2 className={styles.sectionTitle} style={{marginTop: '48px'}}>ORDER ARCHIVE</h2>
-                {orders && orders.filter(o => ['shipped', 'delivered', 'cancelled'].includes(o.status)).length > 0 ? (
-                  <div className={styles.cardList}>
-                    {orders.filter(o => ['shipped', 'delivered', 'cancelled'].includes(o.status)).map(order => (
-                      <div key={order._id} className={styles.card}>
-                        <div className={styles.cardHeader}>
-                          <span>Order #{order._id.substring(0,6).toUpperCase()}</span>
-                          <span>{new Date(order.createdAt).toLocaleDateString()}</span>
-                        </div>
-                        <div className={styles.cardBody}>
-                          Status: {order.status}
-                        </div>
-                      </div>
-                    ))}
+                  <div className={styles.profileField}>
+                    <span className={styles.fieldLabel}>ACCOUNT TYPE</span>
+                    <span className={styles.fieldValue}>{user.role === 'admin' ? '⚡ Admin' : 'Customer'}</span>
                   </div>
-                ) : (
-                  <div className={styles.emptyState}>
-                    <p>No past orders available in your archive.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* TAB: ADDRESS BOOK */}
-            {activeTab === 'addresses' && (
-              <div className={styles.tabSection}>
-                <div className={styles.sectionHeader}>
-                  <h2 className={styles.sectionTitle} style={{marginBottom: 0}}>SAVED ADDRESSES</h2>
-                  <button className={styles.btnSolid}>+ Add New</button>
-                </div>
-                
-                {addresses && addresses.length > 0 ? (
-                  <div className={styles.cardList}>
-                    {addresses.map(addr => (
-                      <div key={addr._id} className={styles.card}>
-                        {addr.isDefault && <div className={styles.badgeSolid}>Default</div>}
-                        <h4 className={styles.cardHeading}>{addr.name}</h4>
-                        <p className={styles.cardText}>{addr.line1}</p>
-                        {addr.line2 && <p className={styles.cardText}>{addr.line2}</p>}
-                        <p className={styles.cardText}>{addr.city}, {addr.state} {addr.pincode}</p>
-                        <p className={styles.cardText}>Phone: {addr.phone}</p>
-                        
-                        <div className={styles.cardActions}>
-                          <button className={styles.btnOutline}>Edit</button>
-                          <button className={styles.btnOutlineDanger}>Delete</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className={styles.emptyState}>
-                    <p>No delivery destinations saved yet. Adding one will accelerate your next checkout.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* TAB: ACCOUNT DETAILS */}
-            {activeTab === 'profile' && (
-              <div className={styles.tabSection}>
-                <h2 className={styles.sectionTitle}>ACCOUNT DETAILS</h2>
-                
-                <div className={styles.detailBox}>
-                  <div className={styles.detailRow}>
-                    <label>Registered Email</label>
-                    <p>{user.email}</p>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <label>Access Type</label>
-                    <p>Passwordless / OTP Verification</p>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <label>Account Created</label>
-                    <p>{new Date(user._creationTime).toLocaleDateString()}</p>
+                  <div className={styles.profileField}>
+                    <span className={styles.fieldLabel}>AUTH METHOD</span>
+                    <span className={styles.fieldValue}>Google / Email OTP</span>
                   </div>
                 </div>
-
-                <div style={{ marginTop: '40px' }}>
-                  <p className={styles.cardText} style={{ marginBottom: '16px' }}>
-                    Require further assistance with your account?
-                  </p>
-                  <button className={styles.btnSolid} onClick={() => navigate('/contact')}>
-                    Contact Support
-                  </button>
-                </div>
               </div>
-            )}
 
+              {/* Help card */}
+              <div className={styles.helpCard}>
+                <h2 className={styles.sectionTitle}>Need Help?</h2>
+                <p className={styles.helpText}>Our team is available on WhatsApp for order queries, customisation advice, and support.</p>
+                <a
+                  href="https://wa.me/917019427272?text=Hi%20BWR%20Works%2C%20I%20need%20help%20with%20my%20account"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.waBtn}
+                >
+                  💬 WhatsApp Support
+                </a>
+                <button onClick={() => navigate('/contact')} className={styles.contactBtn}>
+                  Contact Form →
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
-      
-      <Footer />
     </div>
   )
 }

@@ -1,9 +1,9 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Cart Context
-// Client-side cart state. Prices are verified server-side
-// before checkout. NEVER trust frontend prices alone.
+// Cart is persisted to localStorage so it survives refreshes.
+// Prices are verified server-side before checkout.
 // ═══════════════════════════════════════════════════
 
 export interface CostBreakdown {
@@ -14,19 +14,15 @@ export interface CostBreakdown {
 }
 
 export interface CartItem {
-  id: string // Random unique ID for this cart line
+  id: string
   productId: string
   productSlug: string
   productName: string
-  // Price displayed (from pricing engine), verified at checkout
   unitPrice: number // paise
   quantity: number
-  // Cost breakdown (for order record)
   costBreakdown: CostBreakdown
-  // Snapshot of user's customisations
   customisations: Record<string, string | number | boolean>
   customText?: Record<string, string>
-  // Optional file reference (uploaded separately)
   imageRef?: string
 }
 
@@ -42,6 +38,8 @@ interface CartContextType {
   setIsOpen: (open: boolean) => void
 }
 
+const CART_STORAGE_KEY = 'bwr_cart_v1'
+
 const CartContext = createContext<CartContextType | null>(null)
 
 export function useCart() {
@@ -54,16 +52,55 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 10) + Date.now().toString(36)
 }
 
+function loadCart(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY)
+    if (!raw) return []
+    return JSON.parse(raw) as CartItem[]
+  } catch {
+    return []
+  }
+}
+
+function saveCart(items: CartItem[]) {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+  } catch {
+    // Storage full or unavailable — fail silently
+  }
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([])
+  const [items, setItems] = useState<CartItem[]>(loadCart)
   const [isOpen, setIsOpen] = useState(false)
+
+  // Persist to localStorage on every cart change
+  useEffect(() => {
+    saveCart(items)
+  }, [items])
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
 
   const addItem = (newItem: Omit<CartItem, 'id'>) => {
-    setItems((prev) => [...prev, { ...newItem, id: generateId() }])
-    setIsOpen(true) // Open cart drawer when item is added
+    setItems((prev) => {
+      // If same product + same customisations, increase quantity
+      const existingIndex = prev.findIndex(
+        (i) =>
+          i.productId === newItem.productId &&
+          JSON.stringify(i.customisations) === JSON.stringify(newItem.customisations)
+      )
+      if (existingIndex >= 0) {
+        const updated = [...prev]
+        updated[existingIndex] = {
+          ...updated[existingIndex],
+          quantity: updated[existingIndex].quantity + newItem.quantity,
+        }
+        return updated
+      }
+      return [...prev, { ...newItem, id: generateId() }]
+    })
+    setIsOpen(true)
   }
 
   const removeItem = (id: string) => {
@@ -83,6 +120,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clearCart = () => {
     setItems([])
     setIsOpen(false)
+    localStorage.removeItem(CART_STORAGE_KEY)
   }
 
   return (
