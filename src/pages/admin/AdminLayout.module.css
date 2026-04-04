@@ -14,6 +14,18 @@
   top: 0; left: 0; bottom: 0;
   z-index: var(--z-nav);
   transition: transform var(--transition-base);
+  overflow: hidden;
+}
+
+/* Nav inside sidebar must scroll, NOT the page */
+.nav {
+  flex: 1;
+  padding: var(--space-lg) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
@@ -84,14 +96,9 @@
   color: var(--muted);
 }
 
-/* Nav */
-.nav {
-  flex: 1;
-  padding: var(--space-lg) 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+
+/* Nav — defined above the sidebar block with overflow-y: auto */
+
 
 .navItem {
   display: flex;

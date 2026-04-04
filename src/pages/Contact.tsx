@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useAction } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { useToast } from '../context/ToastContext'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import styles from './Contact.module.css'
@@ -26,6 +27,8 @@ const FAQS = [
 
 export default function Contact() {
   const submitInquiry = useMutation(api.inquiries.submitInquiry)
+  const sendEmail = useAction(api.notifications.sendContactFormEmail)
+  const { error: toastError, success: toastSuccess } = useToast()
   
   const [formData, setFormData] = useState({
     name: '',
@@ -54,6 +57,7 @@ export default function Contact() {
     setIsSubmitting(true)
     
     try {
+      // 1. Save to database
       await submitInquiry({
         name: formData.name,
         email: formData.email,
@@ -61,11 +65,21 @@ export default function Contact() {
         subject: formData.subject as any,
         message: formData.message
       })
+      // 2. Send email notifications (non-blocking — don't fail form if email fails)
+      sendEmail({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        subject: formData.subject,
+        message: formData.message,
+      }).catch(err => console.warn('Email send failed:', err))
+
       setIsSuccess(true)
+      toastSuccess('Message sent! We\'ll reply within 24 hours.')
       setFormData({ name: '', email: '', phone: '', subject: 'support', message: '' })
     } catch (error) {
-      console.error("Failed to submit inquiry:", error)
-      alert("Something went wrong. Please try again.")
+      console.error('Failed to submit inquiry:', error)
+      toastError('Something went wrong. Please try again or WhatsApp us.')
     } finally {
       setIsSubmitting(false)
     }

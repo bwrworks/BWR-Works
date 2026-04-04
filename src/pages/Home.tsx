@@ -16,6 +16,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
+      <Hero />
       <Ticker
         variant="top"
         items={[
@@ -29,7 +30,6 @@ export default function Home() {
           'Objects That Mean Something',
         ]}
       />
-      <Hero />
       <BrandStrip />
       <FeaturedProducts />
       <Ticker

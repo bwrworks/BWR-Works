@@ -4,6 +4,7 @@ import { api } from '../../../convex/_generated/api'
 import { useToast } from '../../context/ToastContext'
 import styles from './AdminDashboard.module.css'
 
+
 // ─────────────────────────────────────────────────
 // Cloudinary signed upload
 // ─────────────────────────────────────────────────
@@ -95,11 +96,12 @@ function ImageUploader({ images, setImages }: { images: string[]; setImages: Rea
 function ProductCard({ product, onEdit }: { product: any; onEdit: (p: any) => void }) {
   const toggleActive = useMutation(api.products.update)
   const deleteProduct = useMutation(api.products.deleteProduct)
-  const { success, error: toastError } = useToast()
+  const { success, error: toastError, confirm } = useToast()
   const [deleting, setDeleting] = useState(false)
 
   const handleDelete = async () => {
-    if (!window.confirm(`Delete "${product.name}"? This cannot be undone.`)) return
+    const ok = await confirm(`Delete "${product.name}"? This cannot be undone.`)
+    if (!ok) return
     setDeleting(true)
     try {
       await deleteProduct({ id: product._id })

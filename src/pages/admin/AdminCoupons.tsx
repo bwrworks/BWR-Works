@@ -9,7 +9,7 @@ export default function AdminCoupons() {
   const createCoupon = useMutation(api.coupons.createCoupon)
   const toggleCoupon = useMutation(api.coupons.toggleCoupon)
   const deleteCoupon = useMutation(api.coupons.deleteCoupon)
-  const { success, error: toastError } = useToast()
+  const { success, error: toastError, confirm } = useToast()
 
   const [form, setForm] = useState({
     code: '', discountType: 'flat' as 'flat' | 'percent',
@@ -39,7 +39,8 @@ export default function AdminCoupons() {
   }
 
   const handleDelete = async (id: string, code: string) => {
-    if (!window.confirm(`Delete coupon "${code}"? This cannot be undone.`)) return
+    const ok = await confirm(`Delete coupon "${code}"? This cannot be undone.`)
+    if (!ok) return
     setDeleting(id)
     try {
       await deleteCoupon({ id: id as any })

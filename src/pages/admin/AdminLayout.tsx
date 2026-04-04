@@ -8,9 +8,10 @@ const NAV_ITEMS = [
   { path: '/admin/orders', label: 'Orders', icon: '📦' },
   { path: '/admin/products', label: 'Products', icon: '🖨️' },
   { path: '/admin/pricing', label: 'Pricing Engine', icon: '⚙️' },
-  { path: '/admin/content', label: 'Content CMS', icon: '✏️' },
   { path: '/admin/coupons', label: 'Coupons', icon: '🏷️' },
   { path: '/admin/inventory', label: 'Inventory', icon: '📊' },
+  { path: '/admin/inquiries', label: 'Inquiries', icon: '✉️' },
+  { path: '/admin/content', label: 'Content CMS', icon: '✏️' },
 ]
 
 export default function AdminLayout() {

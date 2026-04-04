@@ -21,6 +21,7 @@ import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminContent from './pages/admin/AdminContent'
 import AdminInventory from './pages/admin/AdminInventory'
+import AdminInquiries from './pages/admin/AdminInquiries'
 import PricingCalculator from './pages/admin/PricingCalculator'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from '@vercel/speed-insights/react'
@@ -55,6 +56,7 @@ function AnimatedRoutes() {
           <Route path="products" element={<AdminProducts />} />
           <Route path="content" element={<AdminContent />} />
           <Route path="inventory" element={<AdminInventory />} />
+          <Route path="inquiries" element={<AdminInquiries />} />
           <Route path="pricing" element={<PricingCalculator />} />
         </Route>
       </Routes>

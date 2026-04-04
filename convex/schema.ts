@@ -280,7 +280,9 @@ export default defineSchema({
     phone: v.optional(v.string()),
     subject: v.union(v.literal("support"), v.literal("bulk_order"), v.literal("general")),
     message: v.string(),
-    status: v.union(v.literal("new"), v.literal("read"), v.literal("resolved")),
+    status: v.union(v.literal("new"), v.literal("replied"), v.literal("closed")),
+    adminReply: v.optional(v.string()),
+    repliedAt: v.optional(v.number()),
     createdAt: v.number(),
   }).index("by_status", ["status"]),
 

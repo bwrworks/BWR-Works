@@ -158,3 +158,130 @@ export const sendStatusUpdateEmail = action({
     return { sent: true };
   },
 });
+
+/** Contact form: notify admin + send auto-reply to customer */
+export const sendContactFormEmail = action({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    phone: v.optional(v.string()),
+    subject: v.string(),
+    message: v.string(),
+  },
+  handler: async (_ctx, { name, email, phone, subject, message }) => {
+    const resend = getResend();
+    const adminEmail = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
+
+    const subjectLabels: Record<string, string> = {
+      support: "Support Request",
+      bulk_order: "Bulk Order Enquiry",
+      general: "General Enquiry",
+    };
+    const subjectLabel = subjectLabels[subject] || subject;
+
+    // 1. Notify admin
+    await resend.emails.send({
+      from: FROM,
+      to: adminEmail,
+      subject: `New ${subjectLabel} from ${name} | BWR Works`,
+      html: `
+        <!DOCTYPE html>
+        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
+        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
+          <div style="background:#111; padding:24px 32px;">
+            <div style="font-size:20px; font-weight:800; color:#fff; letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS — New Inquiry</div>
+          </div>
+          <div style="padding:28px 32px;">
+            <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+              <tr><td style="padding:6px 0; font-size:13px; color:#666; width:100px;">Name</td><td style="padding:6px 0; font-size:13px; color:#111; font-weight:600;">${name}</td></tr>
+              <tr><td style="padding:6px 0; font-size:13px; color:#666;">Email</td><td style="padding:6px 0; font-size:13px; color:#111;">${email}</td></tr>
+              ${phone ? `<tr><td style="padding:6px 0; font-size:13px; color:#666;">Phone</td><td style="padding:6px 0; font-size:13px; color:#111;">${phone}</td></tr>` : ''}
+              <tr><td style="padding:6px 0; font-size:13px; color:#666;">Type</td><td style="padding:6px 0; font-size:13px; color:#FF5C1A; font-weight:600;">${subjectLabel}</td></tr>
+            </table>
+            <div style="background:#F9FAFB; padding:16px; border-left:3px solid #FF5C1A; font-size:14px; color:#333; line-height:1.7;">${message}</div>
+            <a href="${SITE_URL}/admin/content" style="display:inline-block; margin-top:20px; background:#111; color:#fff; text-decoration:none; padding:12px 24px; font-size:12px; letter-spacing:1px; text-transform:uppercase;">
+              View in Admin →
+            </a>
+          </div>
+        </div>
+        </body></html>
+      `,
+    });
+
+    // 2. Auto-reply to customer
+    await resend.emails.send({
+      from: FROM,
+      to: email,
+      subject: `We got your message — BWR Works`,
+      html: `
+        <!DOCTYPE html>
+        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
+        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
+          <div style="background:#111; padding:28px 32px;">
+            <div style="font-size:22px; font-weight:800; color:#fff; letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+          </div>
+          <div style="padding:32px;">
+            <h1 style="font-size:20px; color:#111; margin:0 0 16px;">Hi ${name}, we received your message!</h1>
+            <p style="color:#444; font-size:14px; line-height:1.7;">
+              Thank you for reaching out. We typically respond within 24 hours on business days.
+            </p>
+            <p style="color:#444; font-size:14px; line-height:1.7;">
+              Your message: <em style="color:#666;">"${message.slice(0, 140)}${message.length > 140 ? '...' : ''}"</em>
+            </p>
+            <p style="color:#444; font-size:14px; line-height:1.7; margin-top:16px;">
+              Need urgent help? WhatsApp us at <a href="https://wa.me/917019427272" style="color:#FF5C1A;">+91 70194 27272</a>
+            </p>
+          </div>
+          <div style="padding:20px 32px; border-top:1px solid #E8E3DB; text-align:center;">
+            <p style="color:#aaa; font-size:11px; margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+          </div>
+        </div>
+        </body></html>
+      `,
+    });
+
+    return { sent: true };
+  },
+});
+
+/** Admin replies to an inquiry — sends email from admin to customer */
+export const sendAdminReplyEmail = action({
+  args: {
+    customerEmail: v.string(),
+    customerName: v.string(),
+    originalMessage: v.string(),
+    replyMessage: v.string(),
+  },
+  handler: async (_ctx, { customerEmail, customerName, originalMessage, replyMessage }) => {
+    const resend = getResend();
+
+    await resend.emails.send({
+      from: FROM,
+      to: customerEmail,
+      subject: `Reply from BWR Works`,
+      html: `
+        <!DOCTYPE html>
+        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
+        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
+          <div style="background:#111; padding:28px 32px;">
+            <div style="font-size:22px; font-weight:800; color:#fff; letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+          </div>
+          <div style="padding:32px;">
+            <h1 style="font-size:20px; color:#111; margin:0 0 16px;">Hi ${customerName},</h1>
+            <div style="font-size:14px; color:#333; line-height:1.7; white-space:pre-wrap;">${replyMessage}</div>
+            <hr style="border:none; border-top:1px solid #E8E3DB; margin:24px 0;" />
+            <p style="font-size:11px; color:#999; font-style:italic;">Your original message: "${originalMessage.slice(0, 200)}${originalMessage.length > 200 ? '...' : ''}"</p>
+          </div>
+          <div style="padding:16px 32px; border-top:1px solid #E8E3DB; background:#F9FAFB;">
+            <p style="color:#888; font-size:11px; margin:0;">
+              BWR — Black &amp; White Rogue Works · <a href="https://wa.me/917019427272" style="color:#FF5C1A;">WhatsApp</a>
+            </p>
+          </div>
+        </div>
+        </body></html>
+      `,
+    });
+
+    return { sent: true };
+  },
+});

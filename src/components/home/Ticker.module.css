@@ -16,7 +16,6 @@
 
 .top {
   background: var(--orange);
-  margin-top: 72px; /* exactly navbar height */
 }
 
 .light {
