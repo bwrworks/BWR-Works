@@ -10,7 +10,7 @@ import styles from './Dashboard.module.css'
 // ─────────────────────────────────────
 // ADMIN QUICK VIEW — shown instead of customer stats
 // ─────────────────────────────────────
-function AdminQuickPanel({ onGoAdmin }: { onGoAdmin: () => void }) {
+function AdminQuickPanel() {
   const stats = useQuery(api.admin.getDashboardStats)
 
   const statCards = [
@@ -31,19 +31,6 @@ function AdminQuickPanel({ onGoAdmin }: { onGoAdmin: () => void }) {
 
   return (
     <div className={styles.adminPanel}>
-      {/* Quick action banner */}
-      <div className={styles.adminBanner}>
-        <div>
-          <div className={styles.adminBannerLabel}>ADMIN QUICK VIEW</div>
-          <div className={styles.adminBannerTitle}>Business Overview</div>
-        </div>
-        <div className={styles.adminActions}>
-          <button className={styles.adminActionBtn} onClick={onGoAdmin}>⚡ Full Admin Panel →</button>
-          <Link to="/admin/orders" className={styles.adminActionBtnOutline}>📦 Manage Orders</Link>
-          <Link to="/admin/products" className={styles.adminActionBtnOutline}>🖨️ Products</Link>
-        </div>
-      </div>
-
       {/* Stats grid */}
       <div className={styles.adminStatsGrid}>
         {statCards.map(card => (
@@ -63,14 +50,14 @@ function AdminQuickPanel({ onGoAdmin }: { onGoAdmin: () => void }) {
         {!stats ? (
           <div style={{ padding: 20, textAlign: 'center', color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>Loading...</div>
         ) : stats.recentOrders.length === 0 ? (
-          <div style={{ padding: 20, textAlign: 'center', color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>No orders yet</div>
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>No orders yet. Start selling!</div>
         ) : (
           <div className={styles.adminOrderTable}>
             <div className={styles.adminOrderHead}>
               <span>ORDER ID</span><span>CUSTOMER</span><span>STATUS</span><span>AMOUNT</span><span>DATE</span>
             </div>
             {stats.recentOrders.map(o => (
-              <Link key={o._id} to={`/admin/orders/${o.orderId}`} className={styles.adminOrderRow}>
+              <Link key={o._id} to={`/admin/orders`} className={styles.adminOrderRow}>
                 <span className={styles.adminOrderId}>{o.orderId}</span>
                 <span>{o.customerName}</span>
                 <span>
@@ -194,7 +181,7 @@ export default function Dashboard() {
 
         {/* ── ADMIN: show business quick-view, hide customer stats ── */}
         {user.role === 'admin' ? (
-          <AdminQuickPanel onGoAdmin={() => navigate('/admin')} />
+          <AdminQuickPanel />
         ) : (
           <>
             {/* ── CUSTOMER STATS ROW ── */}

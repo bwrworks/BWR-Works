@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import styles from './Footer.module.css'
 
 export default function Footer() {
@@ -17,17 +18,26 @@ export default function Footer() {
         <div>
           <div className={styles.colTitle}>Collection</div>
           <ul className={styles.links}>
-            <li><a href="#products">Customised Keychains</a></li>
-            <li><a href="#products">Car Garage Key Holder</a></li>
-            <li><a href="#products">Customizable Photo Frames</a></li>
+            <li><Link to="/products">All Products</Link></li>
+            <li><Link to="/products?cat=keychain">Customised Keychains</Link></li>
+            <li><Link to="/products?cat=keyholder">Car Garage Key Holder</Link></li>
+            <li><Link to="/products?cat=photoframe">Photo Frames</Link></li>
           </ul>
         </div>
         <div>
           <div className={styles.colTitle}>Studio</div>
           <ul className={styles.links}>
-            <li><a href="#process">The Craft</a></li>
-            <li><a href="#contact">WhatsApp</a></li>
-            <li><a href="#contact">Instagram</a></li>
+            <li><Link to="/the-craft">The Craft</Link></li>
+            <li><Link to="/featured-drop">Featured Drop</Link></li>
+            <li><Link to="/contact">Contact Us</Link></li>
+          </ul>
+        </div>
+        <div>
+          <div className={styles.colTitle}>Connect</div>
+          <ul className={styles.links}>
+            <li><a href="https://wa.me/917019427272" target="_blank" rel="noopener noreferrer">WhatsApp Us</a></li>
+            <li><a href="https://instagram.com/bwrworks" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li><Link to="/dashboard">My Account</Link></li>
           </ul>
         </div>
       </div>
@@ -38,3 +48,4 @@ export default function Footer() {
     </footer>
   )
 }
+

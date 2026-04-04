@@ -10,12 +10,13 @@
   position: relative;
   display: flex;
   align-items: center;
+  z-index: 1;
 }
 
 
 .top {
   background: var(--orange);
-  margin-top: 72px;
+  margin-top: 72px; /* exactly navbar height */
 }
 
 .light {

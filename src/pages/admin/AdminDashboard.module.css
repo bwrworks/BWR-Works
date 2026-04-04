@@ -85,3 +85,25 @@
   text-decoration: none; transition: background var(--transition-fast);
 }
 .btnPrimary:hover { background: var(--orange-hover); }
+
+.chartsRow { gap: var(--space-lg); }
+
+/* ── MOBILE TABLE SCROLL ── */
+@media (max-width: 900px) {
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .statusGrid { grid-template-columns: repeat(2, 1fr); }
+  .chartsRow { grid-template-columns: 1fr !important; }
+  .pageHeader { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+  .headerActions { flex-wrap: wrap; }
+
+  .table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tableHead,
+  .tableRow {
+    min-width: 580px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid { grid-template-columns: 1fr 1fr; }
+  .title { font-size: 1.5rem; }
+}

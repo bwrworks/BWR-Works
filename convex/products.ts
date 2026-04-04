@@ -173,3 +173,17 @@ export const update = mutation({
     await ctx.db.patch(id, { ...updates, updatedAt: Date.now() });
   },
 });
+
+export const deleteProduct = mutation({
+  args: { id: v.id("products") },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx);
+    // Remove associated pricing
+    const pricing = await ctx.db
+      .query("productPricing")
+      .withIndex("by_productId", (q) => q.eq("productId", id))
+      .collect();
+    for (const p of pricing) await ctx.db.delete(p._id);
+    await ctx.db.delete(id);
+  },
+});

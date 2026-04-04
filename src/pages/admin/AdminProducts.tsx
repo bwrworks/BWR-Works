@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useAction } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
+import { useToast } from '../../context/ToastContext'
 import styles from './AdminDashboard.module.css'
 
 // ─────────────────────────────────────────────────
@@ -93,18 +94,33 @@ function ImageUploader({ images, setImages }: { images: string[]; setImages: Rea
 // ─────────────────────────────────────────────────
 function ProductCard({ product, onEdit }: { product: any; onEdit: (p: any) => void }) {
   const toggleActive = useMutation(api.products.update)
+  const deleteProduct = useMutation(api.products.deleteProduct)
+  const { success, error: toastError } = useToast()
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Delete "${product.name}"? This cannot be undone.`)) return
+    setDeleting(true)
+    try {
+      await deleteProduct({ id: product._id })
+      success(`"${product.name}" deleted.`)
+    } catch (err) {
+      toastError(err instanceof Error ? err.message : 'Delete failed')
+    } finally { setDeleting(false) }
+  }
+
   return (
-    <div style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', display: 'flex', gap: 'var(--space-lg)', alignItems: 'flex-start' }}>
+    <div style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', display: 'flex', gap: 'var(--space-lg)', alignItems: 'flex-start', flexWrap: 'wrap' as const }}>
       <div style={{ width: 80, height: 80, background: '#F3F4F6', borderRadius: 6, flexShrink: 0, overflow: 'hidden' }}>
         {product.images?.[0]
           ? <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>📦</div>
         }
       </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+      <div style={{ flex: 1, minWidth: 200 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' as const }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)' }}>{product.name}</span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', background: product.isActive ? '#10B981' : 'var(--muted)', color: 'white', padding: '2px 8px', borderRadius: 2 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.1em', background: product.isActive ? '#10B981' : '#9CA3AF', color: 'white', padding: '2px 8px', borderRadius: 2 }}>
             {product.isActive ? 'ACTIVE' : 'DRAFT'}
           </span>
         </div>
@@ -116,6 +132,12 @@ function ProductCard({ product, onEdit }: { product: any; onEdit: (p: any) => vo
         <button className={styles.btnPrimary} style={{ padding: '8px 16px', fontSize: '0.62rem' }} onClick={() => onEdit(product)}>Edit</button>
         <button className={styles.btnOutline} style={{ padding: '8px 16px', fontSize: '0.62rem' }} onClick={() => toggleActive({ id: product._id, isActive: !product.isActive })}>
           {product.isActive ? 'Deactivate' : 'Activate'}
+        </button>
+        <button
+          onClick={handleDelete}
+          disabled={deleting}
+          style={{ padding: '8px 16px', fontSize: '0.62rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', borderRadius: 'var(--radius-sm)', cursor: 'pointer', transition: 'all 0.15s' }}>
+          {deleting ? '...' : 'Delete'}
         </button>
       </div>
     </div>

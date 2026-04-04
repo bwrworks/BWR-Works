@@ -159,3 +159,19 @@ export const toggleCoupon = mutation({
     await ctx.db.patch(id, { isActive });
   },
 });
+
+export const deleteCoupon = mutation({
+  args: { id: v.id("coupons") },
+  handler: async (ctx, { id }) => {
+    await requireAdmin(ctx);
+    // Remove usage records too
+    const uses = await ctx.db
+      .query("couponUses")
+      .withIndex("by_couponId_userId", (q) => q.eq("couponId", id))
+      .collect();
+    for (const use of uses) {
+      await ctx.db.delete(use._id);
+    }
+    await ctx.db.delete(id);
+  },
+});

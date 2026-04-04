@@ -2,6 +2,33 @@
   margin-top: 8px;
 }
 
+/* ── TRUST BADGES ── */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.5);
+  background: rgba(245, 240, 232, 0.06);
+  border: 1px solid rgba(245, 240, 232, 0.1);
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+.light .badges .badge {
+  color: #7a7068;
+  background: rgba(17, 17, 17, 0.04);
+  border-color: rgba(17, 17, 17, 0.1);
+}
+
+
 .sectionTitle {
   font-family: var(--font-display);
   font-weight: 700;
@@ -256,6 +283,21 @@
   background: var(--orange-hover);
   transform: scale(1.02);
 }
+
+.addToCartAdded {
+  background: #10B981 !important;
+  transform: none !important;
+}
+
+.addToCartAdded:hover {
+  background: #059669 !important;
+}
+
+.qtyBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 
 .guarantee {
   margin-top: 16px;
