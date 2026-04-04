@@ -1,4 +1,4 @@
-"use node"; // needed for crypto in httpAction context
+// inquiries.ts
 import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAdmin } from "./admin";

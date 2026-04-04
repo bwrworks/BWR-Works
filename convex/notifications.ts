@@ -1,4 +1,4 @@
-"use node";
+// notifications.ts
 
 import { action } from "./_generated/server";
 import { v } from "convex/values";

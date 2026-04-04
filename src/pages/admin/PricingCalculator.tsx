@@ -377,10 +377,10 @@ export default function PricingCalculator() {
                     </td>
                     <td>
                       <input
-                        type="number"
+                        type={slab.maxQty === 99999 ? "text" : "number"}
                         value={slab.maxQty === 99999 ? '∞' : slab.maxQty}
                         readOnly
-                        style={{ background: '#f0f0f0', color: '#888', cursor: 'not-allowed' }}
+                        style={{ background: '#f0f0f0', color: '#888', cursor: 'not-allowed', width: '100%' }}
                       />
                     </td>
                     <td>
