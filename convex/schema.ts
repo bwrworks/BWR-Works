@@ -281,10 +281,12 @@ export default defineSchema({
     subject: v.union(v.literal("support"), v.literal("bulk_order"), v.literal("general")),
     message: v.string(),
     status: v.union(v.literal("new"), v.literal("replied"), v.literal("closed")),
+    threadId: v.optional(v.string()),    // "BWR-Q-xxxxxxxx" used in email subjects
     adminReply: v.optional(v.string()),
     repliedAt: v.optional(v.number()),
     createdAt: v.number(),
-  }).index("by_status", ["status"]),
+  }).index("by_status", ["status"])
+    .index("by_threadId", ["threadId"]),
 
   // ─────────────────────────────────────────────────
   // COUPONS
@@ -336,4 +338,15 @@ export default defineSchema({
     details: v.any(), // before/after values
     createdAt: v.number(),
   }).index("by_adminUserId", ["adminUserId"]),
+
+  // ─────────────────────────────────────────────────
+  // MESSAGES — Full two-way email thread per inquiry
+  // ─────────────────────────────────────────────────
+  messages: defineTable({
+    inquiryId: v.id("inquiries"),
+    sender: v.union(v.literal("user"), v.literal("admin")),
+    content: v.string(),
+    timestamp: v.number(),
+    resendEmailId: v.optional(v.string()), // dedup incoming webhooks
+  }).index("by_inquiryId", ["inquiryId"]),
 });

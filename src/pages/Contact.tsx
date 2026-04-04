@@ -57,22 +57,25 @@ export default function Contact() {
     setIsSubmitting(true)
     
     try {
-      // 1. Save to database
-      await submitInquiry({
+      // 1. Save to database — returns { inquiryId, threadId }
+      const result = await submitInquiry({
         name: formData.name,
         email: formData.email,
         phone: formData.phone || undefined,
         subject: formData.subject as any,
         message: formData.message
       })
-      // 2. Send email notifications (non-blocking — don't fail form if email fails)
-      sendEmail({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || undefined,
-        subject: formData.subject,
-        message: formData.message,
-      }).catch(err => console.warn('Email send failed:', err))
+      // 2. Send email with thread ID (non-blocking)
+      if (result?.threadId) {
+        sendEmail({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || undefined,
+          subject: formData.subject,
+          message: formData.message,
+          threadId: result.threadId,
+        }).catch(err => console.warn('Email send failed:', err))
+      }
 
       setIsSuccess(true)
       toastSuccess('Message sent! We\'ll reply within 24 hours.')

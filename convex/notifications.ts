@@ -9,13 +9,18 @@ import { Resend } from "resend";
 // ═══════════════════════════════════════════════════
 
 function getResend() {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) throw new Error("RESEND_API_KEY not set in Convex env vars.");
+  const apiKey = process.env.AUTH_RESEND_KEY;
+  if (!apiKey) throw new Error("AUTH_RESEND_KEY not set in Convex env vars.");
   return new Resend(apiKey);
 }
 
-const FROM = process.env.RESEND_FROM_EMAIL || "orders@bwrworks.in";
-const SITE_URL = process.env.SITE_URL || "https://bwr-works-gjkhdumae-bwrworks-projects.vercel.app";
+const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <orders@bwrworks.in>";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
+const SITE_URL = process.env.SITE_URL || "https://bwr-works.vercel.app";
+
+// ─────────────────────────────────────────────────
+// ORDER EMAILS
+// ─────────────────────────────────────────────────
 
 /** Order confirmation email to customer */
 export const sendOrderConfirmationEmail = action({
@@ -34,75 +39,56 @@ export const sendOrderConfirmationEmail = action({
     const resend = getResend();
     const totalRupees = (total / 100).toLocaleString("en-IN");
 
-    const itemsHtml = items
-      .map(i => `<tr>
-        <td style="padding:8px 0; font-family: Arial; font-size:14px; color:#222;">${i.productName}</td>
-        <td style="padding:8px 0; font-family: Arial; font-size:14px; color:#222; text-align:center;">${i.quantity}</td>
-        <td style="padding:8px 0; font-family: Arial; font-size:14px; color:#222; text-align:right;">₹${((i.unitPrice * i.quantity) / 100).toLocaleString("en-IN")}</td>
-      </tr>`)
-      .join("");
+    const itemsHtml = items.map(i =>
+      `<tr>
+        <td style="padding:8px 0;font-family:Arial;font-size:14px;color:#222;">${i.productName}</td>
+        <td style="padding:8px 0;font-family:Arial;font-size:14px;color:#222;text-align:center;">${i.quantity}</td>
+        <td style="padding:8px 0;font-family:Arial;font-size:14px;color:#222;text-align:right;">₹${((i.unitPrice * i.quantity) / 100).toLocaleString("en-IN")}</td>
+      </tr>`
+    ).join("");
 
     await resend.emails.send({
       from: FROM,
       to: customerEmail,
-      subject: `Order Confirmed — ${orderId} | BWR Works`,
-      html: `
-        <!DOCTYPE html>
-        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
-        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
-          <!-- Header -->
-          <div style="background:#111; padding:28px 32px;">
-            <div style="font-size:22px; font-weight:800; color:#fff; letter-spacing:2px;">
-              BW<span style="color:#FF5C1A;">R</span> WORKS
-            </div>
+      subject: `Order Confirmed — ${orderId} [BWR-O-${orderId.slice(0, 8)}]`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
-          <!-- Body -->
           <div style="padding:32px;">
-            <h1 style="font-size:24px; color:#111; margin:0 0 8px;">Order Confirmed ✅</h1>
-            <p style="color:#888; font-size:14px; margin:0 0 24px;">Hi ${customerName}, your order is in our hands.</p>
-
-            <div style="background:#F5F0E8; padding:16px; border-radius:4px; margin-bottom:24px;">
-              <div style="font-size:11px; letter-spacing:2px; color:#888; text-transform:uppercase;">Order ID</div>
-              <div style="font-size:18px; font-weight:700; color:#111;">${orderId}</div>
+            <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Order Confirmed ✅</h1>
+            <p style="color:#888;font-size:14px;margin:0 0 24px;">Hi ${customerName}, your order is in our hands.</p>
+            <div style="background:#F5F0E8;padding:16px;border-radius:4px;margin-bottom:24px;">
+              <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Order ID</div>
+              <div style="font-size:18px;font-weight:700;color:#111;">${orderId}</div>
             </div>
-
-            <table style="width:100%; border-collapse:collapse; margin-bottom:24px;">
+            <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
               <thead>
-                <tr style="border-bottom:1px solid #E8E3DB;">
-                  <th style="text-align:left; padding:8px 0; font-size:11px; letter-spacing:1px; color:#888; text-transform:uppercase;">Item</th>
-                  <th style="text-align:center; padding:8px 0; font-size:11px; letter-spacing:1px; color:#888; text-transform:uppercase;">Qty</th>
-                  <th style="text-align:right; padding:8px 0; font-size:11px; letter-spacing:1px; color:#888; text-transform:uppercase;">Amount</th>
+                <tr style="border-bottom:2px solid #111;">
+                  <th style="padding:8px 0;font-size:11px;letter-spacing:1px;text-align:left;text-transform:uppercase;">Item</th>
+                  <th style="padding:8px 0;font-size:11px;letter-spacing:1px;text-align:center;text-transform:uppercase;">Qty</th>
+                  <th style="padding:8px 0;font-size:11px;letter-spacing:1px;text-align:right;text-transform:uppercase;">Price</th>
                 </tr>
               </thead>
-              <tbody style="border-bottom:1px solid #E8E3DB;">${itemsHtml}</tbody>
+              <tbody>${itemsHtml}</tbody>
               <tfoot>
-                <tr>
-                  <td colspan="2" style="padding:12px 0 0; font-size:14px; font-weight:700; color:#111;">TOTAL PAID</td>
-                  <td style="padding:12px 0 0; font-size:20px; font-weight:700; color:#FF5C1A; text-align:right;">₹${totalRupees}</td>
+                <tr style="border-top:2px solid #111;">
+                  <td colspan="2" style="padding:12px 0;font-size:14px;font-weight:700;color:#111;">TOTAL</td>
+                  <td style="padding:12px 0;font-size:16px;font-weight:800;color:#FF5C1A;text-align:right;">₹${totalRupees}</td>
                 </tr>
               </tfoot>
             </table>
-
-            <p style="color:#888; font-size:13px; line-height:1.7;">
-              Your custom piece will be ready in <strong>5–7 working days</strong>. 
-              We'll send you a WhatsApp update at every stage.
-            </p>
-
-            <a href="${SITE_URL}/dashboard" 
-               style="display:inline-block; margin-top:20px; background:#FF5C1A; color:#fff; text-decoration:none; padding:14px 28px; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+            <a href="${SITE_URL}/order/${orderId}" style="display:inline-block;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
               TRACK YOUR ORDER →
             </a>
           </div>
-          <!-- Footer -->
-          <div style="padding:20px 32px; border-top:1px solid #E8E3DB; text-align:center;">
-            <p style="color:#aaa; font-size:11px; margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
-            <p style="color:#aaa; font-size:11px; margin:4px 0 0;">
-              Questions? WhatsApp us: <a href="https://wa.me/917019427272" style="color:#FF5C1A;">+91 70194 27272</a>
-            </p>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+            <p style="color:#aaa;font-size:11px;margin:4px 0 0;">Questions? WhatsApp: <a href="https://wa.me/917019427272" style="color:#FF5C1A;">+91 70194 27272</a></p>
           </div>
         </div>
-        </body></html>
-      `,
+      </body></html>`,
     });
 
     return { sent: true };
@@ -126,40 +112,40 @@ export const sendStatusUpdateEmail = action({
       shipped: `Your order has been shipped! ${trackingNumber ? `Tracking number: <strong>${trackingNumber}</strong>` : ""}`,
       delivered: "Your order has been delivered! We hope you love it. 🎉",
     };
-
     const message = statusMessages[newStatus] || `Your order status has been updated to: ${newStatus}`;
 
     await resend.emails.send({
       from: FROM,
       to: customerEmail,
       subject: `Order ${orderId} — Status Update | BWR Works`,
-      html: `
-        <!DOCTYPE html>
-        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
-        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
-          <div style="background:#111; padding:28px 32px;">
-            <div style="font-size:22px; font-weight:800; color:#fff; letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
           <div style="padding:32px;">
-            <h1 style="font-size:22px; color:#111; margin:0 0 16px;">Order Update — ${orderId}</h1>
-            <p style="color:#444; font-size:14px; line-height:1.7;">Hi ${customerName}, ${message}</p>
-            <a href="${SITE_URL}/order/${orderId}" 
-               style="display:inline-block; margin-top:20px; background:#FF5C1A; color:#fff; text-decoration:none; padding:14px 28px; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+            <h1 style="font-size:22px;color:#111;margin:0 0 16px;">Order Update — ${orderId}</h1>
+            <p style="color:#444;font-size:14px;line-height:1.7;">Hi ${customerName}, ${message}</p>
+            <a href="${SITE_URL}/order/${orderId}" style="display:inline-block;margin-top:20px;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
               VIEW ORDER STATUS →
             </a>
           </div>
-          <div style="padding:20px 32px; border-top:1px solid #E8E3DB; text-align:center;">
-            <p style="color:#aaa; font-size:11px; margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
           </div>
         </div>
-        </body></html>
-      `,
+      </body></html>`,
     });
+
     return { sent: true };
   },
 });
 
-/** Contact form: notify admin + send auto-reply to customer */
+// ─────────────────────────────────────────────────
+// INQUIRY / CONTACT FORM EMAILS
+// ─────────────────────────────────────────────────
+
+/** Contact form: notify admin + auto-reply to customer with thread ID */
 export const sendContactFormEmail = action({
   args: {
     name: v.string(),
@@ -167,13 +153,13 @@ export const sendContactFormEmail = action({
     phone: v.optional(v.string()),
     subject: v.string(),
     message: v.string(),
+    threadId: v.string(), // "BWR-Q-xxxxxxxx" — embedded in subject for reply tracking
   },
-  handler: async (_ctx, { name, email, phone, subject, message }) => {
+  handler: async (_ctx, { name, email, phone, subject, message, threadId }) => {
     const resend = getResend();
-    const adminEmail = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
 
     const subjectLabels: Record<string, string> = {
-      support: "Support Request",
+      support: "Order Support",
       bulk_order: "Bulk Order Enquiry",
       general: "General Enquiry",
     };
@@ -182,104 +168,105 @@ export const sendContactFormEmail = action({
     // 1. Notify admin
     await resend.emails.send({
       from: FROM,
-      to: adminEmail,
-      subject: `New ${subjectLabel} from ${name} | BWR Works`,
-      html: `
-        <!DOCTYPE html>
-        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
-        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
-          <div style="background:#111; padding:24px 32px;">
-            <div style="font-size:20px; font-weight:800; color:#fff; letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS — New Inquiry</div>
+      to: ADMIN_EMAIL,
+      subject: `New ${subjectLabel} from ${name} [${threadId}]`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:24px 32px;">
+            <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
           <div style="padding:28px 32px;">
-            <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
-              <tr><td style="padding:6px 0; font-size:13px; color:#666; width:100px;">Name</td><td style="padding:6px 0; font-size:13px; color:#111; font-weight:600;">${name}</td></tr>
-              <tr><td style="padding:6px 0; font-size:13px; color:#666;">Email</td><td style="padding:6px 0; font-size:13px; color:#111;">${email}</td></tr>
-              ${phone ? `<tr><td style="padding:6px 0; font-size:13px; color:#666;">Phone</td><td style="padding:6px 0; font-size:13px; color:#111;">${phone}</td></tr>` : ''}
-              <tr><td style="padding:6px 0; font-size:13px; color:#666;">Type</td><td style="padding:6px 0; font-size:13px; color:#FF5C1A; font-weight:600;">${subjectLabel}</td></tr>
+            <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+              <tr><td style="padding:6px 0;font-size:13px;color:#666;width:110px;">Name</td><td style="padding:6px 0;font-size:13px;color:#111;font-weight:600;">${name}</td></tr>
+              <tr><td style="padding:6px 0;font-size:13px;color:#666;">Email</td><td style="padding:6px 0;font-size:13px;color:#111;">${email}</td></tr>
+              ${phone ? `<tr><td style="padding:6px 0;font-size:13px;color:#666;">Phone</td><td style="padding:6px 0;font-size:13px;color:#111;">${phone}</td></tr>` : ""}
+              <tr><td style="padding:6px 0;font-size:13px;color:#666;">Type</td><td style="padding:6px 0;font-size:13px;color:#FF5C1A;font-weight:600;">${subjectLabel}</td></tr>
+              <tr><td style="padding:6px 0;font-size:13px;color:#666;">Ref</td><td style="padding:6px 0;font-size:11px;color:#999;font-family:monospace;">${threadId}</td></tr>
             </table>
-            <div style="background:#F9FAFB; padding:16px; border-left:3px solid #FF5C1A; font-size:14px; color:#333; line-height:1.7;">${message}</div>
-            <a href="${SITE_URL}/admin/content" style="display:inline-block; margin-top:20px; background:#111; color:#fff; text-decoration:none; padding:12px 24px; font-size:12px; letter-spacing:1px; text-transform:uppercase;">
-              View in Admin →
-            </a>
+            <div style="background:#F9FAFB;padding:16px;border-left:3px solid #FF5C1A;font-size:14px;color:#333;line-height:1.7;">${message}</div>
+            <a href="${SITE_URL}/admin/inquiries" style="display:inline-block;margin-top:20px;background:#111;color:#fff;text-decoration:none;padding:12px 24px;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Manage in Admin →</a>
           </div>
         </div>
-        </body></html>
-      `,
+      </body></html>`,
     });
 
-    // 2. Auto-reply to customer
+    // 2. Auto-reply to customer — [BWR-Q-...] tag in subject enables inbound reply tracking
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: `We got your message — BWR Works`,
-      html: `
-        <!DOCTYPE html>
-        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
-        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
-          <div style="background:#111; padding:28px 32px;">
-            <div style="font-size:22px; font-weight:800; color:#fff; letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+      subject: `We received your inquiry — BWR Works [${threadId}]`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
           <div style="padding:32px;">
-            <h1 style="font-size:20px; color:#111; margin:0 0 16px;">Hi ${name}, we received your message!</h1>
-            <p style="color:#444; font-size:14px; line-height:1.7;">
-              Thank you for reaching out. We typically respond within 24 hours on business days.
-            </p>
-            <p style="color:#444; font-size:14px; line-height:1.7;">
-              Your message: <em style="color:#666;">"${message.slice(0, 140)}${message.length > 140 ? '...' : ''}"</em>
-            </p>
-            <p style="color:#444; font-size:14px; line-height:1.7; margin-top:16px;">
+            <h1 style="font-size:20px;color:#111;margin:0 0 16px;">Hi ${name}, we received your message!</h1>
+            <p style="color:#444;font-size:14px;line-height:1.7;">Thank you for reaching out. We typically respond within 24 hours on business days.</p>
+            <p style="color:#444;font-size:14px;line-height:1.7;">Your message: <em style="color:#666;">"${message.slice(0, 140)}${message.length > 140 ? "..." : ""}"</em></p>
+            <p style="color:#444;font-size:14px;line-height:1.7;margin-top:16px;">
               Need urgent help? WhatsApp us at <a href="https://wa.me/917019427272" style="color:#FF5C1A;">+91 70194 27272</a>
             </p>
+            <p style="color:#888;font-size:11px;margin-top:24px;">💬 You can reply to this email directly and we'll see it in our inbox.</p>
           </div>
-          <div style="padding:20px 32px; border-top:1px solid #E8E3DB; text-align:center;">
-            <p style="color:#aaa; font-size:11px; margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Ref: ${threadId}</p>
           </div>
         </div>
-        </body></html>
-      `,
+      </body></html>`,
     });
 
     return { sent: true };
   },
 });
 
-/** Admin replies to an inquiry — sends email from admin to customer */
+/** Admin replies to a customer inquiry — thread ID kept in subject for future reply tracking */
 export const sendAdminReplyEmail = action({
   args: {
     customerEmail: v.string(),
     customerName: v.string(),
-    originalMessage: v.string(),
+    threadId: v.string(),
     replyMessage: v.string(),
+    previousMessages: v.optional(v.array(v.object({
+      sender: v.union(v.literal("user"), v.literal("admin")),
+      content: v.string(),
+      timestamp: v.number(),
+    }))),
   },
-  handler: async (_ctx, { customerEmail, customerName, originalMessage, replyMessage }) => {
+  handler: async (_ctx, { customerEmail, customerName, threadId, replyMessage, previousMessages }) => {
     const resend = getResend();
+
+    const threadHtml = (previousMessages || []).slice(-4).map(m =>
+      `<div style="margin:6px 0;padding:10px 12px;background:${m.sender === "admin" ? "#FFF5F0" : "#F9FAFB"};border-left:3px solid ${m.sender === "admin" ? "#FF5C1A" : "#D1D5DB"};font-size:12px;color:#555;">
+        <strong>${m.sender === "admin" ? "BWR Works" : customerName}</strong>&nbsp;·&nbsp;${new Date(m.timestamp).toLocaleDateString("en-IN")}<br/>
+        ${m.content.slice(0, 300)}${m.content.length > 300 ? "..." : ""}
+      </div>`
+    ).join("");
 
     await resend.emails.send({
       from: FROM,
       to: customerEmail,
-      subject: `Reply from BWR Works`,
-      html: `
-        <!DOCTYPE html>
-        <html><body style="margin:0; padding:0; background:#F5F0E8; font-family:Arial,sans-serif;">
-        <div style="max-width:560px; margin:40px auto; background:#fff; border:1px solid #E8E3DB;">
-          <div style="background:#111; padding:28px 32px;">
-            <div style="font-size:22px; font-weight:800; color:#fff; letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+      subject: `Reply from BWR Works [${threadId}]`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
           <div style="padding:32px;">
-            <h1 style="font-size:20px; color:#111; margin:0 0 16px;">Hi ${customerName},</h1>
-            <div style="font-size:14px; color:#333; line-height:1.7; white-space:pre-wrap;">${replyMessage}</div>
-            <hr style="border:none; border-top:1px solid #E8E3DB; margin:24px 0;" />
-            <p style="font-size:11px; color:#999; font-style:italic;">Your original message: "${originalMessage.slice(0, 200)}${originalMessage.length > 200 ? '...' : ''}"</p>
+            <h1 style="font-size:18px;color:#111;margin:0 0 20px;">Hi ${customerName},</h1>
+            <div style="font-size:14px;color:#333;line-height:1.8;white-space:pre-wrap;">${replyMessage}</div>
+            ${threadHtml ? `
+            <div style="margin-top:24px;border-top:1px solid #E8E3DB;padding-top:16px;">
+              <div style="font-size:10px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">PREVIOUS MESSAGES</div>
+              ${threadHtml}
+            </div>` : ""}
+            <p style="font-size:11px;color:#aaa;margin-top:20px;">💬 Reply to this email to continue the conversation.</p>
           </div>
-          <div style="padding:16px 32px; border-top:1px solid #E8E3DB; background:#F9FAFB;">
-            <p style="color:#888; font-size:11px; margin:0;">
-              BWR — Black &amp; White Rogue Works · <a href="https://wa.me/917019427272" style="color:#FF5C1A;">WhatsApp</a>
-            </p>
+          <div style="padding:16px 32px;border-top:1px solid #E8E3DB;background:#F9FAFB;">
+            <p style="color:#888;font-size:11px;margin:0;">BWR Works · <a href="https://wa.me/917019427272" style="color:#FF5C1A;">WhatsApp</a> · Ref: ${threadId}</p>
           </div>
         </div>
-        </body></html>
-      `,
+      </body></html>`,
     });
 
     return { sent: true };

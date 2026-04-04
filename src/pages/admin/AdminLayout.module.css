@@ -1,6 +1,7 @@
 .shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;   /* the SHELL clips — prevents body scroll in admin */
   background: #F3F4F6;
 }
 
@@ -160,12 +161,13 @@
 }
 .signOut:hover { color: var(--error); }
 
-/* Main content */
+/* Main content — this column scrolls, NOT the body */
 .main {
   flex: 1;
   margin-left: 240px;
   padding: var(--space-2xl);
-  min-height: 100vh;
+  overflow-y: auto;   /* ← only the content scrolls */
+  height: 100vh;
 }
 
 @media (max-width: 768px) {
