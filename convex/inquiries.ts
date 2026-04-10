@@ -2,6 +2,7 @@
 import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAdmin } from "./admin";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Inquiries + Email Thread System
@@ -171,5 +172,76 @@ export const storeInboundMessage = internalMutation({
     }
 
     return { ok: true, inquiryId: inquiry._id };
+  },
+});
+
+// ─────────────────────────────────────────────────
+// CUSTOMER-FACING QUERIES (for user Dashboard)
+// ─────────────────────────────────────────────────
+
+/** Customer: list my own inquiries (matched by email) */
+export const getMyInquiries = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.email) return [];
+
+    const all = await ctx.db.query("inquiries").order("desc").collect();
+    return all.filter(i => i.email.toLowerCase() === user.email!.toLowerCase());
+  },
+});
+
+/** Customer: get messages for one of their own threads */
+export const getMyThread = query({
+  args: { inquiryId: v.id("inquiries") },
+  handler: async (ctx, { inquiryId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.email) return [];
+
+    // Verify ownership
+    const inquiry = await ctx.db.get(inquiryId);
+    if (!inquiry || inquiry.email.toLowerCase() !== user.email!.toLowerCase()) return [];
+
+    return await ctx.db
+      .query("messages")
+      .withIndex("by_inquiryId", q => q.eq("inquiryId", inquiryId))
+      .order("asc")
+      .collect();
+  },
+});
+
+/** Customer: reply to their own inquiry thread from the dashboard */
+export const customerReply = mutation({
+  args: {
+    inquiryId: v.id("inquiries"),
+    message: v.string(),
+  },
+  handler: async (ctx, { inquiryId, message }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Must be logged in.");
+    const user = await ctx.db.get(userId);
+    if (!user?.email) throw new Error("No email on account.");
+
+    // Verify ownership
+    const inquiry = await ctx.db.get(inquiryId);
+    if (!inquiry || inquiry.email.toLowerCase() !== user.email!.toLowerCase()) {
+      throw new Error("Not your inquiry.");
+    }
+
+    await ctx.db.insert("messages", {
+      inquiryId,
+      sender: "user",
+      content: message,
+      timestamp: Date.now(),
+    });
+
+    // Bump status back to 'new' so admin sees it
+    if (inquiry.status === "replied" || inquiry.status === "closed") {
+      await ctx.db.patch(inquiry._id, { status: "new" });
+    }
   },
 });

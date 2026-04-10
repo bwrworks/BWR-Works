@@ -30,6 +30,20 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     try {
+      // ─── AUTH CHECK: Verify webhook secret if configured ───
+      const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
+      if (webhookSecret) {
+        const authHeader = request.headers.get("Authorization") || "";
+        const token = authHeader.replace("Bearer ", "").trim();
+        if (token !== webhookSecret) {
+          console.error("[Inbound] Invalid webhook secret — rejecting.");
+          return new Response(JSON.stringify({ ok: false, reason: "unauthorized" }), {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+      }
+
       const payload = await request.json() as Record<string, any>;
 
       // Resend inbound email payload fields:

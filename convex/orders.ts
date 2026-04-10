@@ -2,6 +2,7 @@ import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { requireAdmin } from "./admin";
+import { api } from "./_generated/api";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Order Queries & Mutations
@@ -97,10 +98,11 @@ export const createOrder = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Must be logged in to place an order.");
 
-    // Generate BWR order ID
+    // Generate BWR order ID with random suffix to prevent race condition duplicates
     const orderCount = await ctx.db.query("orders").collect();
     const orderNumber = String(orderCount.length + 1).padStart(4, "0");
-    const orderId = `BWR-${orderNumber}`;
+    const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+    const orderId = `BWR-${orderNumber}-${suffix}`;
 
     return await ctx.db.insert("orders", {
       orderId,
@@ -209,7 +211,22 @@ export const updateOrderStatus = mutation({
 
     await ctx.db.patch(order._id, updates);
 
-    // TODO: Trigger notification email/WhatsApp here
+    // Trigger status notification email to customer
+    if (status !== "received") {
+      const user = order.userId ? await ctx.db.get(order.userId as any) : null;
+      const customerEmail = (user as any)?.email;
+      const customerName = order.addressSnapshot?.name || "Customer";
+      if (customerEmail) {
+        await ctx.scheduler.runAfter(0, api.notifications.sendStatusUpdateEmail, {
+          customerEmail,
+          customerName,
+          orderId,
+          newStatus: status,
+          trackingNumber,
+        });
+      }
+    }
+
     return order._id;
   },
 });

@@ -3,8 +3,10 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuthActions } from '@convex-dev/auth/react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
 import Navbar from '../components/layout/Navbar'
 import AddressForm from '../components/checkout/AddressForm'
+import { useToast } from '../context/ToastContext'
 import styles from './Dashboard.module.css'
 
 // ─────────────────────────────────────
@@ -108,7 +110,7 @@ export default function Dashboard() {
   const deleteAddress = useMutation(api.addresses.deleteAddress)
   const ensureAdmin = useMutation(api.admin.ensureAdminRole)
 
-  const [activeTab, setActiveTab] = useState<'orders' | 'profile'>('orders')
+  const [activeTab, setActiveTab] = useState<'orders' | 'support' | 'profile'>('orders')
   const [showAddressForm, setShowAddressForm] = useState(false)
 
   useEffect(() => {
@@ -218,13 +220,14 @@ export default function Dashboard() {
 
             {/* ── TABS ── */}
             <div className={styles.tabs}>
-              {(['orders', 'profile'] as const).map(tab => (
+              {(['orders', 'support', 'profile'] as const).map(tab => (
                 <button
                   key={tab}
                   className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
                   onClick={() => setActiveTab(tab)}
                 >
                   {tab === 'orders' && '📦 My Orders'}
+                  {tab === 'support' && '✉️ Support'}
                   {tab === 'profile' && '👤 Profile & Addresses'}
                 </button>
               ))}
@@ -338,6 +341,8 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* ── TAB: SUPPORT ── */}
+        {activeTab === 'support' && <SupportTab />}
 
         {/* ── TAB: PROFILE (includes addresses) ── */}
         {activeTab === 'profile' && (
@@ -421,6 +426,180 @@ export default function Dashboard() {
         )}
 
       </div>
+    </div>
+  )
+}
+
+// ───────────────────────────────────────────
+// SUPPORT TAB — Customer inquiry threads
+// ───────────────────────────────────────────
+function SupportTab() {
+  const inquiries = useQuery(api.inquiries.getMyInquiries)
+  const [selectedId, setSelectedId] = useState<Id<'inquiries'> | null>(null)
+  useToast() // available for future use
+
+  const STATUS_COLORS: Record<string, string> = {
+    new: '#FF5C1A', replied: '#10B981', closed: '#9CA3AF',
+  }
+  const SUBJECT_LABELS: Record<string, string> = {
+    support: 'Order Support', bulk_order: 'Bulk / B2B', general: 'General',
+  }
+
+  if (!inquiries) {
+    return (
+      <div className={styles.tabContent}>
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>Loading...</div>
+      </div>
+    )
+  }
+
+  if (inquiries.length === 0) {
+    return (
+      <div className={styles.tabContent}>
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>✉️</div>
+          <h3 className={styles.emptyTitle}>No support requests</h3>
+          <p className={styles.emptyText}>When you submit a query via the Contact page, your conversation thread will appear here.</p>
+          <Link to="/contact" className={styles.emptyBtn}>Contact Us →</Link>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.tabContent}>
+      <h2 className={styles.sectionTitle}>✉️ My Support Threads</h2>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+        {inquiries.map(inq => (
+          <div key={inq._id}>
+            {/* Inquiry summary card */}
+            <div
+              className={styles.orderCard}
+              style={{ cursor: 'pointer', borderLeft: `3px solid ${STATUS_COLORS[inq.status] || '#9CA3AF'}` }}
+              onClick={() => setSelectedId(selectedId === inq._id ? null : inq._id)}
+            >
+              <div className={styles.orderCardTop}>
+                <div>
+                  <div className={styles.orderIdLabel}>{SUBJECT_LABELS[inq.subject] || inq.subject}</div>
+                  <div className={styles.orderId}>{inq.threadId || `BWR-Q-${inq._id.slice(0, 8)}`}</div>
+                </div>
+                <div className={styles.statusBadge} style={{
+                  background: (STATUS_COLORS[inq.status] || '#9CA3AF') + '20',
+                  color: STATUS_COLORS[inq.status] || '#9CA3AF',
+                  borderColor: (STATUS_COLORS[inq.status] || '#9CA3AF') + '40',
+                }}>
+                  {inq.status === 'new' ? '⏳' : inq.status === 'replied' ? '✅' : '🔒'} {inq.status.toUpperCase()}
+                </div>
+              </div>
+              <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'var(--muted)', marginTop: 8 }}>
+                {inq.message.slice(0, 120)}{inq.message.length > 120 ? '...' : ''}
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', marginTop: 8 }}>
+                {new Date(inq.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </div>
+            </div>
+
+            {/* Thread expansion */}
+            {selectedId === inq._id && (
+              <ThreadView inquiryId={inq._id} status={inq.status} />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ───────────────────────────────────────────
+// THREAD VIEW — Shows messages + reply box
+// ───────────────────────────────────────────
+function ThreadView({ inquiryId, status }: { inquiryId: Id<'inquiries'>; status: string }) {
+  const thread = useQuery(api.inquiries.getMyThread, { inquiryId })
+  const sendReply = useMutation(api.inquiries.customerReply)
+  const { success: toastSuccess, error: toastError } = useToast()
+  const [replyText, setReplyText] = useState('')
+  const [sending, setSending] = useState(false)
+
+  const handleReply = async () => {
+    if (!replyText.trim()) return
+    setSending(true)
+    try {
+      await sendReply({ inquiryId, message: replyText.trim() })
+      toastSuccess('Reply sent!')
+      setReplyText('')
+    } catch (err) {
+      toastError(err instanceof Error ? err.message : 'Failed to send')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <div style={{
+      background: 'rgba(17,17,17,0.03)',
+      border: '1px solid rgba(17,17,17,0.08)',
+      borderTop: 'none',
+      padding: 'var(--space-lg)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--space-md)',
+    }}>
+      {/* Messages */}
+      {(thread || []).map((msg, i) => (
+        <div
+          key={i}
+          style={{
+            padding: '12px 16px',
+            background: msg.sender === 'admin' ? 'rgba(255,92,26,0.06)' : '#fff',
+            borderLeft: `3px solid ${msg.sender === 'admin' ? '#FF5C1A' : '#D1D5DB'}`,
+            fontSize: '0.85rem',
+            lineHeight: 1.7,
+            color: 'var(--ink)',
+          }}
+        >
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', marginBottom: 4 }}>
+            <strong>{msg.sender === 'admin' ? 'BWR Works' : 'You'}</strong>
+            &nbsp;·&nbsp;{new Date(msg.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+          </div>
+          <div style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</div>
+        </div>
+      ))}
+
+      {/* Reply box (only if not closed) */}
+      {status !== 'closed' && (
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <textarea
+            value={replyText}
+            onChange={e => setReplyText(e.target.value)}
+            placeholder="Type your reply..."
+            rows={2}
+            style={{
+              flex: 1, resize: 'vertical', fontFamily: 'var(--font-body)', fontSize: '0.85rem',
+              padding: '10px 12px', border: '1px solid rgba(17,17,17,0.15)', background: '#fff',
+              borderRadius: 'var(--radius-sm)', outline: 'none',
+            }}
+          />
+          <button
+            onClick={handleReply}
+            disabled={sending || !replyText.trim()}
+            style={{
+              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.75rem',
+              letterSpacing: '0.08em', textTransform: 'uppercase' as const,
+              background: 'var(--orange)', color: '#fff', border: 'none',
+              padding: '10px 18px', cursor: 'pointer', opacity: sending ? 0.6 : 1,
+              alignSelf: 'flex-end', whiteSpace: 'nowrap' as const,
+            }}
+          >
+            {sending ? 'Sending...' : 'Reply →'}
+          </button>
+        </div>
+      )}
+      {status === 'closed' && (
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--muted)', textAlign: 'center', padding: 12 }}>
+          This thread is closed. <Link to="/contact" style={{ color: 'var(--orange)' }}>Open a new inquiry →</Link>
+        </div>
+      )}
     </div>
   )
 }

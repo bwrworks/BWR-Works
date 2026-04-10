@@ -18,6 +18,16 @@ const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <orders@bwrworks.in>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
 const SITE_URL = process.env.SITE_URL || "https://bwr-works.vercel.app";
 
+/** Escape HTML special chars to prevent injection in email templates */
+function esc(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // ─────────────────────────────────────────────────
 // ORDER EMAILS
 // ─────────────────────────────────────────────────
@@ -41,7 +51,7 @@ export const sendOrderConfirmationEmail = action({
 
     const itemsHtml = items.map(i =>
       `<tr>
-        <td style="padding:8px 0;font-family:Arial;font-size:14px;color:#222;">${i.productName}</td>
+        <td style="padding:8px 0;font-family:Arial;font-size:14px;color:#222;">${esc(i.productName)}</td>
         <td style="padding:8px 0;font-family:Arial;font-size:14px;color:#222;text-align:center;">${i.quantity}</td>
         <td style="padding:8px 0;font-family:Arial;font-size:14px;color:#222;text-align:right;">₹${((i.unitPrice * i.quantity) / 100).toLocaleString("en-IN")}</td>
       </tr>`
@@ -58,7 +68,7 @@ export const sendOrderConfirmationEmail = action({
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Order Confirmed ✅</h1>
-            <p style="color:#888;font-size:14px;margin:0 0 24px;">Hi ${customerName}, your order is in our hands.</p>
+            <p style="color:#888;font-size:14px;margin:0 0 24px;">Hi ${esc(customerName)}, your order is in our hands.</p>
             <div style="background:#F5F0E8;padding:16px;border-radius:4px;margin-bottom:24px;">
               <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Order ID</div>
               <div style="font-size:18px;font-weight:700;color:#111;">${orderId}</div>
@@ -109,7 +119,7 @@ export const sendStatusUpdateEmail = action({
 
     const statusMessages: Record<string, string> = {
       printing: "Great news! Your order is now being printed. Our team is crafting your custom piece right now.",
-      shipped: `Your order has been shipped! ${trackingNumber ? `Tracking number: <strong>${trackingNumber}</strong>` : ""}`,
+      shipped: `Your order has been shipped! ${trackingNumber ? `Tracking number: <strong>${esc(trackingNumber)}</strong>` : ""}`,
       delivered: "Your order has been delivered! We hope you love it. 🎉",
     };
     const message = statusMessages[newStatus] || `Your order status has been updated to: ${newStatus}`;
@@ -125,7 +135,7 @@ export const sendStatusUpdateEmail = action({
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:22px;color:#111;margin:0 0 16px;">Order Update — ${orderId}</h1>
-            <p style="color:#444;font-size:14px;line-height:1.7;">Hi ${customerName}, ${message}</p>
+            <p style="color:#444;font-size:14px;line-height:1.7;">Hi ${esc(customerName)}, ${message}</p>
             <a href="${SITE_URL}/order/${orderId}" style="display:inline-block;margin-top:20px;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
               VIEW ORDER STATUS →
             </a>
@@ -177,13 +187,13 @@ export const sendContactFormEmail = action({
           </div>
           <div style="padding:28px 32px;">
             <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-              <tr><td style="padding:6px 0;font-size:13px;color:#666;width:110px;">Name</td><td style="padding:6px 0;font-size:13px;color:#111;font-weight:600;">${name}</td></tr>
-              <tr><td style="padding:6px 0;font-size:13px;color:#666;">Email</td><td style="padding:6px 0;font-size:13px;color:#111;">${email}</td></tr>
-              ${phone ? `<tr><td style="padding:6px 0;font-size:13px;color:#666;">Phone</td><td style="padding:6px 0;font-size:13px;color:#111;">${phone}</td></tr>` : ""}
-              <tr><td style="padding:6px 0;font-size:13px;color:#666;">Type</td><td style="padding:6px 0;font-size:13px;color:#FF5C1A;font-weight:600;">${subjectLabel}</td></tr>
+              <tr><td style="padding:6px 0;font-size:13px;color:#666;width:110px;">Name</td><td style="padding:6px 0;font-size:13px;color:#111;font-weight:600;">${esc(name)}</td></tr>
+              <tr><td style="padding:6px 0;font-size:13px;color:#666;">Email</td><td style="padding:6px 0;font-size:13px;color:#111;">${esc(email)}</td></tr>
+              ${phone ? `<tr><td style="padding:6px 0;font-size:13px;color:#666;">Phone</td><td style="padding:6px 0;font-size:13px;color:#111;">${esc(phone)}</td></tr>` : ""}
+              <tr><td style="padding:6px 0;font-size:13px;color:#666;">Type</td><td style="padding:6px 0;font-size:13px;color:#FF5C1A;font-weight:600;">${esc(subjectLabel)}</td></tr>
               <tr><td style="padding:6px 0;font-size:13px;color:#666;">Ref</td><td style="padding:6px 0;font-size:11px;color:#999;font-family:monospace;">${threadId}</td></tr>
             </table>
-            <div style="background:#F9FAFB;padding:16px;border-left:3px solid #FF5C1A;font-size:14px;color:#333;line-height:1.7;">${message}</div>
+            <div style="background:#F9FAFB;padding:16px;border-left:3px solid #FF5C1A;font-size:14px;color:#333;line-height:1.7;">${esc(message)}</div>
             <a href="${SITE_URL}/admin/inquiries" style="display:inline-block;margin-top:20px;background:#111;color:#fff;text-decoration:none;padding:12px 24px;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Manage in Admin →</a>
           </div>
         </div>
@@ -201,9 +211,9 @@ export const sendContactFormEmail = action({
             <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
           <div style="padding:32px;">
-            <h1 style="font-size:20px;color:#111;margin:0 0 16px;">Hi ${name}, we received your message!</h1>
+            <h1 style="font-size:20px;color:#111;margin:0 0 16px;">Hi ${esc(name)}, we received your message!</h1>
             <p style="color:#444;font-size:14px;line-height:1.7;">Thank you for reaching out. We typically respond within 24 hours on business days.</p>
-            <p style="color:#444;font-size:14px;line-height:1.7;">Your message: <em style="color:#666;">"${message.slice(0, 140)}${message.length > 140 ? "..." : ""}"</em></p>
+            <p style="color:#444;font-size:14px;line-height:1.7;">Your message: <em style="color:#666;">"${esc(message.slice(0, 140))}${message.length > 140 ? "..." : ""}"</em></p>
             <p style="color:#444;font-size:14px;line-height:1.7;margin-top:16px;">
               Need urgent help? WhatsApp us at <a href="https://wa.me/917019427272" style="color:#FF5C1A;">+91 70194 27272</a>
             </p>
@@ -238,8 +248,8 @@ export const sendAdminReplyEmail = action({
 
     const threadHtml = (previousMessages || []).slice(-4).map(m =>
       `<div style="margin:6px 0;padding:10px 12px;background:${m.sender === "admin" ? "#FFF5F0" : "#F9FAFB"};border-left:3px solid ${m.sender === "admin" ? "#FF5C1A" : "#D1D5DB"};font-size:12px;color:#555;">
-        <strong>${m.sender === "admin" ? "BWR Works" : customerName}</strong>&nbsp;·&nbsp;${new Date(m.timestamp).toLocaleDateString("en-IN")}<br/>
-        ${m.content.slice(0, 300)}${m.content.length > 300 ? "..." : ""}
+        <strong>${m.sender === "admin" ? "BWR Works" : esc(customerName)}</strong>&nbsp;·&nbsp;${new Date(m.timestamp).toLocaleDateString("en-IN")}<br/>
+        ${esc(m.content.slice(0, 300))}${m.content.length > 300 ? "..." : ""}
       </div>`
     ).join("");
 
@@ -253,8 +263,8 @@ export const sendAdminReplyEmail = action({
             <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
           <div style="padding:32px;">
-            <h1 style="font-size:18px;color:#111;margin:0 0 20px;">Hi ${customerName},</h1>
-            <div style="font-size:14px;color:#333;line-height:1.8;white-space:pre-wrap;">${replyMessage}</div>
+            <h1 style="font-size:18px;color:#111;margin:0 0 20px;">Hi ${esc(customerName)},</h1>
+            <div style="font-size:14px;color:#333;line-height:1.8;white-space:pre-wrap;">${esc(replyMessage)}</div>
             ${threadHtml ? `
             <div style="margin-top:24px;border-top:1px solid #E8E3DB;padding-top:16px;">
               <div style="font-size:10px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">PREVIOUS MESSAGES</div>
