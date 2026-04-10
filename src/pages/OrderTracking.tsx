@@ -72,7 +72,23 @@ export default function OrderTracking() {
           <Link to="/dashboard" className={styles.backLink}>← Back to Dashboard</Link>
           <div className={styles.eyebrow}>ORDER TRACKING</div>
           <h1 className={styles.title}>{order.orderId}</h1>
-          <StatusBadge status={order.status as OrderStatus} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <StatusBadge status={order.status as OrderStatus} />
+            <Link 
+              to={`/invoice/${order.orderId}`} 
+              target="_blank"
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#111',
+                textDecoration: 'underline',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}
+            >
+              Print Invoice 🖨️
+            </Link>
+          </div>
         </div>
 
         <div className={styles.layout}>

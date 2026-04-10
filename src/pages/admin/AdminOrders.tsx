@@ -173,9 +173,14 @@ export default function AdminOrders() {
                     />
                   </div>
 
-                  <Link to={`/admin/orders/${order.orderId}`} className={styles.viewFull}>
-                    View Full Order Details →
-                  </Link>
+                  <div style={{ display: 'flex', gap: '16px', marginTop: '16px', alignItems: 'center' }}>
+                    <Link to={`/admin/orders/${order.orderId}`} className={styles.viewFull}>
+                      View Full Order Details →
+                    </Link>
+                    <Link to={`/invoice/${order.orderId}`} target="_blank" className={styles.statusBtn} style={{ background: '#333', color: '#fff', textDecoration: 'none', padding: '6px 12px' }}>
+                      🖨️ Print Invoice
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>

@@ -320,7 +320,8 @@ export default function Dashboard() {
                           {order.status}
                         </span>
                       </span>
-                      <span>
+                      <span style={{ display: 'flex', gap: '12px' }}>
+                        <Link to={`/invoice/${order.orderId}`} target="_blank" className={styles.historyLink} title="Print Invoice">🖨️</Link>
                         <Link to={`/order/${order.orderId}`} className={styles.historyLink}>View →</Link>
                       </span>
                     </div>

@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import Checkout from './pages/Checkout'
 import OrderConfirm from './pages/OrderConfirm'
 import OrderTracking from './pages/OrderTracking'
+import Invoice from './pages/Invoice'
 import CartDrawer from './components/cart/CartDrawer'
 import CustomCursor from './components/ui/CustomCursor'
 import { AuthGuard } from './components/auth/AuthGuard'
@@ -46,6 +47,7 @@ function AnimatedRoutes() {
         <Route path="/checkout" element={<AuthGuard><Checkout /></AuthGuard>} />
         <Route path="/order-confirm" element={<AuthGuard><OrderConfirm /></AuthGuard>} />
         <Route path="/order/:orderId" element={<AuthGuard><OrderTracking /></AuthGuard>} />
+        <Route path="/invoice/:orderId" element={<AuthGuard><Invoice /></AuthGuard>} />
 
         {/* ── ADMIN ROUTES (nested under AdminLayout) ── */}
         <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>

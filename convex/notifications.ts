@@ -57,7 +57,7 @@ export const sendOrderConfirmationEmail = action({
       </tr>`
     ).join("");
 
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM,
       to: customerEmail,
       subject: `Order Confirmed — ${orderId} [BWR-O-${orderId.slice(0, 8)}]`,
@@ -89,8 +89,12 @@ export const sendOrderConfirmationEmail = action({
                 </tr>
               </tfoot>
             </table>
-            <a href="${SITE_URL}/order/${orderId}" style="display:inline-block;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+            <a href="${SITE_URL}/order/${orderId}" style="display:inline-block;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-right:12px;">
               TRACK YOUR ORDER →
+            </a>
+            <br />
+            <a href="${SITE_URL}/invoice/${orderId}" style="display:inline-block;margin-top:16px;color:#111;text-decoration:underline;font-size:13px;font-weight:600;">
+              Download your Invoice 🖨️
             </a>
           </div>
           <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
@@ -101,7 +105,9 @@ export const sendOrderConfirmationEmail = action({
       </body></html>`,
     });
 
-    return { sent: true };
+    if (error) console.error("[Resend Error] sendOrderConfirmationEmail failed:", error);
+
+    return { sent: !error };
   },
 });
 
@@ -124,7 +130,7 @@ export const sendStatusUpdateEmail = action({
     };
     const message = statusMessages[newStatus] || `Your order status has been updated to: ${newStatus}`;
 
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM,
       to: customerEmail,
       subject: `Order ${orderId} — Status Update | BWR Works`,
@@ -147,7 +153,9 @@ export const sendStatusUpdateEmail = action({
       </body></html>`,
     });
 
-    return { sent: true };
+    if (error) console.error("[Resend Error] sendStatusUpdateEmail failed:", error);
+
+    return { sent: !error };
   },
 });
 
@@ -176,7 +184,7 @@ export const sendContactFormEmail = action({
     const subjectLabel = subjectLabels[subject] || subject;
 
     // 1. Notify admin
-    await resend.emails.send({
+    const { error: adminError } = await resend.emails.send({
       from: FROM,
       to: ADMIN_EMAIL,
       subject: `New ${subjectLabel} from ${name} [${threadId}]`,
@@ -201,7 +209,7 @@ export const sendContactFormEmail = action({
     });
 
     // 2. Auto-reply to customer — [BWR-Q-...] tag in subject enables inbound reply tracking
-    await resend.emails.send({
+    const { error: customerError } = await resend.emails.send({
       from: FROM,
       to: email,
       subject: `We received your inquiry — BWR Works [${threadId}]`,
@@ -226,7 +234,10 @@ export const sendContactFormEmail = action({
       </body></html>`,
     });
 
-    return { sent: true };
+    if (adminError) console.error("[Resend Error] notify admin failed:", adminError);
+    if (customerError) console.error("[Resend Error] auto-reply to customer failed:", customerError);
+
+    return { sent: !adminError && !customerError };
   },
 });
 
@@ -253,7 +264,7 @@ export const sendAdminReplyEmail = action({
       </div>`
     ).join("");
 
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM,
       to: customerEmail,
       subject: `Reply from BWR Works [${threadId}]`,
@@ -279,6 +290,8 @@ export const sendAdminReplyEmail = action({
       </body></html>`,
     });
 
-    return { sent: true };
+    if (error) console.error("[Resend Error] sendAdminReplyEmail failed:", error);
+
+    return { sent: !error };
   },
 });

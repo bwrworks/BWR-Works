@@ -33,13 +33,17 @@ export const getOrderById = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
+    const user = await ctx.db.get(userId);
+
     const order = await ctx.db
       .query("orders")
       .withIndex("by_orderId", (q) => q.eq("orderId", orderId))
       .first();
 
-    // Customers can only see their own orders
-    if (!order || order.userId !== userId) return null;
+    // Customers can only see their own orders, Admins can see all
+    if (!order) return null;
+    if (order.userId !== userId && user?.role !== "admin") return null;
+    
     return order;
   },
 });

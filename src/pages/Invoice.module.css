@@ -1,0 +1,236 @@
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.invoiceWrapper {
+  min-height: 100vh;
+  padding: var(--space-md);
+  font-family: Arial, sans-serif;
+  color: #111;
+}
+
+/* Action Bar */
+.actionBar {
+  max-width: 800px;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btnSecondary {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: var(--font-body);
+}
+
+.btnPrint {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: var(--font-display);
+}
+
+/* Invoice Layout (A4 styled box) */
+.invoicePage {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 40px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #222;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.companyName {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+  letter-spacing: 1px;
+}
+
+.companyDetail {
+  margin: 2px 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.invoiceTitle {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0 0 16px 0;
+  text-align: right;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  font-size: 13px;
+}
+
+.infoLabel {
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Addresses */
+.addresses {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.addressBlock {
+  flex: 1;
+}
+
+.addressTitle {
+  font-size: 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.addressContent {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* Items Table */
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.itemsTable th {
+  background: #f5f5f5;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.itemsTable td {
+  padding: 12px 10px;
+  font-size: 13px;
+  border: 1px solid #ddd;
+  vertical-align: top;
+}
+
+.itemMeta {
+  font-size: 11px;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* Totals Section */
+.totalsSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.qrCodeBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.qrText {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.totalsTable {
+  min-width: 280px;
+}
+
+.totalsRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+.grandTotal {
+  font-weight: 800;
+  font-size: 16px;
+  border-bottom: none;
+  border-top: 2px solid #222;
+  padding-top: 12px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 11px;
+  color: #888;
+  border-top: 1px solid #ddd;
+  padding-top: 16px;
+}
+
+/* ──────────────────────────────────
+   PRINT STYLES
+   ────────────────────────────────── */
+@media print {
+  @page {
+    margin: 0.5cm;
+    size: A4 portrait;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .invoicePage, .invoicePage * {
+    visibility: visible;
+  }
+
+  .invoicePage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    border: none;
+    box-shadow: none;
+  }
+
+  .actionBar {
+    display: none !important;
+  }
+}
