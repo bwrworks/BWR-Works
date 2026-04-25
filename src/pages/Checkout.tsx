@@ -9,10 +9,12 @@ import AddressForm from '../components/checkout/AddressForm'
 import OrderSummary, { calculateTotals } from '../components/checkout/OrderSummary'
 import PaymentButton from '../components/checkout/PaymentButton'
 import styles from './Checkout.module.css'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 
 type Step = 'address' | 'review' | 'payment'
 
 export default function Checkout() {
+  useScrollReveal()
   const navigate = useNavigate()
   const { items, clearCart } = useCart()
   const user = useQuery(api.users.current)
@@ -101,11 +103,11 @@ export default function Checkout() {
     <div className={styles.page}>
       <Navbar />
 
-      <div className={styles.container}>
+      <div className={`${styles.container} page-enter`}>
         {/* ── PAGE HEADER ── */}
         <div className={styles.header}>
-          <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>SECURE CHECKOUT</div>
-          <h1 className={styles.title}>Complete Your Order</h1>
+          <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>SECURE CHECKOUT</div>
+          <h1 className={`${styles.title} reveal reveal-delay-1`}>Complete Your Order</h1>
         </div>
 
         <div className={styles.layout}>

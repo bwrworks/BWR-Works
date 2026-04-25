@@ -4,10 +4,12 @@ import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import Ticker from '../components/home/Ticker'
 import ProductGrid from '../components/product/ProductGrid'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 import styles from './Products.module.css'
 
 export default function Products() {
   const products = useQuery(api.products.listActive)
+  useScrollReveal()
 
   return (
     <>
@@ -27,14 +29,14 @@ export default function Products() {
       {/* ── DARK HEADER (Top 50%) ── */}
       <div className={styles.darkSection}>
         <div className={styles.headerInner}>
-          <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>
+          <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
             Our Collection
           </div>
-          <h1 className={styles.title}>
+          <h1 className={`${styles.title} reveal reveal-delay-1`}>
             EVERY PIECE<br />
             <span className={styles.outlineDark}>TELLS A STORY.</span>
           </h1>
-          <p className={styles.subtitleDark}>
+          <p className={`${styles.subtitleDark} reveal reveal-delay-2`}>
             Premium 3D-designed objects crafted with Bambu Lab P1S precision.
             Each piece made to order — never mass-produced.
           </p>
@@ -43,7 +45,7 @@ export default function Products() {
 
       {/* ── OFF-WHITE PRODUCTS GRID (Bottom 50%) ── */}
       <div className={styles.lightSection}>
-        <div className={styles.gridContainer}>
+        <div className={`${styles.gridContainer} reveal`}>
           <ProductGrid products={products} />
         </div>
       </div>

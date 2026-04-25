@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 
 /**
- * Hook that observes elements with the 'reveal' class
+ * Hook that observes elements with reveal classes
  * and adds 'visible' when they enter the viewport.
- * This powers all scroll-triggered animations site-wide.
+ * Supports: .reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur
  */
 export function useScrollReveal() {
   useEffect(() => {
@@ -16,10 +16,12 @@ export function useScrollReveal() {
           }
         })
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
     )
 
-    const elements = document.querySelectorAll('.reveal')
+    // Observe all reveal variant classes
+    const selectors = '.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur'
+    const elements = document.querySelectorAll(selectors)
     elements.forEach((el) => observer.observe(el))
 
     return () => observer.disconnect()

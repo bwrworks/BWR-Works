@@ -37,7 +37,7 @@ export default function ProductCard({
   const hasImage = images.length > 0
 
   return (
-    <Link to={`/products/${slug}`} className={styles.card}>
+    <Link to={`/products/${slug}`} className={`${styles.card} hover-lift hover-zoom`}>
       {/* Dark visual section */}
       <div className={styles.cardVisual}>
         {hasImage ? (

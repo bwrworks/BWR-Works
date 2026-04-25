@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthActions } from '@convex-dev/auth/react'
+import { useConvexAuth } from 'convex/react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import styles from './Auth.module.css'
 
 export default function Auth() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { signIn } = useAuthActions()
+  const { isAuthenticated, isLoading } = useConvexAuth()
   
   const [step, setStep] = useState<'email' | 'otp'>('email')
   const [email, setEmail] = useState('')
@@ -15,12 +18,21 @@ export default function Auth() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  // Check if we are already logged in to redirect
-  // We don't have a specific user query yet, but signIn handles the session.
+  // Determine where to redirect after login
+  const redirectTo = (location.state as any)?.from?.pathname || '/dashboard'
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  // ⚡ KEY FIX: If the user is already authenticated (e.g. after Google OAuth
+  // callback or switching users), redirect immediately to dashboard.
+  // This also fixes the "Login button stays after signing in" bug.
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      navigate(redirectTo, { replace: true })
+    }
+  }, [isAuthenticated, isLoading, navigate, redirectTo])
 
   const handleRequestOTP = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -4,6 +4,7 @@ import { api } from '../../convex/_generated/api'
 import { useToast } from '../context/ToastContext'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 import styles from './Contact.module.css'
 
 const FAQS = [
@@ -26,6 +27,7 @@ const FAQS = [
 ]
 
 export default function Contact() {
+  useScrollReveal()
   const submitInquiry = useMutation(api.inquiries.submitInquiry)
   const sendEmail = useAction(api.notifications.sendContactFormEmail)
   const { error: toastError, success: toastSuccess } = useToast()
@@ -96,8 +98,8 @@ export default function Contact() {
         {/* ── LEFT: FORM (DARK) ── */}
         <div className={styles.leftHalf}>
           <div className={styles.leftContent}>
-            <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>Start a Conversation</div>
-            <h1 className={styles.title}>
+            <div className="section-eyebrow reveal-left" style={{ color: 'var(--orange)' }}>Start a Conversation</div>
+            <h1 className={`${styles.title} reveal-left reveal-delay-1`}>
               GOT SOMETHING<br />
               <span className={styles.outline}>IN MIND?</span>
             </h1>
@@ -185,8 +187,8 @@ export default function Contact() {
         {/* ── RIGHT: FAQS (LIGHT) ── */}
         <div className={styles.rightHalf}>
           <div className={styles.rightContent}>
-            <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>Need to know</div>
-            <h2 className={styles.faqTitle}>
+            <div className="section-eyebrow reveal-right" style={{ color: 'var(--orange)' }}>Need to know</div>
+            <h2 className={`${styles.faqTitle} reveal-right reveal-delay-1`}>
               FREQUENTLY ASKED
             </h2>
 

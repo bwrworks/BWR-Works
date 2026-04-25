@@ -97,11 +97,25 @@
   100% { background-position: 200% 0; }
 }
 
-/* ── SCROLL REVEAL CLASSES ── */
+/* Gentle glow pulse — CTAs, badges */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 92, 26, 0); }
+  50% { box-shadow: 0 0 20px 4px rgba(255, 92, 26, 0.15); }
+}
+
+/* ══════════════════════════════════════════════════
+   SCROLL REVEAL SYSTEM
+   Add "reveal" class to any element to animate on scroll.
+   Variants: reveal-left, reveal-right, reveal-scale, reveal-blur
+   ══════════════════════════════════════════════════ */
+
+/* Default: fade up */
 .reveal {
   opacity: 0;
-  transform: translateY(32px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
 .reveal.visible {
@@ -109,7 +123,120 @@
   transform: translateY(0);
 }
 
+/* Slide from left */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide from right */
+.reveal-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Scale up from smaller */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Blur in */
+.reveal-blur {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(20px);
+  transition: opacity 0.9s ease,
+              filter 0.9s ease,
+              transform 0.9s ease;
+  will-change: opacity, filter, transform;
+}
+.reveal-blur.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* Stagger delays */
 .reveal-delay-1 { transition-delay: 0.1s; }
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
 .reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-6 { transition-delay: 0.6s; }
+.reveal-delay-7 { transition-delay: 0.7s; }
+.reveal-delay-8 { transition-delay: 0.8s; }
+
+/* ══════════════════════════════════════════════════
+   HOVER MICRO-INTERACTIONS
+   ══════════════════════════════════════════════════ */
+
+/* Card lift effect */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Subtle scale on hover */
+.hover-grow {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-grow:hover {
+  transform: scale(1.03);
+}
+
+/* Button press effect */
+.hover-press {
+  transition: transform 0.15s ease;
+}
+.hover-press:active {
+  transform: scale(0.97);
+}
+
+/* CTA glow pulse */
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* Image zoom on hover (for cards wrapping images) */
+.hover-zoom img,
+.hover-zoom video {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-zoom:hover img,
+.hover-zoom:hover video {
+  transform: scale(1.06);
+}
+
+/* ══════════════════════════════════════════════════
+   PAGE TRANSITION BASE
+   ══════════════════════════════════════════════════ */
+.page-enter {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
