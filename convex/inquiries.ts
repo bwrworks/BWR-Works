@@ -22,12 +22,23 @@ export const submitInquiry = mutation({
     message: v.string(),
   },
   handler: async (ctx, args) => {
+    // ─── Input Validation ───
+    const name = args.name.trim().slice(0, 100);
+    const email = args.email.trim().slice(0, 254).toLowerCase();
+    const phone = args.phone?.trim().slice(0, 15);
+    const message = args.message.trim().slice(0, 5000);
+
+    if (!name || name.length < 2) throw new Error("Name must be at least 2 characters.");
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Please enter a valid email address.");
+    if (!message || message.length < 10) throw new Error("Message must be at least 10 characters.");
+    if (phone && !/^[\d\s\-+()]{7,15}$/.test(phone)) throw new Error("Please enter a valid phone number.");
+
     const inquiryId = await ctx.db.insert("inquiries", {
-      name: args.name,
-      email: args.email,
-      phone: args.phone,
+      name,
+      email,
+      phone,
       subject: args.subject,
-      message: args.message,
+      message,
       status: "new",
       createdAt: Date.now(),
     });
@@ -40,7 +51,7 @@ export const submitInquiry = mutation({
     await ctx.db.insert("messages", {
       inquiryId,
       sender: "user",
-      content: args.message,
+      content: message,
       timestamp: Date.now(),
     });
 

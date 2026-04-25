@@ -13,9 +13,13 @@ dist-ssr
 *.local
 
 # ⚠️ SECURITY — NEVER COMMIT SECRETS
+.env
 .env.local
 .env.*.local
+.env.development
+.env.staging
 .env.production
+.env.test
 
 # Editor directories and files
 .vscode/*
