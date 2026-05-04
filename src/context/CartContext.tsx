@@ -38,7 +38,7 @@ interface CartContextType {
   setIsOpen: (open: boolean) => void
 }
 
-const CART_STORAGE_KEY = 'bwr_cart_v1'
+const CART_STORAGE_KEY = 'bwr_cart_v2'
 
 const CartContext = createContext<CartContextType | null>(null)
 
