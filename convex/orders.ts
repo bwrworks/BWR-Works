@@ -258,6 +258,19 @@ export const markOrderPaid = internalMutation({
       updatedAt: Date.now(),
     });
 
+    // Schedule order confirmation email
+    const user = order.userId ? await ctx.db.get(order.userId as any) : null;
+    const customerEmail = (user as any)?.email;
+    if (customerEmail) {
+      await ctx.scheduler.runAfter(0, api.notifications.sendOrderConfirmationEmail, {
+        customerEmail,
+        customerName: order.addressSnapshot.name,
+        orderId: order.orderId,
+        items: order.items,
+        total: order.total,
+      });
+    }
+
     return order;
   },
 });

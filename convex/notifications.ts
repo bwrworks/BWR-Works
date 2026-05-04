@@ -3,6 +3,7 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { Resend } from "resend";
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Email Notifications via Resend
@@ -32,6 +33,46 @@ function esc(str: string): string {
 // ORDER EMAILS
 // ─────────────────────────────────────────────────
 
+/** Generate a simple PDF invoice using pdf-lib */
+async function generateInvoicePdf(orderId: string, customerName: string, items: any[], totalRupees: string) {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage();
+  const { width, height } = page.getSize();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  
+  let y = height - 50;
+  
+  page.drawText('BWR WORKS - TAX INVOICE', { x: 50, y, size: 20, font: boldFont, color: rgb(0, 0, 0) });
+  y -= 30;
+  
+  page.drawText(`Order ID: ${orderId}`, { x: 50, y, size: 12, font });
+  y -= 20;
+  page.drawText(`Date: ${new Date().toLocaleDateString('en-IN')}`, { x: 50, y, size: 12, font });
+  y -= 20;
+  page.drawText(`Customer: ${customerName}`, { x: 50, y, size: 12, font });
+  y -= 40;
+  
+  page.drawText('Items:', { x: 50, y, size: 14, font: boldFont });
+  y -= 20;
+  
+  for (const item of items) {
+    const itemTotal = `Rs. ${((item.unitPrice * item.quantity) / 100).toLocaleString("en-IN")}`;
+    page.drawText(`${item.quantity}x ${item.productName}`, { x: 50, y, size: 11, font });
+    page.drawText(itemTotal, { x: width - 150, y, size: 11, font });
+    y -= 20;
+  }
+  
+  y -= 20;
+  page.drawLine({ start: { x: 50, y }, end: { x: width - 50, y }, thickness: 1, color: rgb(0, 0, 0) });
+  y -= 20;
+  
+  page.drawText('GRAND TOTAL:', { x: 50, y, size: 14, font: boldFont });
+  page.drawText(`Rs. ${totalRupees}`, { x: width - 150, y, size: 14, font: boldFont });
+  
+  return await pdfDoc.saveAsBase64();
+}
+
 /** Order confirmation email to customer */
 export const sendOrderConfirmationEmail = action({
   args: {
@@ -57,10 +98,18 @@ export const sendOrderConfirmationEmail = action({
       </tr>`
     ).join("");
 
+    const pdfBase64 = await generateInvoicePdf(orderId, customerName, items, totalRupees);
+
     const { error } = await resend.emails.send({
       from: FROM,
       to: customerEmail,
       subject: `Order Confirmed — ${orderId} [BWR-O-${orderId.slice(0, 8)}]`,
+      attachments: [
+        {
+          filename: `Invoice-${orderId}.pdf`,
+          content: pdfBase64,
+        }
+      ],
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
@@ -94,7 +143,7 @@ export const sendOrderConfirmationEmail = action({
             </a>
             <br />
             <a href="${SITE_URL}/invoice/${orderId}" style="display:inline-block;margin-top:16px;color:#111;text-decoration:underline;font-size:13px;font-weight:600;">
-              Download your Invoice 🖨️
+              View full Invoice online 🖨️
             </a>
           </div>
           <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
