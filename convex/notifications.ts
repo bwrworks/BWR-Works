@@ -295,3 +295,86 @@ export const sendAdminReplyEmail = action({
     return { sent: !error };
   },
 });
+
+// ─────────────────────────────────────────────────
+// WHATSAPP NOTIFICATIONS
+// Uses WhatsApp API link format for automated messages
+// Admin can trigger these from the dashboard
+// ─────────────────────────────────────────────────
+
+
+
+/** Generate a WhatsApp deep-link for order confirmation */
+export const sendWhatsAppOrderConfirmation = action({
+  args: {
+    customerPhone: v.string(),
+    customerName: v.string(),
+    orderId: v.string(),
+    total: v.number(),
+  },
+  handler: async (_ctx, { customerPhone, customerName, orderId, total }) => {
+    const totalRupees = (total / 100).toLocaleString("en-IN");
+
+    // Clean phone number — remove spaces, dashes, and leading 0
+    const cleanPhone = customerPhone.replace(/[\s\-\(\)]/g, "").replace(/^0/, "");
+    const fullPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+
+    const message = encodeURIComponent(
+      `Hi ${customerName}! 🎉\n\n` +
+      `Your BWR Works order *${orderId}* has been confirmed!\n` +
+      `Total: ₹${totalRupees}\n\n` +
+      `Track your order: ${SITE_URL}/order/${orderId}\n\n` +
+      `Thank you for choosing BWR Works! 🙏`
+    );
+
+    const whatsappUrl = `https://wa.me/${fullPhone}?text=${message}`;
+
+    console.log(`[WhatsApp] Order confirmation link generated for ${orderId}: ${whatsappUrl}`);
+
+    return { whatsappUrl, phone: fullPhone };
+  },
+});
+
+/** Generate a WhatsApp deep-link for order status updates */
+export const sendWhatsAppStatusUpdate = action({
+  args: {
+    customerPhone: v.string(),
+    customerName: v.string(),
+    orderId: v.string(),
+    newStatus: v.string(),
+    trackingNumber: v.optional(v.string()),
+  },
+  handler: async (_ctx, { customerPhone, customerName, orderId, newStatus, trackingNumber }) => {
+    const statusEmojis: Record<string, string> = {
+      printing: "🖨️",
+      shipped: "📦",
+      delivered: "✅",
+    };
+
+    const statusMessages: Record<string, string> = {
+      printing: "Your order is now being printed! Our team is crafting your custom piece.",
+      shipped: `Your order has been shipped!${trackingNumber ? ` Tracking: ${trackingNumber}` : ""}`,
+      delivered: "Your order has been delivered! We hope you love it! 🎉",
+    };
+
+    const cleanPhone = customerPhone.replace(/[\s\-\(\)]/g, "").replace(/^0/, "");
+    const fullPhone = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
+
+    const emoji = statusEmojis[newStatus] || "📋";
+    const msg = statusMessages[newStatus] || `Status updated to: ${newStatus}`;
+
+    const message = encodeURIComponent(
+      `Hi ${customerName}! ${emoji}\n\n` +
+      `*Order ${orderId} Update*\n` +
+      `${msg}\n\n` +
+      `Track: ${SITE_URL}/order/${orderId}\n\n` +
+      `— BWR Works`
+    );
+
+    const whatsappUrl = `https://wa.me/${fullPhone}?text=${message}`;
+
+    console.log(`[WhatsApp] Status update link generated for ${orderId}: ${whatsappUrl}`);
+
+    return { whatsappUrl, phone: fullPhone };
+  },
+});

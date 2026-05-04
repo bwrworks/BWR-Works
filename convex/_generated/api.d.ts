@@ -10,9 +10,11 @@
 
 import type * as addresses from "../addresses.js";
 import type * as admin from "../admin.js";
+import type * as auditLogs from "../auditLogs.js";
 import type * as auth from "../auth.js";
 import type * as auth_ResendOTP from "../auth/ResendOTP.js";
 import type * as cloudinary from "../cloudinary.js";
+import type * as cms from "../cms.js";
 import type * as coupons from "../coupons.js";
 import type * as http from "../http.js";
 import type * as inquiries from "../inquiries.js";
@@ -36,9 +38,11 @@ import type {
 declare const fullApi: ApiFromModules<{
   addresses: typeof addresses;
   admin: typeof admin;
+  auditLogs: typeof auditLogs;
   auth: typeof auth;
   "auth/ResendOTP": typeof auth_ResendOTP;
   cloudinary: typeof cloudinary;
+  cms: typeof cms;
   coupons: typeof coupons;
   http: typeof http;
   inquiries: typeof inquiries;

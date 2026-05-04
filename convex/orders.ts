@@ -331,6 +331,19 @@ export const updateOrderStatus = mutation({
 
     await ctx.db.patch(order._id, updates);
 
+    // Audit log
+    const adminUserId = await getAuthUserId(ctx);
+    if (adminUserId) {
+      await ctx.db.insert("adminLogs", {
+        adminUserId,
+        action: "update_status",
+        targetType: "order",
+        targetId: orderId,
+        details: { from: order.status, to: status, trackingNumber },
+        createdAt: Date.now(),
+      });
+    }
+
     // Trigger status notification email to customer
     if (status !== "received") {
       const user = order.userId ? await ctx.db.get(order.userId as any) : null;
@@ -371,6 +384,19 @@ export const addAdminNote = mutation({
       adminNotes: note,
       updatedAt: Date.now(),
     });
+
+    // Audit log
+    const adminUserId = await getAuthUserId(ctx);
+    if (adminUserId) {
+      await ctx.db.insert("adminLogs", {
+        adminUserId,
+        action: "add_note",
+        targetType: "order",
+        targetId: orderId,
+        details: { note: note.slice(0, 200) },
+        createdAt: Date.now(),
+      });
+    }
   },
 });
 

@@ -39,6 +39,44 @@ export const listActive = query({
 });
 
 /**
+ * Search active products by name, description, or category
+ * Returns matching products with prices
+ */
+export const search = query({
+  args: { term: v.string() },
+  handler: async (ctx, { term }) => {
+    const products = await ctx.db
+      .query("products")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .collect();
+
+    const lower = term.toLowerCase().trim();
+    if (!lower) return [];
+
+    const matched = products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(lower) ||
+        p.description.toLowerCase().includes(lower) ||
+        p.category.toLowerCase().includes(lower) ||
+        p.shortTagline.toLowerCase().includes(lower)
+    );
+
+    return Promise.all(
+      matched.map(async (product) => {
+        const pricing = await ctx.db
+          .query("productPricing")
+          .withIndex("by_productId", (q) => q.eq("productId", product._id))
+          .first();
+        return {
+          ...product,
+          price: pricing?.calculatedB2CPrice ?? null,
+        };
+      })
+    );
+  },
+});
+
+/**
  * Get single product by slug (for product detail page)
  */
 export const getBySlug = query({

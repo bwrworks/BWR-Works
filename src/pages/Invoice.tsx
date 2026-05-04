@@ -1,21 +1,74 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import QRCode from 'react-qr-code'
 import styles from './Invoice.module.css'
 
+/** Generate a simple Code128-style barcode as inline SVG */
+function Barcode({ value }: { value: string }) {
+  const bars = useMemo(() => {
+    // Simple encoding: each char -> binary stripe pattern
+    const result: boolean[] = []
+    for (let i = 0; i < value.length; i++) {
+      const code = value.charCodeAt(i)
+      // Convert char code to 8-bit binary stripes
+      for (let b = 7; b >= 0; b--) {
+        result.push(Boolean((code >> b) & 1))
+      }
+      result.push(false) // gap between chars
+    }
+    return result
+  }, [value])
+
+  const barWidth = 1.5
+  const height = 40
+  const totalWidth = bars.length * barWidth
+
+  return (
+    <svg width={totalWidth} height={height + 14} viewBox={`0 0 ${totalWidth} ${height + 14}`} style={{ display: 'block' }}>
+      {bars.map((on, i) => (
+        on && (
+          <rect
+            key={i}
+            x={i * barWidth}
+            y={0}
+            width={barWidth}
+            height={height}
+            fill="#111"
+          />
+        )
+      ))}
+      <text
+        x={totalWidth / 2}
+        y={height + 12}
+        textAnchor="middle"
+        fontSize="8"
+        fontFamily="monospace"
+        fill="#333"
+      >
+        {value}
+      </text>
+    </svg>
+  )
+}
+
 export default function Invoice() {
   const { orderId } = useParams<{ orderId: string }>()
   const order = useQuery(api.orders.getOrderById, { orderId: orderId || '' })
-  
-  // Need the SITE_URL for QR code tracking links
+  const cmsContent = useQuery(api.cms.getAll)
+
   const siteUrl = window.location.origin
 
-  // Disable global scroll logic specific to this page
+  // Helper to read CMS values with fallback
+  const cms = (section: string, key: string, fallback: string) => {
+    const entry = cmsContent?.find((c) => c.section === section && c.key === key)
+    return entry?.value || fallback
+  }
+
   useEffect(() => {
     window.scrollTo(0, 0)
-    document.body.style.backgroundColor = '#e5e7eb' // Gray background for outside of paper
+    document.body.style.backgroundColor = '#e5e7eb'
     return () => {
       document.body.style.backgroundColor = ''
     }
@@ -25,12 +78,12 @@ export default function Invoice() {
     return <div className={styles.loading}>Loading Invoice...</div>
   }
 
-  // Not found or not authorized
   if (order === null) {
     return <Navigate to="/dashboard" />
   }
 
   const fmt = (paise: number) => `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+  const hsnCode = cms('invoice', 'hsn_code', '3926')
 
   const handlePrint = () => {
     window.print()
@@ -54,20 +107,19 @@ export default function Invoice() {
           <div className={styles.companyInfo}>
             <h1 className={styles.companyName}>BWR WORKS</h1>
             <p className={styles.companyDetail}>Made in Bengaluru</p>
-            {/* PLACEHolders for user requested invoice details */}
-            <p className={styles.companyDetail}>GSTIN: [Enter GST Here]</p>
-            <p className={styles.companyDetail}>Address: [Enter Address Here]</p>
-            <p className={styles.companyDetail}>Email: orders@bwrworks.in</p>
+            <p className={styles.companyDetail}>GSTIN: {cms('invoice', 'gstin', '[Enter GST in Admin → Content]')}</p>
+            <p className={styles.companyDetail}>{cms('invoice', 'company_address', '[Enter Address in Admin → Content]')}</p>
+            <p className={styles.companyDetail}>Email: {cms('invoice', 'contact_email', 'orders@bwrworks.in')}</p>
           </div>
           <div className={styles.invoiceInfo}>
             <h2 className={styles.invoiceTitle}>Tax Invoice / Bill of Supply</h2>
             <div className={styles.infoGrid}>
               <span className={styles.infoLabel}>Order ID:</span>
               <span className={styles.infoValue}>{order.orderId}</span>
-              
+
               <span className={styles.infoLabel}>Order Date:</span>
               <span className={styles.infoValue}>{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
-              
+
               <span className={styles.infoLabel}>Invoice Date:</span>
               <span className={styles.infoValue}>{new Date().toLocaleDateString('en-IN')}</span>
 
@@ -113,7 +165,6 @@ export default function Invoice() {
           </thead>
           <tbody>
             {order.items.map((item, index) => {
-              // Extract pre-tax and tax amounts for formatting
               const itemTotal = item.unitPrice * item.quantity;
               const preTax = itemTotal / 1.18;
               const tax = itemTotal - preTax;
@@ -124,7 +175,7 @@ export default function Invoice() {
                   <td>
                     <strong>{item.productName}</strong>
                     <div className={styles.itemMeta}>
-                      HSN: [XXXX]
+                      HSN: {hsnCode}
                     </div>
                   </td>
                   <td style={{ textAlign: 'center' }}>{item.quantity}</td>
@@ -140,8 +191,14 @@ export default function Invoice() {
         <div className={styles.totalsSection}>
           <div className={styles.qrCodeBox}>
             <QRCode value={`${siteUrl}/order/${order.orderId}`} size={80} level="M" />
-            <div className={styles.qrText}>Scan to Track Order</div>
+            <div className={styles.qrText}>Scan to Track</div>
           </div>
+
+          {/* Barcode */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <Barcode value={order.orderId} />
+          </div>
+
           <div className={styles.totalsTable}>
             <div className={styles.totalsRow}>
               <span>Subtotal:</span>
@@ -166,7 +223,7 @@ export default function Invoice() {
 
         <div className={styles.footer}>
           This is a computer-generated document. No signature is required. <br />
-          For any queries, please reach out to orders@bwrworks.in
+          For any queries, please reach out to {cms('invoice', 'contact_email', 'orders@bwrworks.in')}
         </div>
       </div>
     </div>
