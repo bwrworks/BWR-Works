@@ -15,9 +15,9 @@ function getResend() {
   return new Resend(apiKey);
 }
 
-const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <orders@bwrworks.in>";
+const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <orders@bwrworks.com>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
-const SITE_URL = process.env.SITE_URL || "https://bwr-works.vercel.app";
+const SITE_URL = process.env.SITE_URL || "https://bwrworks.com";
 
 /** Escape HTML special chars to prevent injection in email templates */
 function esc(str: string): string {
