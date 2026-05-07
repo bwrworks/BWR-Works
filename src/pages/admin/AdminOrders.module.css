@@ -3,13 +3,13 @@
 .loading { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); padding: var(--space-2xl) 0; }
 .empty { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); text-align: center; padding: var(--space-3xl); background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-md); }
 .pageHeader { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: var(--space-xl); border-bottom: 1px solid var(--line); }
-.eyebrow { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.16em; color: var(--orange); }
+.eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.16em; color: var(--orange); }
 .title { font-family: var(--font-display); font-size: 2rem; font-weight: 700; letter-spacing: 0.04em; color: var(--ink); margin: 4px 0 0; }
 
 /* Filters */
 .filters { display: flex; gap: var(--space-lg); align-items: center; flex-wrap: wrap; }
 .statusTabs { display: flex; gap: 4px; }
-.statusTab { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; background: transparent; border: 1px solid var(--line); color: var(--muted); padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition-fast); }
+.statusTab { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; background: transparent; border: 1px solid var(--line); color: var(--muted); padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition-fast); }
 .statusTab:hover { border-color: var(--orange); color: var(--orange); }
 .statusTabActive { background: var(--ink); border-color: var(--ink); color: white; }
 .searchInput { flex: 1; min-width: 200px; font-family: var(--font-body); font-size: 0.85rem; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); outline: none; color: var(--black-soft); }
@@ -26,19 +26,19 @@
 .orderAmount { font-family: var(--font-mono); font-size: 0.88rem; color: var(--ink); font-weight: 500; }
 .orderRight { display: flex; align-items: center; gap: var(--space-lg); }
 .badge { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; color: white; padding: 4px 10px; border-radius: 4px; white-space: nowrap; }
-.orderDate { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); }
-.chevron { font-size: 0.6rem; color: var(--muted); }
+.orderDate { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.chevron { font-size: 0.75rem; color: var(--muted); }
 
 /* Expanded detail */
 .orderDetail { border-top: 1px solid var(--line); padding: var(--space-xl); display: flex; flex-direction: column; gap: var(--space-xl); background: #FAFAFA; }
 .detailSection { display: flex; flex-direction: column; gap: var(--space-sm); }
-.detailLabel { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+.detailLabel { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
 .detailItem { display: flex; justify-content: space-between; font-family: var(--font-body); font-size: 0.85rem; color: var(--black-soft); }
 .detailText { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
 
 /* Status actions */
 .statusActions { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
-.statusBtn { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 14px; border: 1px solid var(--line); background: white; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition-fast); }
+.statusBtn { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 14px; border: 1px solid var(--line); background: white; border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition-fast); }
 .statusBtn:hover { border-color: var(--orange); }
 .statusBtnActive { color: white; border-color: transparent; }
 
