@@ -211,6 +211,8 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 6px;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .tab {
@@ -225,9 +227,15 @@
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 .tab:hover { color: var(--ink); background: #F3F4F6; }
 .tabActive { background: var(--ink); color: var(--white); }
+
+@media (max-width: 600px) {
+  .tabs { flex-direction: column; white-space: normal; }
+  .tab { white-space: normal; }
+}
 
 /* ── TAB CONTENT ── */
 .tabContent {
@@ -381,7 +389,14 @@
 .miniLineDone { background: var(--orange); }
 
 /* ── ORDER HISTORY TABLE ── */
-.historyTable { display: flex; flex-direction: column; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
+.historyTable { 
+  display: flex; 
+  flex-direction: column; 
+  background: var(--white); 
+  border: 1px solid var(--line); 
+  border-radius: var(--radius-md); 
+  overflow-x: auto; 
+}
 
 .historyHead {
   display: grid;
@@ -747,7 +762,7 @@
   background: white;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .adminSectionTitle {

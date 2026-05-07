@@ -218,7 +218,7 @@ export default function Contact() {
 
             <div className={styles.directContact}>
               <p>Prefer direct contact?</p>
-              <a href="mailto:hello@bwrworks.in" className={styles.contactLink}>hello@bwrworks.in</a>
+              <a href="mailto:contact@bwrworks.com" className={styles.contactLink}>contact@bwrworks.com</a>
             </div>
           </div>
         </div>

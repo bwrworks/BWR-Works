@@ -57,7 +57,7 @@ export default function Navbar() {
             )}
           </li>
           <li className={styles.mobileOnly} style={{ marginTop: '8px' }}>
-            <Link to="/#contact" onClick={() => setMobileOpen(false)} style={{ color: 'var(--orange)' }}>Enquire Now</Link>
+            <Link to="/contact" onClick={() => setMobileOpen(false)} style={{ color: 'var(--orange)' }}>Enquire Now</Link>
           </li>
         </ul>
 
@@ -111,7 +111,7 @@ export default function Navbar() {
           </button>
 
           {/* Enquire CTA */}
-          <Link to="/#contact" className={`${styles.cta} ${styles.desktopOnly}`}>Enquire Now</Link>
+          <Link to="/contact" className={`${styles.cta} ${styles.desktopOnly}`}>Enquire Now</Link>
 
           {/* Mobile burger */}
           <button

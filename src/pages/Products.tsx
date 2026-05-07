@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
@@ -9,7 +10,16 @@ import styles from './Products.module.css'
 
 export default function Products() {
   const products = useQuery(api.products.listActive)
+  const location = useLocation()
   useScrollReveal()
+
+  const searchParams = new URLSearchParams(location.search)
+  const catFilter = searchParams.get('cat')?.toLowerCase()
+
+  const filteredProducts = products ? (catFilter ? products.filter(p => {
+    const cat = p.category.toLowerCase()
+    return cat.includes(catFilter) || catFilter.includes(cat) || cat.replace(/\s+/g, '').includes(catFilter)
+  }) : products) : undefined
 
   return (
     <>
@@ -59,7 +69,7 @@ export default function Products() {
         {/* ── OFF-WHITE PRODUCTS GRID (Bottom 50%) ── */}
         <div className={styles.lightSection}>
           <div className={`${styles.gridContainer} reveal`}>
-            <ProductGrid products={products} />
+            <ProductGrid products={filteredProducts} />
           </div>
         </div>
 
