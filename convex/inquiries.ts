@@ -8,8 +8,16 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 // BWR WORKS — Inquiries + Email Thread System
 // ═══════════════════════════════════════════════════
 
-function makeThreadId(id: string) {
-  return `BWR-Q-${id.slice(0, 8)}`;
+/** Generate a human-readable sequential ticket ID like BWR-SUP-0001 */
+async function makeThreadId(ctx: any): Promise<string> {
+  try {
+    const allInquiries = await ctx.db.query("inquiries").collect();
+    const nextNum = allInquiries.length + 1;
+    return `BWR-SUP-${String(nextNum).padStart(4, "0")}`;
+  } catch {
+    // Fallback if count fails
+    return `BWR-SUP-${String(Date.now()).slice(-6)}`;
+  }
 }
 
 /** Customer submits a contact form inquiry — creates the thread */
@@ -22,40 +30,45 @@ export const submitInquiry = mutation({
     message: v.string(),
   },
   handler: async (ctx, args) => {
-    // ─── Input Validation ───
-    const name = args.name.trim().slice(0, 100);
-    const email = args.email.trim().slice(0, 254).toLowerCase();
-    const phone = args.phone?.trim().slice(0, 15);
-    const message = args.message.trim().slice(0, 5000);
+    try {
+      // ─── Input Validation ───
+      const name = args.name.trim().slice(0, 100);
+      const email = args.email.trim().slice(0, 254).toLowerCase();
+      const phone = args.phone?.trim().slice(0, 15) || undefined;
+      const message = args.message.trim().slice(0, 5000);
 
-    if (!name || name.length < 2) throw new Error("Name must be at least 2 characters.");
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Please enter a valid email address.");
-    if (!message || message.length < 10) throw new Error("Message must be at least 10 characters.");
-    if (phone && !/^[\d\s\-+()]{7,15}$/.test(phone)) throw new Error("Please enter a valid phone number.");
+      if (!name || name.length < 2) throw new Error("Name must be at least 2 characters.");
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Please enter a valid email address.");
+      if (!message || message.length < 10) throw new Error("Message must be at least 10 characters.");
+      if (phone && !/^[\d\s\-+()]{7,15}$/.test(phone)) throw new Error("Please enter a valid phone number.");
 
-    const inquiryId = await ctx.db.insert("inquiries", {
-      name,
-      email,
-      phone,
-      subject: args.subject,
-      message,
-      status: "new",
-      createdAt: Date.now(),
-    });
+      // Generate sequential ticket ID
+      const threadId = await makeThreadId(ctx);
 
-    // Set threadId using the newly-created ID
-    const threadId = makeThreadId(inquiryId);
-    await ctx.db.patch(inquiryId, { threadId });
+      const inquiryId = await ctx.db.insert("inquiries", {
+        name,
+        email,
+        phone,
+        subject: args.subject,
+        message,
+        status: "new",
+        threadId,
+        createdAt: Date.now(),
+      });
 
-    // Store first message as thread entry
-    await ctx.db.insert("messages", {
-      inquiryId,
-      sender: "user",
-      content: message,
-      timestamp: Date.now(),
-    });
+      // Store first message as thread entry
+      await ctx.db.insert("messages", {
+        inquiryId,
+        sender: "user",
+        content: message,
+        timestamp: Date.now(),
+      });
 
-    return { inquiryId, threadId };
+      return { inquiryId, threadId };
+    } catch (err: any) {
+      console.error("[submitInquiry] Error:", err);
+      throw err;
+    }
   },
 });
 

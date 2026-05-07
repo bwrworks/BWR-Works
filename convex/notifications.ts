@@ -19,8 +19,9 @@ function getResend() {
 
 // ─── IMPORTANT: FROM must match a verified domain in Resend ───
 // The domain bwrworks.com must be verified in Resend → Domains
-// If using bwrworks.in, that domain must also be verified
-const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <contact@bwrworks.com>";
+// Split by purpose: orders@ for transactional, contact@ for support
+const FROM_ORDERS = "BWR Works Orders <orders@bwrworks.com>";
+const FROM_SUPPORT = "BWR Works Support <contact@bwrworks.com>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
 const SITE_URL = process.env.SITE_URL || "https://bwrworks.com";
 
@@ -106,9 +107,10 @@ export const sendOrderConfirmationEmail = action({
     const pdfBase64 = await generateInvoicePdf(orderId, customerName, items, totalRupees);
 
     const { error } = await resend.emails.send({
-      from: FROM,
+      from: FROM_ORDERS,
+      replyTo: "contact@bwrworks.com",
       to: customerEmail,
-      subject: `Order Confirmed — ${orderId} [BWR-O-${orderId.slice(0, 8)}]`,
+      subject: `Order Confirmed — ${orderId}`,
       attachments: [
         {
           filename: `Invoice-${orderId}.pdf`,
@@ -185,7 +187,8 @@ export const sendStatusUpdateEmail = action({
     const message = statusMessages[newStatus] || `Your order status has been updated to: ${newStatus}`;
 
     const { error } = await resend.emails.send({
-      from: FROM,
+      from: FROM_ORDERS,
+      replyTo: "contact@bwrworks.com",
       to: customerEmail,
       subject: `Order ${orderId} — Status Update | BWR Works`,
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
@@ -239,7 +242,8 @@ export const sendContactFormEmail = action({
 
     // 1. Notify admin
     const { error: adminError } = await resend.emails.send({
-      from: FROM,
+      from: FROM_SUPPORT,
+      replyTo: email,
       to: ADMIN_EMAIL,
       subject: `New ${subjectLabel} from ${name} [${threadId}]`,
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
@@ -262,9 +266,10 @@ export const sendContactFormEmail = action({
       </body></html>`,
     });
 
-    // 2. Auto-reply to customer — [BWR-Q-...] tag in subject enables inbound reply tracking
+    // 2. Auto-reply to customer — ticket tag in subject enables inbound reply tracking
     const { error: customerError } = await resend.emails.send({
-      from: FROM,
+      from: FROM_SUPPORT,
+      replyTo: "contact@bwrworks.com",
       to: email,
       subject: `We received your inquiry — BWR Works [${threadId}]`,
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
@@ -319,9 +324,10 @@ export const sendAdminReplyEmail = action({
     ).join("");
 
     const { error } = await resend.emails.send({
-      from: FROM,
+      from: FROM_SUPPORT,
+      replyTo: "contact@bwrworks.com",
       to: customerEmail,
-      subject: `Reply from BWR Works [${threadId}]`,
+      subject: `Reply from BWR Works Support [${threadId}]`,
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
