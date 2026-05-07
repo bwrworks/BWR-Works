@@ -39,7 +39,7 @@ export const submitInquiry = mutation({
 
       if (!name || name.length < 2) throw new ConvexError("Name must be at least 2 characters.");
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ConvexError("Please enter a valid email address.");
-      if (!message || message.length < 10) throw new ConvexError("Message must be at least 10 characters.");
+      if (!message || message.length < 3) throw new ConvexError("Message must be at least 3 characters.");
       if (phone && !/^[\d\s\-+()]{7,15}$/.test(phone)) throw new ConvexError("Please enter a valid phone number.");
 
       // Generate sequential ticket ID
