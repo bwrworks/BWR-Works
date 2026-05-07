@@ -78,7 +78,7 @@ function NotificationPanel({ onClose }: { onClose: () => void }) {
             <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'var(--muted)' }}>No items need your attention right now.</div>
           </div>
         ) : (
-          items.map(item => (
+          items.map((item: any) => (
             <NavLink
               key={item.id}
               to={item.link}

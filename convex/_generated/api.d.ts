@@ -10,6 +10,7 @@
 
 import type * as addresses from "../addresses.js";
 import type * as admin from "../admin.js";
+import type * as adminNotifications from "../adminNotifications.js";
 import type * as auditLogs from "../auditLogs.js";
 import type * as auth from "../auth.js";
 import type * as auth_ResendOTP from "../auth/ResendOTP.js";
@@ -38,6 +39,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   addresses: typeof addresses;
   admin: typeof admin;
+  adminNotifications: typeof adminNotifications;
   auditLogs: typeof auditLogs;
   auth: typeof auth;
   "auth/ResendOTP": typeof auth_ResendOTP;
