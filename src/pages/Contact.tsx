@@ -82,9 +82,10 @@ export default function Contact() {
       setIsSuccess(true)
       toastSuccess('Message sent! We\'ll reply within 24 hours.')
       setFormData({ name: '', email: '', phone: '', subject: 'support', message: '' })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit inquiry:', error)
-      toastError('Something went wrong. Please try again or WhatsApp us.')
+      const errMsg = error?.data || 'Something went wrong. Please try again or WhatsApp us.'
+      toastError(errMsg)
     } finally {
       setIsSubmitting(false)
     }

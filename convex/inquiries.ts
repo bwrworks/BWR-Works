@@ -1,6 +1,6 @@
 // inquiries.ts
 import { mutation, query, internalMutation } from "./_generated/server";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { requireAdmin } from "./admin";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
@@ -37,10 +37,10 @@ export const submitInquiry = mutation({
       const phone = args.phone?.trim().slice(0, 15) || undefined;
       const message = args.message.trim().slice(0, 5000);
 
-      if (!name || name.length < 2) throw new Error("Name must be at least 2 characters.");
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Please enter a valid email address.");
-      if (!message || message.length < 10) throw new Error("Message must be at least 10 characters.");
-      if (phone && !/^[\d\s\-+()]{7,15}$/.test(phone)) throw new Error("Please enter a valid phone number.");
+      if (!name || name.length < 2) throw new ConvexError("Name must be at least 2 characters.");
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ConvexError("Please enter a valid email address.");
+      if (!message || message.length < 10) throw new ConvexError("Message must be at least 10 characters.");
+      if (phone && !/^[\d\s\-+()]{7,15}$/.test(phone)) throw new ConvexError("Please enter a valid phone number.");
 
       // Generate sequential ticket ID
       const threadId = await makeThreadId(ctx);
