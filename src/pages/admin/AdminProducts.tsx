@@ -130,15 +130,15 @@ function ProductCard({ product, onEdit }: { product: any; onEdit: (p: any) => vo
         <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.82rem', color: 'var(--muted)' }}>{product.shortTagline}</div>
         {product.price && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--orange)', marginTop: 4, fontWeight: 600 }}>₹{(product.price / 100).toLocaleString('en-IN')}</div>}
       </div>
-      <div style={{ display: 'flex', gap: 8, flexDirection: 'column', alignItems: 'flex-end' }}>
-        <button className={styles.btnPrimary} style={{ padding: '8px 16px', fontSize: '0.62rem' }} onClick={() => onEdit(product)}>Edit</button>
-        <button className={styles.btnOutline} style={{ padding: '8px 16px', fontSize: '0.62rem' }} onClick={() => toggleActive({ id: product._id, isActive: !product.isActive })}>
+      <div className={styles.productActions}>
+        <button className={styles.btnPrimary} style={{ padding: '10px 16px', fontSize: '0.75rem' }} onClick={() => onEdit(product)}>Edit</button>
+        <button className={styles.btnOutline} style={{ padding: '10px 16px', fontSize: '0.75rem' }} onClick={() => toggleActive({ id: product._id, isActive: !product.isActive })}>
           {product.isActive ? 'Deactivate' : 'Activate'}
         </button>
         <button
           onClick={handleDelete}
           disabled={deleting}
-          style={{ padding: '8px 16px', fontSize: '0.62rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', borderRadius: 'var(--radius-sm)', cursor: 'pointer', transition: 'all 0.15s' }}>
+          style={{ padding: '10px 16px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', borderRadius: 'var(--radius-sm)', cursor: 'pointer', transition: 'all 0.15s' }}>
           {deleting ? '...' : 'Delete'}
         </button>
       </div>
@@ -333,11 +333,11 @@ export default function AdminProducts() {
           <div className={styles.eyebrow}>ADMIN</div>
           <h1 className={styles.title}>Products</h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--muted)' }}>
+        <div className={styles.headerActions}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--muted)' }}>
             {products?.length ?? 0} products total
           </div>
-          <button className={styles.btnPrimary} style={{ padding: '10px 22px', fontSize: '0.7rem' }} onClick={() => setShowCreate(true)}>
+          <button className={styles.btnPrimary} style={{ padding: '10px 22px', fontSize: '0.75rem' }} onClick={() => setShowCreate(true)}>
             + Add Product
           </button>
         </div>

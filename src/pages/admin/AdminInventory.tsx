@@ -50,9 +50,9 @@ export default function AdminInventory() {
         </div>
       </div>
 
-      <div style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+      <div className={styles.inventoryTable} style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
         {/* Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px 120px 120px', padding: '12px 20px', background: '#F9FAFB', borderBottom: '1px solid var(--line)', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+        <div className={styles.inventoryHead}>
           <span>Product</span>
           <span>Category</span>
           <span>Status</span>
@@ -70,15 +70,15 @@ export default function AdminInventory() {
           const isDirty = stockEdits[p._id] !== undefined
 
           return (
-            <div key={p._id} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px 120px 120px', padding: '14px 20px', borderBottom: '1px solid var(--line)', alignItems: 'center', transition: 'background 0.15s' }}>
+            <div key={p._id} className={styles.inventoryRow}>
               <div>
-                <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)' }}>{p.name}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', marginTop: 2 }}>/{p.slug}</div>
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--ink)' }}>{p.name}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--muted)', marginTop: 2 }}>/{p.slug}</div>
               </div>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--muted)' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--muted)' }}>
                 {CATEGORIES.find(c => c.id === p.category)?.label || p.category}
               </span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: status.color, background: status.color + '15', padding: '3px 8px', borderRadius: 4, display: 'inline-block' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: status.color, background: status.color + '15', padding: '4px 10px', borderRadius: 4, display: 'inline-block' }}>
                 {status.label}
               </span>
               <input
@@ -86,14 +86,14 @@ export default function AdminInventory() {
                 min={0}
                 value={currentStock}
                 onChange={e => handleStockChange(p._id, Number(e.target.value))}
-                style={{ width: 70, padding: '6px 10px', border: `1px solid ${isDirty ? 'var(--orange)' : 'var(--line)'}`, borderRadius: 6, fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--ink)' }}
+                style={{ width: '100%', maxWidth: 100, padding: '8px 12px', border: `1px solid ${isDirty ? 'var(--orange)' : 'var(--line)'}`, borderRadius: 6, fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--ink)' }}
               />
-              <div>
+              <div style={{ width: '100%' }}>
                 {isDirty && (
                   <button
                     onClick={() => handleSaveStock(p._id)}
                     disabled={saving === p._id}
-                    style={{ padding: '6px 14px', background: 'var(--orange)', color: 'white', border: 'none', borderRadius: 6, fontFamily: 'var(--font-mono)', fontSize: '0.6rem', cursor: 'pointer' }}
+                    style={{ padding: '8px 16px', background: 'var(--orange)', color: 'white', border: 'none', borderRadius: 6, fontFamily: 'var(--font-mono)', fontSize: '0.75rem', cursor: 'pointer', width: '100%' }}
                   >
                     {saving === p._id ? '...' : 'Save'}
                   </button>

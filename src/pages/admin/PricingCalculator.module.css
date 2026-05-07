@@ -446,8 +446,32 @@
   .productsGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 700px) {
-  .content { padding: 20px 16px; }
+@media (max-width: 768px) {
+  .header { 
+    padding: 12px 20px; 
+    flex-wrap: wrap; 
+    height: auto; 
+    gap: 12px; 
+  }
+  .headerTitle { font-size: 0.85rem; }
+  .recalcBtn { 
+    font-size: 0.75rem; 
+    padding: 12px 16px; 
+    width: 100%; 
+    text-align: center; 
+  }
+  .content { padding: 20px 16px; gap: 24px; }
   .fieldsGrid { grid-template-columns: 1fr 1fr; }
   .productsGrid { grid-template-columns: 1fr; }
+  
+  .slabsTable, .priceTable { 
+    display: block; 
+    overflow-x: auto; 
+    white-space: nowrap; 
+    -webkit-overflow-scrolling: touch;
+  }
+  .fieldLabel { font-size: 0.75rem; }
+  .slabsTable th, .priceTable th { font-size: 0.75rem; }
+  .slabsTable input { font-size: 0.9rem; padding: 8px 10px; }
+  .priceB2B { font-size: 0.85rem !important; }
 }

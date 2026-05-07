@@ -25,7 +25,7 @@
 .orderCustomer { font-family: var(--font-body); font-size: 0.88rem; color: var(--black-soft); }
 .orderAmount { font-family: var(--font-mono); font-size: 0.88rem; color: var(--ink); font-weight: 500; }
 .orderRight { display: flex; align-items: center; gap: var(--space-lg); }
-.badge { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; color: white; padding: 3px 8px; border-radius: 2px; white-space: nowrap; }
+.badge { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; color: white; padding: 4px 10px; border-radius: 4px; white-space: nowrap; }
 .orderDate { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); }
 .chevron { font-size: 0.6rem; color: var(--muted); }
 
@@ -46,4 +46,13 @@
 .trackingInput:focus { border-color: var(--orange); }
 .noteInput { font-family: var(--font-body); font-size: 0.85rem; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); outline: none; width: 100%; resize: vertical; }
 .noteInput:focus { border-color: var(--orange); }
-.viewFull { font-family: var(--font-mono); font-size: 0.65rem; color: var(--orange); text-decoration: none; align-self: flex-end; }
+.viewFull { font-family: var(--font-mono); font-size: 0.75rem; color: var(--orange); text-decoration: none; align-self: flex-end; }
+
+@media (max-width: 768px) {
+  .orderHeader { flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+  .orderMeta { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .orderRight { width: 100%; justify-content: space-between; margin-top: 8px; }
+  .statusTabs { overflow-x: auto; white-space: nowrap; padding-bottom: 4px; width: 100%; }
+  .filters { flex-direction: column; align-items: stretch; }
+  .searchInput { width: 100%; }
+}
