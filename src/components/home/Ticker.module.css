@@ -16,6 +16,7 @@
 
 .top {
   background: var(--orange);
+  margin-top: 72px;
 }
 
 .light {

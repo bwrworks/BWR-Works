@@ -8,7 +8,7 @@
    ═══════════════════════════════════════ */
 .darkSection {
   background: var(--ink);
-  padding: 140px 60px 80px;
+  padding: 60px 60px 80px;
 }
 
 .headerInner {
