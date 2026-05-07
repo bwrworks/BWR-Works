@@ -252,7 +252,7 @@
 /* ── MOBILE ── */
 @media (max-width: 900px) {
   .darkSection {
-    padding: 110px 24px 50px;
+    padding: 40px 24px 50px;
   }
 
   .lightSection {
