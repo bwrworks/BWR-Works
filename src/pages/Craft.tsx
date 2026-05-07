@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { useCms } from '../hooks/useCms'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import styles from './Craft.module.css'
 
 export default function Craft() {
   useScrollReveal()
+  const { cms } = useCms()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -23,11 +25,15 @@ export default function Craft() {
             The Process
           </div>
           <h1 className={styles.title}>
-            MACHINED.<br />
-            <span className={styles.outline}>REFINED.</span>
+            {cms('about', 'title', 'MACHINED.\nREFINED.').split('\n').map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {i > 0 ? <span className={styles.outline}>{line}</span> : line}
+              </span>
+            ))}
           </h1>
           <p className={styles.description}>
-            We reject the disposable culture of mass manufacturing. Every BWR piece is individually 3D-crafted using industrial-grade materials, taking hours to produce a single perfect unit.
+            {cms('about', 'body', 'We reject the disposable culture of mass manufacturing. Every BWR piece is individually 3D-crafted using industrial-grade materials, taking hours to produce a single perfect unit.')}
           </p>
         </div>
       </section>
@@ -94,7 +100,7 @@ export default function Craft() {
       {/* ── ENDING CTA (LIGHT) ── */}
       <section className={styles.sectionLight}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <h2 className={styles.ctaTitle}>Experience the Craft</h2>
+          <h2 className={styles.ctaTitle}>{cms('about', 'tagline', 'Experience the Craft')}</h2>
           <p className={styles.ctaSub}>Every order is made specifically for you.</p>
           <div className={styles.ctaActions}>
             <Link to="/products" className={styles.btnPrimary}>View Collection →</Link>

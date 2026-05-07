@@ -1,10 +1,12 @@
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
+import { useCms } from '../../hooks/useCms'
 import styles from './Hero.module.css'
 
 export default function Hero() {
   const products = useQuery(api.products.listActive)
   const featured = products?.[0]
+  const { cms } = useCms()
 
   return (
     <section className={styles.hero}>
@@ -14,18 +16,19 @@ export default function Hero() {
           <span>{featured ? `Drop #01 — ${featured.name}` : 'Drop #01 — Now Live'}</span>
         </div>
         <h1 className={styles.title}>
-          Crafted.<br />
-          <span className={styles.accent}>Not</span>
-          <span className={styles.outline}>Mass-Made.</span>
+          {cms('hero', 'headline', 'Crafted.\nNot Mass-Made.').split('\n').map((line, i) => (
+            <span key={i}>
+              {i > 0 && <br />}
+              {i === 0 ? line : <><span className={styles.accent}>{line.split(' ')[0]}</span><span className={styles.outline}>{line.split(' ').slice(1).join(' ')}</span></>}
+            </span>
+          ))}
         </h1>
         <p className={styles.sub}>
-          Premium 3D-designed objects for the moments that{' '}
-          <strong>matter most.</strong> Memory. Identity. Spirit. Pride.
-          Each piece made with intention — never in bulk, never without purpose.
+          {cms('hero', 'subheadline', 'Premium 3D-designed objects for the moments that matter most. Memory. Identity. Spirit. Pride. Each piece made with intention — never in bulk, never without purpose.')}
         </p>
         <div className={styles.actions}>
           <a href="#products" className={styles.btnPrimary}>
-            Explore Collection →
+            {cms('hero', 'cta_text', 'Explore Collection →')}
           </a>
           <a href="#process" className={styles.btnSecondary}>
             See The Process

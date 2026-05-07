@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { useCms } from '../hooks/useCms'
 // react-qr-code CJS→ESM interop is broken in Vite prod builds:
 // default export resolves to module namespace { QRCode, default } instead of the component.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,7 +61,7 @@ function Barcode({ value }: { value: string }) {
 export default function Invoice() {
   const { orderId } = useParams<{ orderId: string }>()
   const order = useQuery(api.orders.getOrderById, { orderId: orderId || '' })
-  const cmsContent = useQuery(api.cms.getAll)
+  const { cms } = useCms()
 
   const siteUrl = window.location.origin
 
@@ -72,14 +73,7 @@ export default function Invoice() {
     try { return JSON.stringify(val) } catch { return '' }
   }
 
-  // Helper to read CMS values with fallback
-  const cms = (section: string, key: string, fallback: string) => {
-    const entry = cmsContent?.find((c) => c.section === section && c.key === key)
-    const val = entry?.value
-    if (val === null || val === undefined) return fallback
-    if (typeof val !== 'string') return fallback
-    return val || fallback
-  }
+
 
   useEffect(() => {
     window.scrollTo(0, 0)

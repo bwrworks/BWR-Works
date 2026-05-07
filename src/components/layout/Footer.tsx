@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
+import { useCms } from '../../hooks/useCms'
 import styles from './Footer.module.css'
 
 export default function Footer() {
+  const { cms } = useCms()
+
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
@@ -12,7 +15,7 @@ export default function Footer() {
           <div className={styles.tagline}>
             Black &amp; White Rogue<br />
             Premium Functional Design Studio<br />
-            Bengaluru, India
+            {cms('footer', 'address', 'Bengaluru, India')}
           </div>
         </div>
         <div>
@@ -35,8 +38,8 @@ export default function Footer() {
         <div>
           <div className={styles.colTitle}>Connect</div>
           <ul className={styles.links}>
-            <li><a href="https://wa.me/917019427272" target="_blank" rel="noopener noreferrer">WhatsApp Us</a></li>
-            <li><a href="https://instagram.com/bwrworks" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li><a href={`https://wa.me/${cms('footer', 'phone', '917019427272').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer">WhatsApp Us</a></li>
+            <li><a href={cms('footer', 'instagram', 'https://instagram.com/bwrworks')} target="_blank" rel="noopener noreferrer">Instagram</a></li>
             <li><Link to="/dashboard">My Account</Link></li>
           </ul>
         </div>
