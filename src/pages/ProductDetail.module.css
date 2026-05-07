@@ -148,10 +148,9 @@
 .productImage {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   position: relative;
   z-index: 1;
-  padding: 24px;
 }
 
 /* ── THUMBNAIL ROW ── */
@@ -162,16 +161,22 @@
 }
 
 .thumbItem {
-  width: 64px;
-  height: 64px;
-  border: 1px solid rgba(245, 240, 232, 0.12);
+  width: 72px;
+  height: 72px;
+  border: 2px solid rgba(245, 240, 232, 0.12);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
 .thumbItem:hover {
   border-color: var(--orange);
+  transform: scale(1.05);
+}
+
+.thumbActive {
+  border-color: var(--orange) !important;
+  box-shadow: 0 0 0 2px rgba(255, 92, 26, 0.3);
 }
 
 .thumbItem img {

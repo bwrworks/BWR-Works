@@ -228,8 +228,9 @@
 }
 
 .productImageWrap {
-  width: 280px;
-  height: 280px;
+  width: 90%;
+  max-width: 520px;
+  aspect-ratio: 1;
   border-radius: 4px;
   overflow: hidden;
   animation: float 6s ease-in-out infinite;

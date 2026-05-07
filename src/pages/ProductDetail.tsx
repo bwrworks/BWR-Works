@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
@@ -10,6 +11,7 @@ import styles from './ProductDetail.module.css'
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
   const product = useQuery(api.products.getBySlug, slug ? { slug } : 'skip')
+  const [selectedImage, setSelectedImage] = useState(0)
 
   if (product === undefined) {
     return (
@@ -37,6 +39,8 @@ export default function ProductDetail() {
     )
   }
 
+  const currentImage = product.images?.[selectedImage] || product.images?.[0]
+
   return (
     <>
       <Navbar />
@@ -56,9 +60,9 @@ export default function ProductDetail() {
         <div className={styles.darkHalf}>
           <div className={styles.visualSticky}>
             <div className={styles.visualBox}>
-              {product.images && product.images.length > 0 ? (
+              {currentImage ? (
                 <img
-                  src={product.images[0]}
+                  src={currentImage}
                   alt={product.name}
                   className={styles.productImage}
                 />
@@ -74,7 +78,14 @@ export default function ProductDetail() {
             {product.images && product.images.length > 1 && (
               <div className={styles.thumbRow}>
                 {product.images.map((img, i) => (
-                  <div key={i} className={styles.thumbItem}>
+                  <div
+                    key={i}
+                    className={`${styles.thumbItem} ${i === selectedImage ? styles.thumbActive : ''}`}
+                    onClick={() => setSelectedImage(i)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => e.key === 'Enter' && setSelectedImage(i)}
+                  >
                     <img src={img} alt={`${product.name} ${i + 1}`} />
                   </div>
                 ))}

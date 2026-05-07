@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { useCms } from '../../hooks/useCms'
@@ -5,15 +6,28 @@ import styles from './Hero.module.css'
 
 export default function Hero() {
   const products = useQuery(api.products.listActive)
-  const featured = products?.[0]
   const { cms } = useCms()
+
+  // Pick a random product on each page load (stable for the session)
+  const featured = useMemo(() => {
+    if (!products || products.length === 0) return null
+    const idx = Math.floor(Math.random() * products.length)
+    return products[idx]
+  }, [products])
+
+  // Pick a random image from the featured product's gallery
+  const heroImage = useMemo(() => {
+    if (!featured?.images?.length) return null
+    const idx = Math.floor(Math.random() * featured.images.length)
+    return featured.images[idx]
+  }, [featured])
 
   return (
     <section className={styles.hero}>
       <div className={styles.left}>
         <div className={styles.badge}>
           <span className={styles.badgeDot} />
-          <span>{featured ? `Drop #01 — ${featured.name}` : 'Drop #01 — Now Live'}</span>
+          <span>{featured ? `Featured — ${featured.name}` : 'Featured — Now Live'}</span>
         </div>
         <h1 className={styles.title}>
           {cms('hero', 'headline', 'Crafted.\nNot Mass-Made.').split('\n').map((line, i) => (
@@ -52,11 +66,11 @@ export default function Hero() {
       <div className={styles.right}>
         <div className={styles.productDisplay}>
           <div className={styles.productTag}>Featured Drop</div>
-          {featured?.images?.[0] ? (
+          {heroImage ? (
             <div className={styles.productImageWrap}>
               <img
-                src={featured.images[0]}
-                alt={featured.name}
+                src={heroImage}
+                alt={featured?.name || 'BWR Works Product'}
                 className={styles.productImage}
               />
             </div>
