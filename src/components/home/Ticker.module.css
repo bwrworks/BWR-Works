@@ -16,13 +16,6 @@
 
 .top {
   background: var(--orange);
-  margin-top: 72px;
-}
-
-@media (max-width: 900px) {
-  .top {
-    margin-top: 64px;
-  }
 }
 
 .light {

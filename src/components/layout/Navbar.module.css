@@ -1,15 +1,13 @@
 .nav {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: var(--z-nav);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
   height: 72px;
-  background: rgba(17, 17, 17, 0.85);
+  background: rgba(17, 17, 17, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(245, 240, 232, 0.1);

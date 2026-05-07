@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  padding-top: 76px; /* Navbar */
+  padding-top: 0;
 }
 
 .splitLayout {

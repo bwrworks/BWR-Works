@@ -10,7 +10,7 @@
 /* ── BREADCRUMB BAR ── */
 .breadcrumbBar {
   background: var(--ink);
-  padding: 80px 60px 0;
+  padding: 20px 60px 0;
 }
 
 .breadcrumb {
@@ -343,7 +343,7 @@
 /* ── MOBILE ── */
 @media (max-width: 900px) {
   .breadcrumbBar {
-    padding: 80px 24px 0;
+    padding: 16px 24px 0;
   }
 
   .page {

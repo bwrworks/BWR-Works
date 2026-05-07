@@ -20,21 +20,35 @@ export default function Craft() {
       
       {/* ── HERO SHIFT (INK) ── */}
       <section className={styles.heroDark}>
+        <div className={styles.heroWatermark}>THE<br/>CRAFT</div>
         <div className="container">
-          <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
-            The Process
+          <div className={styles.heroGrid}>
+            <div className={styles.heroContent}>
+              <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
+                The Process
+              </div>
+              <h1 className={`${styles.title} reveal reveal-delay-1`}>
+                {cms('about', 'title', 'MACHINED.\nREFINED.').split('\n').map((line, i) => (
+                  <span key={i}>
+                    {i > 0 && <br />}
+                    {i > 0 ? <span className={styles.outline}>{line}</span> : line}
+                  </span>
+                ))}
+              </h1>
+              <p className={`${styles.description} reveal reveal-delay-2`}>
+                {cms('about', 'body', 'We reject the disposable culture of mass manufacturing. Every BWR piece is individually 3D-crafted using industrial-grade materials, taking hours to produce a single perfect unit.')}
+              </p>
+            </div>
+            <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
+              <div className={styles.shapeContainer}>
+                <div className={styles.shapeMain}>
+                  <div className={styles.shapeInner}>
+                    <div className={styles.shapeCore} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1 className={styles.title}>
-            {cms('about', 'title', 'MACHINED.\nREFINED.').split('\n').map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {i > 0 ? <span className={styles.outline}>{line}</span> : line}
-              </span>
-            ))}
-          </h1>
-          <p className={styles.description}>
-            {cms('about', 'body', 'We reject the disposable culture of mass manufacturing. Every BWR piece is individually 3D-crafted using industrial-grade materials, taking hours to produce a single perfect unit.')}
-          </p>
         </div>
       </section>
 

@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  padding-top: 76px; /* Navbar height */
+  padding-top: 0;
 }
 
 .splitLayout {
@@ -8,7 +8,7 @@
   min-height: calc(100vh - 76px);
 }
 
-.splitLayout > div {
+.splitLayout>div {
   flex: 1;
   display: flex;
   align-items: center;
@@ -20,7 +20,7 @@
   background: var(--ink);
   color: var(--off-white);
   position: sticky;
-  top: 76px;
+  top: 71px;
   height: calc(100vh - 76px);
   padding: 60px;
 }
