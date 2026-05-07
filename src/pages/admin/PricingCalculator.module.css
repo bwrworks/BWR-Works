@@ -448,6 +448,7 @@
 
 @media (max-width: 768px) {
   .header { 
+    position: relative; /* Prevent floating over hamburger */
     padding: 12px 20px; 
     flex-wrap: wrap; 
     height: auto; 
@@ -470,8 +471,15 @@
     white-space: nowrap; 
     -webkit-overflow-scrolling: touch;
   }
-  .fieldLabel { font-size: 0.75rem; }
+  
+  /* Increase typography */
+  .fieldLabel, .productFieldLabel, .breakdownTitle { font-size: 0.75rem; }
   .slabsTable th, .priceTable th { font-size: 0.75rem; }
-  .slabsTable input { font-size: 0.9rem; padding: 8px 10px; }
+  .slabsTable input, .fieldInput, .productFieldInput, .priceTable td { font-size: 0.95rem; padding: 10px 12px; }
   .priceB2B { font-size: 0.85rem !important; }
+  .cardTitle, .productCardName { font-size: 0.85rem; }
+  .cardSubtitle { font-size: 0.85rem; }
+  .saveBtn, .productSaveBtn { font-size: 0.8rem; padding: 12px 20px; }
+  .productCardCategory { font-size: 0.75rem; }
+  .breakdownRow { font-size: 0.8rem; }
 }
