@@ -14,53 +14,55 @@ export default function Products() {
   return (
     <>
       <Navbar />
-      <Ticker
-        variant="top"
-        items={[
-          'Customised Keychains',
-          'Car Garage Key Holder',
-          'Photo Frames',
-          'Made to Order',
-          'Premium Quality',
-          'Designed in Bengaluru',
-        ]}
-      />
+      <div style={{ paddingTop: 72 }}>
+        <Ticker
+          variant="top"
+          items={[
+            'Customised Keychains',
+            'Car Garage Key Holder',
+            'Photo Frames',
+            'Made to Order',
+            'Premium Quality',
+            'Designed in Bengaluru',
+          ]}
+        />
 
-      {/* ── DARK HEADER (Top 50%) ── */}
-      <div className={styles.darkSection}>
-        <div className={styles.headerInner}>
-          <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
-            Our Collection
+        {/* ── DARK HEADER (Top 50%) ── */}
+        <div className={styles.darkSection}>
+          <div className={styles.headerInner}>
+            <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
+              Our Collection
+            </div>
+            <h1 className={`${styles.title} reveal reveal-delay-1`}>
+              EVERY PIECE<br />
+              <span className={styles.outlineDark}>TELLS A STORY.</span>
+            </h1>
+            <p className={`${styles.subtitleDark} reveal reveal-delay-2`}>
+              Premium 3D-designed objects crafted with Bambu Lab P1S precision.
+              Each piece made to order — never mass-produced.
+            </p>
           </div>
-          <h1 className={`${styles.title} reveal reveal-delay-1`}>
-            EVERY PIECE<br />
-            <span className={styles.outlineDark}>TELLS A STORY.</span>
-          </h1>
-          <p className={`${styles.subtitleDark} reveal reveal-delay-2`}>
-            Premium 3D-designed objects crafted with Bambu Lab P1S precision.
-            Each piece made to order — never mass-produced.
-          </p>
         </div>
-      </div>
 
-      {/* ── OFF-WHITE PRODUCTS GRID (Bottom 50%) ── */}
-      <div className={styles.lightSection}>
-        <div className={`${styles.gridContainer} reveal`}>
-          <ProductGrid products={products} />
+        {/* ── OFF-WHITE PRODUCTS GRID (Bottom 50%) ── */}
+        <div className={styles.lightSection}>
+          <div className={`${styles.gridContainer} reveal`}>
+            <ProductGrid products={products} />
+          </div>
         </div>
-      </div>
 
-      <Ticker
-        variant="bottom"
-        items={[
-          'Made With Intention',
-          'Bambu Lab P1S Precision',
-          '0.12mm Layer Resolution',
-          'Ships in 7 Days',
-          'Each Piece Unique',
-        ]}
-      />
-      <Footer />
+        <Ticker
+          variant="bottom"
+          items={[
+            'Made With Intention',
+            'Bambu Lab P1S Precision',
+            '0.12mm Layer Resolution',
+            'Ships in 7 Days',
+            'Each Piece Unique',
+          ]}
+        />
+        <Footer />
+      </div>
     </>
   )
 }
