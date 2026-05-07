@@ -39,30 +39,42 @@ export const listActive = query({
 });
 
 /**
- * Search active products by name, description, or category
+ * Search active products by name using native Convex search index
  * Returns matching products with prices
  */
 export const search = query({
   args: { term: v.string() },
   handler: async (ctx, { term }) => {
-    const products = await ctx.db
+    const lower = term.toLowerCase().trim();
+    if (!lower) return [];
+
+    // Use native search index for name-based search
+    const searchResults = await ctx.db
+      .query("products")
+      .withSearchIndex("search_products", (q) =>
+        q.search("name", lower).eq("isActive", true)
+      )
+      .take(20);
+
+    // Also do a fallback filter on description/category/tagline
+    // for terms that match those but not the name
+    const allActive = await ctx.db
       .query("products")
       .withIndex("by_isActive", (q) => q.eq("isActive", true))
       .collect();
 
-    const lower = term.toLowerCase().trim();
-    if (!lower) return [];
-
-    const matched = products.filter(
+    const extraMatches = allActive.filter(
       (p) =>
-        p.name.toLowerCase().includes(lower) ||
-        p.description.toLowerCase().includes(lower) ||
-        p.category.toLowerCase().includes(lower) ||
-        p.shortTagline.toLowerCase().includes(lower)
+        !searchResults.some((sr) => sr._id === p._id) &&
+        (p.description.toLowerCase().includes(lower) ||
+         p.category.toLowerCase().includes(lower) ||
+         p.shortTagline.toLowerCase().includes(lower))
     );
 
+    const combined = [...searchResults, ...extraMatches];
+
     return Promise.all(
-      matched.map(async (product) => {
+      combined.map(async (product) => {
         const pricing = await ctx.db
           .query("productPricing")
           .withIndex("by_productId", (q) => q.eq("productId", product._id))

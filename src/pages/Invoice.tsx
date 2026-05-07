@@ -60,10 +60,21 @@ export default function Invoice() {
 
   const siteUrl = window.location.origin
 
+  // Safely convert any value to a renderable string — prevents React Error #130
+  const safe = (val: unknown): string => {
+    if (val === null || val === undefined) return ''
+    if (typeof val === 'string') return val
+    if (typeof val === 'number' || typeof val === 'boolean') return String(val)
+    try { return JSON.stringify(val) } catch { return '' }
+  }
+
   // Helper to read CMS values with fallback
   const cms = (section: string, key: string, fallback: string) => {
     const entry = cmsContent?.find((c) => c.section === section && c.key === key)
-    return entry?.value || fallback
+    const val = entry?.value
+    if (val === null || val === undefined) return fallback
+    if (typeof val !== 'string') return fallback
+    return val || fallback
   }
 
   useEffect(() => {
@@ -115,7 +126,7 @@ export default function Invoice() {
             <h2 className={styles.invoiceTitle}>Tax Invoice / Bill of Supply</h2>
             <div className={styles.infoGrid}>
               <span className={styles.infoLabel}>Order ID:</span>
-              <span className={styles.infoValue}>{order.orderId}</span>
+              <span className={styles.infoValue}>{safe(order.orderId)}</span>
 
               <span className={styles.infoLabel}>Order Date:</span>
               <span className={styles.infoValue}>{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
@@ -124,7 +135,7 @@ export default function Invoice() {
               <span className={styles.infoValue}>{new Date().toLocaleDateString('en-IN')}</span>
 
               <span className={styles.infoLabel}>Payment:</span>
-              <span className={styles.infoValue}>{order.paymentStatus.toUpperCase()}</span>
+              <span className={styles.infoValue}>{safe(order.paymentStatus).toUpperCase()}</span>
             </div>
           </div>
         </div>
@@ -133,21 +144,21 @@ export default function Invoice() {
           <div className={styles.addressBlock}>
             <h3 className={styles.addressTitle}>Billing Address</h3>
             <div className={styles.addressContent}>
-              <strong>{order.addressSnapshot.name}</strong><br />
-              {order.addressSnapshot.line1}<br />
-              {order.addressSnapshot.line2 && <>{order.addressSnapshot.line2}<br /></>}
-              {order.addressSnapshot.city}, {order.addressSnapshot.state} — {order.addressSnapshot.pincode}<br />
-              Phone: {order.addressSnapshot.phone}
+              <strong>{safe(order.addressSnapshot.name)}</strong><br />
+              {safe(order.addressSnapshot.line1)}<br />
+              {order.addressSnapshot.line2 && <>{safe(order.addressSnapshot.line2)}<br /></>}
+              {safe(order.addressSnapshot.city)}, {safe(order.addressSnapshot.state)} — {safe(order.addressSnapshot.pincode)}<br />
+              Phone: {safe(order.addressSnapshot.phone)}
             </div>
           </div>
           <div className={styles.addressBlock}>
             <h3 className={styles.addressTitle}>Shipping Address</h3>
             <div className={styles.addressContent}>
-              <strong>{order.addressSnapshot.name}</strong><br />
-              {order.addressSnapshot.line1}<br />
-              {order.addressSnapshot.line2 && <>{order.addressSnapshot.line2}<br /></>}
-              {order.addressSnapshot.city}, {order.addressSnapshot.state} — {order.addressSnapshot.pincode}<br />
-              Phone: {order.addressSnapshot.phone}
+              <strong>{safe(order.addressSnapshot.name)}</strong><br />
+              {safe(order.addressSnapshot.line1)}<br />
+              {order.addressSnapshot.line2 && <>{safe(order.addressSnapshot.line2)}<br /></>}
+              {safe(order.addressSnapshot.city)}, {safe(order.addressSnapshot.state)} — {safe(order.addressSnapshot.pincode)}<br />
+              Phone: {safe(order.addressSnapshot.phone)}
             </div>
           </div>
         </div>
@@ -173,9 +184,9 @@ export default function Invoice() {
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>
-                    <strong>{item.productName}</strong>
+                    <strong>{safe(item.productName)}</strong>
                     <div className={styles.itemMeta}>
-                      HSN: {hsnCode}
+                      HSN: {safe(hsnCode)}
                     </div>
                   </td>
                   <td style={{ textAlign: 'center' }}>{item.quantity}</td>
@@ -206,7 +217,7 @@ export default function Invoice() {
             </div>
             {order.discountAmount > 0 && (
               <div className={styles.totalsRow}>
-                <span>Discount ({order.couponCode || 'Promo'}):</span>
+                <span>Discount ({safe(order.couponCode) || 'Promo'}):</span>
                 <span>-{fmt(order.discountAmount)}</span>
               </div>
             )}

@@ -61,6 +61,12 @@ export default function OrderTracking() {
   const currentStep = STATUS_STEPS.indexOf(order.status as OrderStatus)
   const fmt = (paise: number) =>
     `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`
+  const safe = (val: unknown): string => {
+    if (val === null || val === undefined) return ''
+    if (typeof val === 'string') return val
+    if (typeof val === 'number' || typeof val === 'boolean') return String(val)
+    try { return JSON.stringify(val) } catch { return '' }
+  }
 
   return (
     <div className={styles.page}>
@@ -71,7 +77,7 @@ export default function OrderTracking() {
         <div className={styles.header}>
           <Link to="/dashboard" className={styles.backLink}>← Back to Dashboard</Link>
           <div className={styles.eyebrow}>ORDER TRACKING</div>
-          <h1 className={styles.title}>{order.orderId}</h1>
+          <h1 className={styles.title}>{safe(order.orderId)}</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <StatusBadge status={order.status as OrderStatus} />
             <Link 
@@ -124,7 +130,7 @@ export default function OrderTracking() {
                         )}
                         {step === 'shipped' && order.trackingNumber && (
                           <div className={styles.trackingNum}>
-                            Tracking: <strong>{order.trackingNumber}</strong>
+                            Tracking: <strong>{safe(order.trackingNumber)}</strong>
                           </div>
                         )}
                       </div>
@@ -141,7 +147,7 @@ export default function OrderTracking() {
                 {order.items.map((item, i) => (
                   <div key={i} className={styles.item}>
                     <div className={styles.itemInfo}>
-                      <span className={styles.itemName}>{item.productName}</span>
+                      <span className={styles.itemName}>{safe(item.productName)}</span>
                       <span className={styles.itemQty}>Qty: {item.quantity}</span>
                     </div>
                     <span className={styles.itemPrice}>{fmt(item.unitPrice * item.quantity)}</span>
@@ -160,7 +166,7 @@ export default function OrderTracking() {
               </div>
               {order.discountAmount > 0 && (
                 <div className={`${styles.summaryRow} ${styles.discountRow}`}>
-                  <span>Discount {order.couponCode && `(${order.couponCode})`}</span>
+                  <span>Discount {order.couponCode && `(${safe(order.couponCode)})`}</span>
                   <span>−{fmt(order.discountAmount)}</span>
                 </div>
               )}
@@ -176,11 +182,11 @@ export default function OrderTracking() {
             <div className={styles.card}>
               <h2 className={styles.cardTitle}>Delivery Address</h2>
               <div className={styles.addressBox}>
-                <div className={styles.addressName}>{order.addressSnapshot.name}</div>
-                <div className={styles.addressLine}>{order.addressSnapshot.line1}</div>
-                {order.addressSnapshot.line2 && <div className={styles.addressLine}>{order.addressSnapshot.line2}</div>}
-                <div className={styles.addressLine}>{order.addressSnapshot.city}, {order.addressSnapshot.state} — {order.addressSnapshot.pincode}</div>
-                <div className={styles.addressLine}>📱 {order.addressSnapshot.phone}</div>
+                <div className={styles.addressName}>{safe(order.addressSnapshot.name)}</div>
+                <div className={styles.addressLine}>{safe(order.addressSnapshot.line1)}</div>
+                {order.addressSnapshot.line2 && <div className={styles.addressLine}>{safe(order.addressSnapshot.line2)}</div>}
+                <div className={styles.addressLine}>{safe(order.addressSnapshot.city)}, {safe(order.addressSnapshot.state)} — {safe(order.addressSnapshot.pincode)}</div>
+                <div className={styles.addressLine}>📱 {safe(order.addressSnapshot.phone)}</div>
               </div>
             </div>
 

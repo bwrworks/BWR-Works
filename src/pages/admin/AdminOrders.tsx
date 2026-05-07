@@ -13,6 +13,13 @@ function fmt(paise: number) {
   return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`
 }
 
+function safe(val: unknown): string {
+  if (val === null || val === undefined) return ''
+  if (typeof val === 'string') return val
+  if (typeof val === 'number' || typeof val === 'boolean') return String(val)
+  try { return JSON.stringify(val) } catch { return '' }
+}
+
 export default function AdminOrders() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
@@ -90,8 +97,8 @@ export default function AdminOrders() {
                 onClick={() => setExpandedOrder(expandedOrder === order.orderId ? null : order.orderId)}
               >
                 <div className={styles.orderMeta}>
-                  <span className={styles.orderId}>{order.orderId}</span>
-                  <span className={styles.orderCustomer}>{order.addressSnapshot.name}</span>
+                  <span className={styles.orderId}>{safe(order.orderId)}</span>
+                  <span className={styles.orderCustomer}>{safe(order.addressSnapshot.name)}</span>
                   <span className={styles.orderAmount}>{fmt(order.total)}</span>
                 </div>
                 <div className={styles.orderRight}>
@@ -112,7 +119,7 @@ export default function AdminOrders() {
                     <div className={styles.detailLabel}>ITEMS</div>
                     {order.items.map((item, i) => (
                       <div key={i} className={styles.detailItem}>
-                        <span>{item.productName} × {item.quantity}</span>
+                        <span>{safe(item.productName)} × {item.quantity}</span>
                         <span>{fmt(item.unitPrice * item.quantity)}</span>
                       </div>
                     ))}
@@ -122,9 +129,9 @@ export default function AdminOrders() {
                   <div className={styles.detailSection}>
                     <div className={styles.detailLabel}>DELIVER TO</div>
                     <div className={styles.detailText}>
-                      {order.addressSnapshot.name}, {order.addressSnapshot.line1},
-                      {order.addressSnapshot.city}, {order.addressSnapshot.state} — {order.addressSnapshot.pincode}
-                      <br />📱 {order.addressSnapshot.phone}
+                      {safe(order.addressSnapshot.name)}, {safe(order.addressSnapshot.line1)},
+                      {safe(order.addressSnapshot.city)}, {safe(order.addressSnapshot.state)} — {safe(order.addressSnapshot.pincode)}
+                      <br />📱 {safe(order.addressSnapshot.phone)}
                     </div>
                   </div>
 

@@ -266,7 +266,11 @@ export const markOrderPaid = internalMutation({
         customerEmail,
         customerName: order.addressSnapshot.name,
         orderId: order.orderId,
-        items: order.items,
+        items: order.items.map((item) => ({
+          productName: item.productName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
         total: order.total,
       });
     }

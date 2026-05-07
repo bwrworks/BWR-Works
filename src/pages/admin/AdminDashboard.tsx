@@ -86,6 +86,13 @@ function fmt(paise: number) {
   return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`
 }
 
+function safe(val: unknown): string {
+  if (val === null || val === undefined) return ''
+  if (typeof val === 'string') return val
+  if (typeof val === 'number' || typeof val === 'boolean') return String(val)
+  try { return JSON.stringify(val) } catch { return '' }
+}
+
 // Generate last 7 day labels
 function getLast7Days() {
   const days = []
@@ -247,8 +254,8 @@ export default function AdminDashboard() {
             </div>
             {recentOrders.map(order => (
               <div key={order._id} className={styles.tableRow}>
-                <span className={styles.orderId}>{order.orderId}</span>
-                <span className={styles.cell}>{order.addressSnapshot.name}</span>
+                <span className={styles.orderId}>{safe(order.orderId)}</span>
+                <span className={styles.cell}>{safe(order.addressSnapshot.name)}</span>
                 <span className={styles.cell}>{fmt(order.total)}</span>
                 <span>
                   <span className={styles.badge} style={{ background: STATUS_COLOR[order.status] }}>

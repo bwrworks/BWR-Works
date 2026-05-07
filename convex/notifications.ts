@@ -1,5 +1,7 @@
 // notifications.ts
 
+"use node";
+
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { Resend } from "resend";
@@ -15,6 +17,9 @@ function getResend() {
   return new Resend(apiKey);
 }
 
+// ─── IMPORTANT: FROM must match a verified domain in Resend ───
+// The domain bwrworks.com must be verified in Resend → Domains
+// If using bwrworks.in, that domain must also be verified
 const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <orders@bwrworks.com>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
 const SITE_URL = process.env.SITE_URL || "https://bwrworks.com";

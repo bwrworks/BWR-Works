@@ -26,7 +26,7 @@ export const ResendOTP = Email({
     const resend = new ResendAPI(provider.apiKey);
     
     const { error } = await resend.emails.send({
-      from: process.env.AUTH_EMAIL_FROM ?? "BWR Works <onboarding@resend.dev>",
+      from: process.env.AUTH_EMAIL_FROM ?? "BWR Works <auth@bwrworks.com>",
       to: [email],
       subject: `Your sign-in code for BWR Works`,
       text: `Your distinct access code is: ${token}\n\nDo not share this code with anyone.`,

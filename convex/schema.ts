@@ -96,7 +96,11 @@ export default defineSchema({
   })
     .index("by_slug", ["slug"])
     .index("by_category", ["category"])
-    .index("by_isActive", ["isActive"]),
+    .index("by_isActive", ["isActive"])
+    .searchIndex("search_products", {
+      searchField: "name",
+      filterFields: ["isActive"],
+    }),
 
   // ─────────────────────────────────────────────────
   // PRICING DEFAULTS — Global cost parameters
@@ -268,7 +272,7 @@ export default defineSchema({
     key: v.string(),
     value: v.string(),
     updatedAt: v.number(),
-    updatedBy: v.string(),
+    updatedBy: v.id("users"),
   }).index("by_section_key", ["section", "key"]),
 
   // ─────────────────────────────────────────────────
