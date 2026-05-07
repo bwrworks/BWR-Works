@@ -118,7 +118,7 @@ export default function Invoice() {
             <p className={styles.companyDetail}>Made in Bengaluru</p>
             <p className={styles.companyDetail}>GSTIN: {cms('invoice', 'gstin', '[Enter GST in Admin → Content]')}</p>
             <p className={styles.companyDetail}>{cms('invoice', 'company_address', '[Enter Address in Admin → Content]')}</p>
-            <p className={styles.companyDetail}>Email: {cms('invoice', 'contact_email', 'orders@bwrworks.in')}</p>
+            <p className={styles.companyDetail}>Email: {cms('invoice', 'contact_email', 'contact@bwrworks.com')}</p>
           </div>
           <div className={styles.invoiceInfo}>
             <h2 className={styles.invoiceTitle}>Tax Invoice / Bill of Supply</h2>
@@ -232,7 +232,7 @@ export default function Invoice() {
 
         <div className={styles.footer}>
           This is a computer-generated document. No signature is required. <br />
-          For any queries, please reach out to {cms('invoice', 'contact_email', 'orders@bwrworks.in')}
+          For any queries, please reach out to {cms('invoice', 'contact_email', 'contact@bwrworks.com')}
         </div>
       </div>
     </div>

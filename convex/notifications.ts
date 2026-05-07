@@ -20,7 +20,7 @@ function getResend() {
 // ─── IMPORTANT: FROM must match a verified domain in Resend ───
 // The domain bwrworks.com must be verified in Resend → Domains
 // If using bwrworks.in, that domain must also be verified
-const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <orders@bwrworks.com>";
+const FROM = process.env.RESEND_FROM_EMAIL || "BWR Works <contact@bwrworks.com>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
 const SITE_URL = process.env.SITE_URL || "https://bwrworks.com";
 
@@ -153,7 +153,7 @@ export const sendOrderConfirmationEmail = action({
           </div>
           <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
             <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
-            <p style="color:#aaa;font-size:11px;margin:4px 0 0;">Questions? WhatsApp: <a href="https://wa.me/917019427272" style="color:#FF5C1A;">+91 70194 27272</a></p>
+            <p style="color:#aaa;font-size:11px;margin:4px 0 0;">Questions? WhatsApp: <a href="https://wa.me/918431797007" style="color:#FF5C1A;">+91 84317 97007</a></p>
           </div>
         </div>
       </body></html>`,
@@ -277,7 +277,7 @@ export const sendContactFormEmail = action({
             <p style="color:#444;font-size:14px;line-height:1.7;">Thank you for reaching out. We typically respond within 24 hours on business days.</p>
             <p style="color:#444;font-size:14px;line-height:1.7;">Your message: <em style="color:#666;">"${esc(message.slice(0, 140))}${message.length > 140 ? "..." : ""}"</em></p>
             <p style="color:#444;font-size:14px;line-height:1.7;margin-top:16px;">
-              Need urgent help? WhatsApp us at <a href="https://wa.me/917019427272" style="color:#FF5C1A;">+91 70194 27272</a>
+              Need urgent help? WhatsApp us at <a href="https://wa.me/918431797007" style="color:#FF5C1A;">+91 84317 97007</a>
             </p>
             <p style="color:#888;font-size:11px;margin-top:24px;">💬 You can reply to this email directly and we'll see it in our inbox.</p>
           </div>
@@ -338,7 +338,7 @@ export const sendAdminReplyEmail = action({
             <p style="font-size:11px;color:#aaa;margin-top:20px;">💬 Reply to this email to continue the conversation.</p>
           </div>
           <div style="padding:16px 32px;border-top:1px solid #E8E3DB;background:#F9FAFB;">
-            <p style="color:#888;font-size:11px;margin:0;">BWR Works · <a href="https://wa.me/917019427272" style="color:#FF5C1A;">WhatsApp</a> · Ref: ${threadId}</p>
+            <p style="color:#888;font-size:11px;margin:0;">BWR Works · <a href="https://wa.me/918431797007" style="color:#FF5C1A;">WhatsApp</a> · Ref: ${threadId}</p>
           </div>
         </div>
       </body></html>`,

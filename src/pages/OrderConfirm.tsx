@@ -87,7 +87,7 @@ export default function OrderConfirm() {
           <p className={styles.whatsapp}>
             Questions? WhatsApp us at{' '}
             <a
-              href="https://wa.me/917019427272?text=Hi%2C%20I%20have%20a%20question%20about%20my%20BWR%20order"
+              href="https://wa.me/918431797007?text=Hi%2C%20I%20have%20a%20question%20about%20my%20BWR%20order"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.link}

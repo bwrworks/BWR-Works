@@ -38,7 +38,7 @@ export default function Footer() {
         <div>
           <div className={styles.colTitle}>Connect</div>
           <ul className={styles.links}>
-            <li><a href={`https://wa.me/${cms('footer', 'phone', '917019427272').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer">WhatsApp Us</a></li>
+            <li><a href={`https://wa.me/${cms('footer', 'phone', '918431797007').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer">WhatsApp Us</a></li>
             <li><a href={cms('footer', 'instagram', 'https://instagram.com/bwrworks')} target="_blank" rel="noopener noreferrer">Instagram</a></li>
             <li><Link to="/dashboard">My Account</Link></li>
           </ul>

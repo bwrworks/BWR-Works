@@ -369,7 +369,7 @@ export default function Dashboard() {
                 {/* Support */}
                 <div style={{ marginTop: 'var(--space-xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
                   <a
-                    href="https://wa.me/917019427272?text=Hi%20BWR%20Works%2C%20I%20need%20help%20with%20my%20account"
+                    href="https://wa.me/918431797007?text=Hi%20BWR%20Works%2C%20I%20need%20help%20with%20my%20account"
                     target="_blank" rel="noopener noreferrer"
                     className={styles.waBtn}
                   >
