@@ -2,7 +2,11 @@ import { useEffect, useMemo } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
-import QRCode from 'react-qr-code'
+// react-qr-code CJS→ESM interop is broken in Vite prod builds:
+// default export resolves to module namespace { QRCode, default } instead of the component.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import _QRCodeModule from 'react-qr-code'
+const QRCode: any = (_QRCodeModule as any)?.QRCode ?? (_QRCodeModule as any)?.default ?? _QRCodeModule
 import styles from './Invoice.module.css'
 
 /** Generate a simple Code128-style barcode as inline SVG */
