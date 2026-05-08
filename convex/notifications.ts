@@ -17,11 +17,12 @@ function getResend() {
   return new Resend(apiKey);
 }
 
-// ─── IMPORTANT: FROM must match a verified domain in Resend ───
-// The domain bwrworks.com must be verified in Resend → Domains
-// Split by purpose: orders@ for transactional, contact@ for support
-const FROM_ORDERS = "BWR Works Orders <orders@bwrworks.com>";
-const FROM_SUPPORT = "BWR Works Support <contact@bwrworks.com>";
+// ─── EMAIL FROM ADDRESSES ───
+// Each alias must exist in Hostinger (bwrworks.com) AND the domain must be verified in Resend
+// Aliases: support@, orders@, auth@, contact@
+const FROM_SUPPORT = "BWR Works Support <support@bwrworks.com>";
+const FROM_ORDERS = "BWR Works <orders@bwrworks.com>";
+const REPLY_TO_SUPPORT = "support@bwrworks.com";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
 const SITE_URL = process.env.SITE_URL || "https://bwrworks.com";
 
@@ -108,7 +109,7 @@ export const sendOrderConfirmationEmail = action({
 
     const { error } = await resend.emails.send({
       from: FROM_ORDERS,
-      replyTo: "contact@bwrworks.com",
+      replyTo: REPLY_TO_SUPPORT,
       to: customerEmail,
       subject: `Order Confirmed — ${orderId}`,
       attachments: [
@@ -188,7 +189,7 @@ export const sendStatusUpdateEmail = action({
 
     const { error } = await resend.emails.send({
       from: FROM_ORDERS,
-      replyTo: "contact@bwrworks.com",
+      replyTo: REPLY_TO_SUPPORT,
       to: customerEmail,
       subject: `Order ${orderId} — Status Update | BWR Works`,
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
@@ -269,7 +270,7 @@ export const sendContactFormEmail = action({
     // 2. Auto-reply to customer — ticket tag in subject enables inbound reply tracking
     const { error: customerError } = await resend.emails.send({
       from: FROM_SUPPORT,
-      replyTo: "contact@bwrworks.com",
+      replyTo: REPLY_TO_SUPPORT,
       to: email,
       subject: `We received your inquiry — BWR Works [${threadId}]`,
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
@@ -317,34 +318,40 @@ export const sendAdminReplyEmail = action({
     const resend = getResend();
 
     const threadHtml = (previousMessages || []).slice(-4).map(m =>
-      `<div style="margin:6px 0;padding:10px 12px;background:${m.sender === "admin" ? "#FFF5F0" : "#F9FAFB"};border-left:3px solid ${m.sender === "admin" ? "#FF5C1A" : "#D1D5DB"};font-size:12px;color:#555;">
-        <strong>${m.sender === "admin" ? "BWR Works" : esc(customerName)}</strong>&nbsp;·&nbsp;${new Date(m.timestamp).toLocaleDateString("en-IN")}<br/>
-        ${esc(m.content.slice(0, 300))}${m.content.length > 300 ? "..." : ""}
+      `<div style="margin:12px 0;padding-left:14px;border-left:3px solid ${m.sender === "admin" ? "#FF5C1A" : "#ccc"};">
+        <div style="font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">
+          <strong>${m.sender === "admin" ? "BWR Works" : esc(customerName)}</strong> • ${new Date(m.timestamp).toLocaleDateString("en-IN")}
+        </div>
+        <div style="font-size:14px;color:#333;line-height:1.6;white-space:pre-wrap;">${esc(m.content.slice(0, 300))}${m.content.length > 300 ? "..." : ""}</div>
       </div>`
     ).join("");
 
     const { error } = await resend.emails.send({
       from: FROM_SUPPORT,
-      replyTo: "contact@bwrworks.com",
+      replyTo: REPLY_TO_SUPPORT,
       to: customerEmail,
       subject: `Reply from BWR Works Support [${threadId}]`,
-      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
-        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
-          <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+        <div style="max-width:560px;margin:20px auto;border:1px solid #eaeaea;border-radius:8px;overflow:hidden;">
+          <div style="background:#111;padding:24px 32px;text-align:center;">
+            <div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:18px;color:#111;margin:0 0 20px;">Hi ${esc(customerName)},</h1>
-            <div style="font-size:14px;color:#333;line-height:1.8;white-space:pre-wrap;">${esc(replyMessage)}</div>
+            <div style="font-size:15px;color:#222;line-height:1.7;white-space:pre-wrap;">${esc(replyMessage)}</div>
+            
             ${threadHtml ? `
-            <div style="margin-top:24px;border-top:1px solid #E8E3DB;padding-top:16px;">
-              <div style="font-size:10px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">PREVIOUS MESSAGES</div>
+            <div style="margin-top:32px;padding-top:24px;border-top:1px solid #eaeaea;">
+              <div style="font-size:10px;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Conversation History</div>
               ${threadHtml}
             </div>` : ""}
-            <p style="font-size:11px;color:#aaa;margin-top:20px;">💬 Reply to this email to continue the conversation.</p>
+            
+            <div style="margin-top:32px;padding:16px;background:#f9f9f9;border-radius:6px;text-align:center;">
+              <p style="font-size:13px;color:#555;margin:0;">💬 <strong>Reply directly to this email</strong> to continue the conversation.</p>
+            </div>
           </div>
-          <div style="padding:16px 32px;border-top:1px solid #E8E3DB;background:#F9FAFB;">
-            <p style="color:#888;font-size:11px;margin:0;">BWR Works · <a href="https://wa.me/918431797007" style="color:#FF5C1A;">WhatsApp</a> · Ref: ${threadId}</p>
+          <div style="padding:16px 32px;background:#f5f5f5;text-align:center;border-top:1px solid #eaeaea;">
+            <p style="color:#888;font-size:12px;margin:0;">BWR Works • <a href="https://wa.me/918431797007" style="color:#FF5C1A;text-decoration:none;font-weight:bold;">WhatsApp Us</a> • Ref: ${threadId}</p>
           </div>
         </div>
       </body></html>`,
