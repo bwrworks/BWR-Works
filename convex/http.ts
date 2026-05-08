@@ -46,24 +46,37 @@ http.route({
 
       const payload = await request.json() as Record<string, any>;
 
+      // ─── DEBUG: Log full payload structure ───
+      console.log(`[Inbound] Raw payload keys: ${Object.keys(payload).join(', ')}`);
+      console.log(`[Inbound] payload.type: ${payload.type}`);
+      if (payload.data) {
+        console.log(`[Inbound] payload.data keys: ${Object.keys(payload.data).join(', ')}`);
+      }
+
       // Resend wraps inbound emails in a `data` object: { type: 'email.received', data: { ... } }
       const emailData = payload.data || payload;
 
       // Extract details
       const emailId: string = emailData.email_id || emailData.id || "";
+
       const fromRaw: string = emailData.from || "";
       const subject: string = emailData.subject || "";
-      const textBody: string = emailData.text || emailData.plain_text || "";
+
+      console.log(`[Inbound] emailId=${emailId}, from=${fromRaw}, subject="${subject}"`);
 
       // Extract sender email from "Name <email@example.com>" format
       const emailMatch = fromRaw.match(/<(.+?)>/) || [null, fromRaw];
       const senderEmail = (emailMatch[1] || fromRaw).trim().toLowerCase();
 
+      console.log(`[Inbound] Parsed senderEmail=${senderEmail}`);
+
       // Extract thread ID from subject: [BWRSUP0001] or [BWR-SUP-0001] or Order IDs (BWR0001AEXL)
       const supMatch = subject.match(/\[?BWR-?SUP-?(\d+)\]?/i);
       const orderMatch = subject.match(/\[?BWR(\d{4}[A-Z0-9]{4})\]?/i) || subject.match(/\[?BWR-(\d{4}-[A-Z0-9]{4})\]?/i);
       const legacyMatch = subject.match(/\[?BWR-Q-([a-z0-9]+)\]?/i);
-      
+
+      console.log(`[Inbound] Regex results: supMatch=${JSON.stringify(supMatch)}, orderMatch=${JSON.stringify(orderMatch)}, legacyMatch=${JSON.stringify(legacyMatch)}`);
+
       if (!supMatch && !orderMatch && !legacyMatch) {
         console.warn(`[Inbound] No thread ID in subject: "${subject}" — ignoring`);
         return new Response(JSON.stringify({ ok: false, reason: "no_thread_id" }), {
@@ -81,24 +94,73 @@ http.route({
         threadId = `BWR-Q-${legacyMatch[1].toLowerCase().slice(0, 8)}`;
       }
 
-      // Strip quoted previous messages from the reply body
-      // (Lines starting with > are quoted replies from email clients)
-      const cleanBody = textBody
+      console.log(`[Inbound] Resolved threadId=${threadId}`);
+
+      let textBody: string = emailData.text || emailData.plain_text || "";
+
+      // Resend webhook for email.received does NOT include the body!
+      // We must fetch it via the Resend API using the email_id
+      if (!textBody && emailId) {
+        const apiKey = process.env.AUTH_RESEND_KEY;
+        if (apiKey) {
+          try {
+            console.log(`[Inbound] No body in webhook — fetching from Resend API: ${emailId}`);
+            const res = await fetch(`https://api.resend.com/emails/${emailId}`, {
+              headers: { "Authorization": `Bearer ${apiKey}` },
+            });
+            if (res.ok) {
+              const fullEmail = await res.json() as Record<string, any>;
+              textBody = fullEmail.text || fullEmail.plain_text || "";
+              if (!textBody && fullEmail.html) {
+                textBody = fullEmail.html
+                  .replace(/<br\s*\/?>/gi, '\n')
+                  .replace(/<p[^>]*>/gi, '\n')
+                  .replace(/<[^>]*>?/gm, '')
+                  .replace(/&nbsp;/g, ' ')
+                  .replace(/\n\s*\n/g, '\n')
+                  .trim();
+              }
+              if (!textBody && fullEmail.body) {
+                textBody = fullEmail.body;
+              }
+              console.log(`[Inbound] Fetched email body, length=${textBody.length}`);
+            } else {
+              const errText = await res.text();
+              console.warn(`[Inbound] Resend API ${res.status}: ${errText}`);
+            }
+          } catch (fetchErr) {
+            console.error(`[Inbound] Failed to fetch email:`, fetchErr);
+          }
+        }
+      }
+
+      // If still no body, store a placeholder so the message still appears
+      if (!textBody) {
+        textBody = `[Email reply received — view full content in Resend dashboard]`;
+      }
+
+      // Strip quoted previous messages
+      let cleanBody = textBody
         .split("\n")
-        .filter(line => !line.startsWith(">") && !line.startsWith("On "))
+        .filter((line: string) => !line.trim().startsWith(">") && !line.trim().startsWith("On "))
         .join("\n")
         .trim();
 
-      const content = cleanBody || textBody.slice(0, 2000);
+      if (!cleanBody) cleanBody = textBody;
+
+      const content = cleanBody.slice(0, 5000);
+      console.log(`[Inbound] Final content: "${content.slice(0, 100)}..."`);
 
       // Store in DB via internal mutation
-      await ctx.runMutation(internal.inquiries.storeInboundMessage, {
+      const result = await ctx.runMutation(internal.inquiries.storeInboundMessage, {
         threadId,
         senderEmail,
         content,
         resendEmailId: emailId,
         timestamp: Date.now(),
       });
+
+      console.log(`[Inbound] storeInboundMessage result: ${JSON.stringify(result)}`);
 
       return new Response(JSON.stringify({ ok: true }), {
         status: 200,
