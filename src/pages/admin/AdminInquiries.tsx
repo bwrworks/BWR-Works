@@ -113,7 +113,7 @@ export default function AdminInquiries() {
       <div className={selected ? styles.splitLayout : styles.splitLayoutSingle}>
 
         {/* ── LEFT: INQUIRY LIST (Hide on mobile if selected) ── */}
-        <div style={{ display: selected ? 'none' : 'flex', flexDirection: 'column', gap: 10, minWidth: 0, '@media (min-width: 900px)': { display: 'flex' } } as any}>
+        <div className={selected ? styles.mobileHide : ''} style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
           {inquiries === undefined ? (
             <div className={styles.loading}>Loading inquiries...</div>
           ) : inquiries.length === 0 ? (

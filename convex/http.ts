@@ -46,12 +46,14 @@ http.route({
 
       const payload = await request.json() as Record<string, any>;
 
-      // Resend inbound email payload fields:
-      // { email_id, from, to, subject, text, html, headers }
-      const emailId: string = payload.email_id || payload.id || "";
-      const fromRaw: string = payload.from || "";
-      const subject: string = payload.subject || "";
-      const textBody: string = payload.text || payload.plain_text || "";
+      // Resend wraps inbound emails in a `data` object: { type: 'email.received', data: { ... } }
+      const emailData = payload.data || payload;
+
+      // Extract details
+      const emailId: string = emailData.email_id || emailData.id || "";
+      const fromRaw: string = emailData.from || "";
+      const subject: string = emailData.subject || "";
+      const textBody: string = emailData.text || emailData.plain_text || "";
 
       // Extract sender email from "Name <email@example.com>" format
       const emailMatch = fromRaw.match(/<(.+?)>/) || [null, fromRaw];

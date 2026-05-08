@@ -184,6 +184,12 @@
 }
 
 .mobileBackBtn { display: none !important; }
+
 @media (max-width: 900px) {
+  .splitLayout {
+    display: flex;
+    flex-direction: column;
+  }
   .mobileBackBtn { display: flex !important; }
+  .mobileHide { display: none !important; }
 }
