@@ -22,7 +22,8 @@ function getResend() {
 // Aliases: support@, orders@, auth@, contact@
 const FROM_SUPPORT = "BWR Works Support <support@bwrworks.com>";
 const FROM_ORDERS = "BWR Works <orders@bwrworks.com>";
-const REPLY_TO_SUPPORT = "support@bwrworks.com";
+// Using Resend's direct inbound receiving address to bypass Hostinger forwarder setup
+const REPLY_TO_SUPPORT = "support@laeklieu.resend.app";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
 const SITE_URL = process.env.SITE_URL || "https://bwrworks.com";
 

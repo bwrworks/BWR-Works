@@ -57,11 +57,12 @@ http.route({
       const emailMatch = fromRaw.match(/<(.+?)>/) || [null, fromRaw];
       const senderEmail = (emailMatch[1] || fromRaw).trim().toLowerCase();
 
-      // Extract thread ID from subject: [BWR-SUP-XXXX] or legacy [BWR-Q-xxxxxxxx]
-      const supMatch = subject.match(/\[BWR-SUP-(\d+)\]/i);
-      const legacyMatch = subject.match(/\[BWR-Q-([a-z0-9]+)\]/i);
+      // Extract thread ID from subject: [BWRSUP0001] or [BWR-SUP-0001] or Order IDs (BWR0001AEXL)
+      const supMatch = subject.match(/\[?BWR-?SUP-?(\d+)\]?/i);
+      const orderMatch = subject.match(/\[?BWR(\d{4}[A-Z0-9]{4})\]?/i) || subject.match(/\[?BWR-(\d{4}-[A-Z0-9]{4})\]?/i);
+      const legacyMatch = subject.match(/\[?BWR-Q-([a-z0-9]+)\]?/i);
       
-      if (!supMatch && !legacyMatch) {
+      if (!supMatch && !orderMatch && !legacyMatch) {
         console.warn(`[Inbound] No thread ID in subject: "${subject}" — ignoring`);
         return new Response(JSON.stringify({ ok: false, reason: "no_thread_id" }), {
           status: 200,
@@ -69,9 +70,14 @@ http.route({
         });
       }
 
-      const threadId = supMatch 
-        ? `BWR-SUP-${supMatch[1]}` 
-        : `BWR-Q-${legacyMatch![1].toLowerCase().slice(0, 8)}`;
+      let threadId = "";
+      if (supMatch) {
+        threadId = `BWRSUP${supMatch[1].padStart(4, "0")}`;
+      } else if (orderMatch) {
+        threadId = `BWR${orderMatch[1].replace(/-/g, '')}`.toUpperCase();
+      } else if (legacyMatch) {
+        threadId = `BWR-Q-${legacyMatch[1].toLowerCase().slice(0, 8)}`;
+      }
 
       // Strip quoted previous messages from the reply body
       // (Lines starting with > are quoted replies from email clients)

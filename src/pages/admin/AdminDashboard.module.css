@@ -161,3 +161,29 @@
     padding: var(--space-lg);
   }
 }
+
+/* ── Split Layout for Inquiries/Details ── */
+.splitLayout {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+.splitLayoutSingle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .splitLayout {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.mobileBackBtn { display: none !important; }
+@media (max-width: 900px) {
+  .mobileBackBtn { display: flex !important; }
+}

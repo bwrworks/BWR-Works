@@ -8,15 +8,15 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 // BWR WORKS — Inquiries + Email Thread System
 // ═══════════════════════════════════════════════════
 
-/** Generate a human-readable sequential ticket ID like BWR-SUP-0001 */
+/** Generate a human-readable sequential ticket ID like BWRSUP0001 */
 async function makeThreadId(ctx: any): Promise<string> {
   try {
     const allInquiries = await ctx.db.query("inquiries").collect();
     const nextNum = allInquiries.length + 1;
-    return `BWR-SUP-${String(nextNum).padStart(4, "0")}`;
+    return `BWRSUP${String(nextNum).padStart(4, "0")}`;
   } catch {
     // Fallback if count fails
-    return `BWR-SUP-${String(Date.now()).slice(-6)}`;
+    return `BWRSUP${String(Date.now()).slice(-6)}`;
   }
 }
 
@@ -155,14 +155,34 @@ export const storeInboundMessage = internalMutation({
   },
   handler: async (ctx, { threadId, senderEmail, content, resendEmailId, timestamp }) => {
     // Find inquiry by threadId
-    const inquiry = await ctx.db
+    let inquiry = await ctx.db
       .query("inquiries")
       .withIndex("by_threadId", q => q.eq("threadId", threadId))
       .first();
 
     if (!inquiry) {
-      console.warn(`[Inbound] No inquiry found for threadId: ${threadId}`);
-      return { ok: false, reason: "thread_not_found" };
+      // If it's a new reply to an Order or old format, create a new inquiry automatically!
+      if (threadId.startsWith("BWR")) {
+        console.log(`[Inbound] Creating new inquiry thread for unrecognized ID: ${threadId}`);
+        // Try to find the order to get the customer name
+        const order = await ctx.db.query("orders").withIndex("by_orderId", q => q.eq("orderId", threadId)).first();
+        const name = order ? order.addressSnapshot.name : senderEmail.split("@")[0];
+        
+        const inquiryId = await ctx.db.insert("inquiries", {
+          name,
+          email: senderEmail,
+          subject: "support",
+          message: `Customer replied to an automated email regarding ${threadId}.`,
+          status: "new",
+          threadId,
+          createdAt: timestamp,
+        });
+        inquiry = await ctx.db.get(inquiryId);
+        if (!inquiry) throw new Error("Failed to create inquiry for order reply");
+      } else {
+        console.warn(`[Inbound] No inquiry found for threadId: ${threadId}`);
+        return { ok: false, reason: "thread_not_found" };
+      }
     }
 
     // Idempotency: check if this email was already stored

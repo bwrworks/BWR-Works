@@ -110,10 +110,10 @@ export default function AdminInquiries() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1.3fr' : '1fr', gap: 'var(--space-lg)', alignItems: 'start' }}>
+      <div className={selected ? styles.splitLayout : styles.splitLayoutSingle}>
 
-        {/* ── LEFT: INQUIRY LIST ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
+        {/* ── LEFT: INQUIRY LIST (Hide on mobile if selected) ── */}
+        <div style={{ display: selected ? 'none' : 'flex', flexDirection: 'column', gap: 10, minWidth: 0, '@media (min-width: 900px)': { display: 'flex' } } as any}>
           {inquiries === undefined ? (
             <div className={styles.loading}>Loading inquiries...</div>
           ) : inquiries.length === 0 ? (
@@ -129,23 +129,23 @@ export default function AdminInquiries() {
                 cursor: 'pointer',
                 transition: 'all 0.15s',
               }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+                <div style={{ minWidth: 0, flex: '1 1 200px' }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem', color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 6 }}>
                     {inq.name}
                     {inq.status === 'new' && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--orange)', display: 'inline-block' }} />}
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', marginTop: 2 }}>{inq.email}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', marginTop: 2, wordBreak: 'break-all' }}>{inq.email}</div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--muted)', opacity: 0.6 }}>{timeAgo(inq.createdAt)}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--muted)' }}>{SUBJECT_LABELS[inq.subject]}</span>
                   <span style={{
                     fontFamily: 'var(--font-mono)', fontSize: '0.5rem', letterSpacing: '0.08em',
                     background: `${STATUS_COLORS[inq.status]}20`, color: STATUS_COLORS[inq.status],
                     border: `1px solid ${STATUS_COLORS[inq.status]}40`,
                     padding: '2px 8px', borderRadius: 3
                   }}>{inq.status.toUpperCase()}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--muted)' }}>{SUBJECT_LABELS[inq.subject]}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--muted)', opacity: 0.6 }}>{timeAgo(inq.createdAt)}</span>
                 </div>
               </div>
               <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.82rem', color: 'var(--muted)', marginTop: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -163,10 +163,19 @@ export default function AdminInquiries() {
           <div style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
             {/* Header */}
             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'var(--ink)' }}>
-              <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1rem', color: 'white' }}>{selected.name}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{selected.email}</div>
-                {selected.threadId && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'rgba(255,92,26,0.8)', marginTop: 2 }}>{selected.threadId}</div>}
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <button 
+                  onClick={() => setSelected(null)} 
+                  style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '4px 8px 4px 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center' }}
+                  className={styles.mobileBackBtn}
+                >
+                  ←
+                </button>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1rem', color: 'white' }}>{selected.name}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', marginTop: 2, wordBreak: 'break-all' }}>{selected.email}</div>
+                  {selected.threadId && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'rgba(255,92,26,0.8)', marginTop: 2 }}>{selected.threadId}</div>}
+                </div>
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {selected.status !== 'closed' && (
@@ -174,7 +183,6 @@ export default function AdminInquiries() {
                     Close
                   </button>
                 )}
-                <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: '1.1rem' }}>✕</button>
               </div>
             </div>
 

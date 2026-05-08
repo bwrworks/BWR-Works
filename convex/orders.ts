@@ -215,7 +215,7 @@ export const createOrder = mutation({
     const orderCount = await ctx.db.query("orders").collect();
     const orderNumber = String(orderCount.length + 1).padStart(4, "0");
     const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
-    const orderId = `BWR-${orderNumber}-${suffix}`;
+    const orderId = `BWR${orderNumber}${suffix}`;
 
     return await ctx.db.insert("orders", {
       orderId,
