@@ -22,6 +22,8 @@ interface ProductCardProps {
   description: string
   price: number | null  // paise from pricing engine
   images: string[]       // Cloudinary URLs
+  rating?: number        // average rating (0-5)
+  reviewCount?: number   // total reviews
 }
 
 export default function ProductCard({
@@ -32,6 +34,8 @@ export default function ProductCard({
   description,
   price,
   images,
+  rating,
+  reviewCount,
 }: ProductCardProps) {
   const tag = TAG_MAP[category] ?? { class: 'tagIdentity', label: category }
   const hasImage = images.length > 0
@@ -66,6 +70,18 @@ export default function ProductCard({
         <p className={styles.cardDesc}>
           {description.length > 100 ? description.slice(0, 100) + '...' : description}
         </p>
+        {rating !== undefined && rating > 0 && (
+          <div className={styles.cardRating}>
+            <span className={styles.cardStars}>
+              {[1, 2, 3, 4, 5].map(i => (
+                <span key={i} className={i <= Math.round(rating) ? styles.starFilled : styles.starEmpty}>★</span>
+              ))}
+            </span>
+            <span className={styles.cardReviewCount}>
+              {rating.toFixed(1)} ({reviewCount || 0})
+            </span>
+          </div>
+        )}
         <div className={styles.cardFooter}>
           <span className={styles.cardPrice}>
             {price ? `Starting at ${formatPrice(price)}` : 'Custom pricing'}

@@ -1,3 +1,6 @@
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
+import type { Id } from '../../../convex/_generated/dataModel'
 import ProductCard from './ProductCard'
 import styles from './ProductGrid.module.css'
 
@@ -5,6 +8,7 @@ import styles from './ProductGrid.module.css'
 // BWR WORKS — ProductGrid
 // Reusable responsive grid of ProductCards.
 // Handles loading skeleton and empty states.
+// Now includes star ratings fetched from backend.
 // ═══════════════════════════════════════════════════
 
 interface Product {
@@ -20,6 +24,27 @@ interface Product {
 
 interface ProductGridProps {
   products: Product[] | undefined  // undefined = loading
+}
+
+/** Wrapper to fetch rating for a single product card */
+function RatedProductCard({ product }: { product: Product }) {
+  const ratingData = useQuery(api.reviews.getAverageRating, {
+    productId: product._id as Id<'products'>,
+  })
+
+  return (
+    <ProductCard
+      slug={product.slug}
+      name={product.name}
+      category={product.category}
+      shortTagline={product.shortTagline}
+      description={product.description}
+      price={product.price}
+      images={product.images}
+      rating={ratingData?.avg}
+      reviewCount={ratingData?.count}
+    />
+  )
 }
 
 export default function ProductGrid({ products }: ProductGridProps) {
@@ -51,16 +76,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   return (
     <div className={styles.grid}>
       {products.map((p) => (
-        <ProductCard
-          key={p._id}
-          slug={p.slug}
-          name={p.name}
-          category={p.category}
-          shortTagline={p.shortTagline}
-          description={p.description}
-          price={p.price}
-          images={p.images}
-        />
+        <RatedProductCard key={p._id} product={p} />
       ))}
     </div>
   )

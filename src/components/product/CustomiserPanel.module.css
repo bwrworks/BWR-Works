@@ -333,59 +333,66 @@
    LIGHT VARIANT — for off-white backgrounds
    ═══════════════════════════════════════ */
 .light .sectionTitle {
-  color: var(--ink);
+  color: #111;
 }
 
 .light .label {
-  color: #6a6058;
+  color: #111;
+  font-weight: 700;
 }
 
 .light .optionBtn {
-  background: rgba(17, 17, 17, 0.03);
-  border-color: rgba(17, 17, 17, 0.15);
-  color: #5a5248;
+  background: #fff;
+  border: 1.5px solid rgba(17, 17, 17, 0.22);
+  color: #111;
   border-radius: 8px;
+  font-weight: 600;
 }
 
 .light .optionBtn:hover {
-  border-color: rgba(17, 17, 17, 0.4);
-  color: var(--ink);
-  background: rgba(17, 17, 17, 0.06);
+  border-color: #111;
+  color: #111;
+  background: rgba(17, 17, 17, 0.04);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
 .light .textInput {
   background: #fff;
-  border-color: rgba(17, 17, 17, 0.15);
-  color: var(--ink);
+  border: 1.5px solid rgba(17, 17, 17, 0.22);
+  color: #111;
   border-radius: 8px;
 }
 
 .light .textInput::placeholder {
-  color: rgba(17, 17, 17, 0.3);
+  color: rgba(17, 17, 17, 0.35);
 }
 
 .light .charCount {
-  color: rgba(17, 17, 17, 0.3);
+  color: rgba(17, 17, 17, 0.4);
 }
 
 .light .qtyBtn {
-  background: rgba(17, 17, 17, 0.04);
-  border-color: rgba(17, 17, 17, 0.12);
-  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid rgba(17, 17, 17, 0.22);
+  color: #111;
+  font-weight: 700;
 }
 
 .light .qtyBtn:hover {
-  background: rgba(17, 17, 17, 0.1);
+  background: rgba(17, 17, 17, 0.06);
+  border-color: #111;
 }
 
 .light .qtyValue {
-  color: var(--ink);
+  color: #111;
   background: #fff;
-  border-color: rgba(17, 17, 17, 0.12);
+  border-color: rgba(17, 17, 17, 0.22);
+  font-weight: 800;
 }
 
 .light .qtyMax {
-  color: rgba(17, 17, 17, 0.3);
+  color: rgba(17, 17, 17, 0.45);
 }
 
 .light .toggle {
@@ -403,8 +410,8 @@
 
 .light .fileLabel {
   background: #fff;
-  border-color: rgba(17, 17, 17, 0.15);
-  color: #7a7068;
+  border: 1.5px dashed rgba(17, 17, 17, 0.22);
+  color: #333;
 }
 
 .light .fileHint {

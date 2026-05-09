@@ -174,6 +174,36 @@
   letter-spacing: 0.16em;
 }
 
+/* ── Star Rating ── */
+.cardRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.cardStars {
+  display: flex;
+  gap: 1px;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.starFilled {
+  color: #FF5C1A;
+}
+
+.starEmpty {
+  color: rgba(17, 17, 17, 0.12);
+}
+
+.cardReviewCount {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
