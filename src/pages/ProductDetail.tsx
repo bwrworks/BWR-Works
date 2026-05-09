@@ -171,6 +171,7 @@ export default function ProductDetail() {
             config={product.customisationConfig}
             productId={product._id}
             productName={product.name}
+            image={product.images?.[0]}
             variant="light"
           />
 

@@ -1,37 +1,39 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
 import styles from './Testimonials.module.css'
 
-const testimonials = [
+const DEFAULT_TESTIMONIALS = [
   {
-    quote: "The keychain with my bike's number plate is the coolest thing I own. Everyone at my riding group wants one now.",
+    quote: "Got my bike's number plate on a keychain. It's solid, looks premium, and now everyone in my riding group keeps asking where I got it.",
     author: 'Arjun K.',
     city: 'Bengaluru',
     tag: 'Keychains',
     light: false,
   },
   {
-    quote: "Got the key holder as a housewarming gift for my brother. The LED lights up when you pick the keys — his jaw literally dropped.",
+    quote: "Gifted the key holder for a housewarming. The way the LED lights up when you grab the keys is such a neat touch. They loved it.",
     author: 'Priya M.',
     city: 'Mumbai',
     tag: 'Key Holder',
     light: true,
   },
   {
-    quote: "Ordered a photo frame for my parents' anniversary. The quality is insane — they thought I got it from some high-end store abroad.",
+    quote: "The photo frame was for my parents' anniversary. It feels so well-made, definitely doesn't look like your usual store-bought stuff.",
     author: 'Rohan S.',
     city: 'Hyderabad',
     tag: 'Photo Frame',
     light: false,
   },
   {
-    quote: "I run a small car accessories shop. BWR's key holders are my best-selling gift item. Customers love the personalisation.",
+    quote: "I keep a few of these in my auto accessories shop. They always sell out quickly because the finish is just that good.",
     author: 'Nandita R.',
     city: 'Pune',
     tag: 'Key Holder',
     light: true,
   },
   {
-    quote: "The attention to detail is unreal. You can feel this isn't factory-made. The matte finish, the weight — everything is premium.",
+    quote: "You can really tell these are made with care. The weight is perfect and the matte finish gives it a very clean look.",
     author: 'Sneha V.',
     city: 'Delhi',
     tag: 'Keychains',
@@ -42,6 +44,22 @@ const testimonials = [
 export default function Testimonials() {
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  
+  const fetchedReviews = useQuery(api.reviews.getTopReviews)
+  
+  const testimonials = useMemo(() => {
+    if (fetchedReviews && fetchedReviews.length > 0) {
+      return fetchedReviews.map((r, index) => ({
+        quote: r.reviewText,
+        author: r.userName,
+        city: '', // User location isn't stored in reviews currently
+        tag: r.productCategory,
+        light: index % 2 !== 0, // Alternate dark/light cards
+      }))
+    }
+    return DEFAULT_TESTIMONIALS
+  }, [fetchedReviews])
+
   const total = testimonials.length
 
   const goNext = useCallback(() => {
@@ -60,6 +78,8 @@ export default function Testimonials() {
   }, [goNext, isPaused])
 
   const t = testimonials[current]
+
+  if (!t) return null
 
   return (
     <div
@@ -99,10 +119,10 @@ export default function Testimonials() {
             <div className={styles.cardTag}>{t.tag}</div>
             <div className={styles.quote}>{t.quote}</div>
             <div className={styles.author}>
-              <div className={styles.avatar}>{t.author[0]}</div>
+              <div className={styles.avatar}>{t.author[0]?.toUpperCase()}</div>
               <div>
                 <span className={styles.name}>{t.author}</span>
-                <span className={styles.city}>{t.city}</span>
+                {t.city && <span className={styles.city}>{t.city}</span>}
               </div>
             </div>
           </div>

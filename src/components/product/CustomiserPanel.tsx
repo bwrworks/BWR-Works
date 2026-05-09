@@ -22,10 +22,11 @@ interface Props {
   config: CustomField[]
   productId: string
   productName: string
+  image?: string
   variant?: 'dark' | 'light'
 }
 
-export default function CustomiserPanel({ config, productId, productName, variant = 'dark' }: Props) {
+export default function CustomiserPanel({ config, productId, productName, image, variant = 'dark' }: Props) {
   const [values, setValues] = useState<Record<string, string | number | boolean>>({})
   const [files, setFiles] = useState<Record<string, File | null>>({})
   const [qty, setQty] = useState(1)
@@ -69,6 +70,7 @@ export default function CustomiserPanel({ config, productId, productName, varian
         sellingPrice: priceData?.unitPrice ?? 0,
       },
       customisations: values,
+      imageRef: image,
     })
 
     setAdded(true)

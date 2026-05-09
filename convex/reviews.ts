@@ -106,6 +106,35 @@ export const getAverageRating = query({
 });
 
 /**
+ * Get top reviews (4 or 5 stars) across all products for the homepage.
+ * Returns up to 10 recent top reviews.
+ */
+export const getTopReviews = query({
+  args: {},
+  handler: async (ctx) => {
+    const reviews = await ctx.db.query("reviews").collect();
+    
+    // Filter for 4 or 5 stars, sort newest first, take top 10
+    const topReviews = reviews
+      .filter((r) => r.rating >= 4)
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .slice(0, 10);
+
+    // Join with product data to get product names and categories for the tags
+    return Promise.all(
+      topReviews.map(async (review) => {
+        const product = await ctx.db.get(review.productId);
+        return {
+          ...review,
+          productName: product?.name || "Custom Product",
+          productCategory: product?.category || "Product",
+        };
+      })
+    );
+  },
+});
+
+/**
  * Delete a review (admin only).
  */
 export const deleteReview = mutation({
