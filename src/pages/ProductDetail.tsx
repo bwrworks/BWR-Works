@@ -4,6 +4,7 @@ import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import SEO from '../components/layout/SEO'
 import CustomiserPanel from '../components/product/CustomiserPanel'
 import ReviewSection from '../components/product/ReviewSection'
 import RelatedProducts from '../components/product/RelatedProducts'
@@ -30,6 +31,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <>
+        <SEO title="Product Not Found | BWR Works" description="This product does not exist." />
         <Navbar />
         <div className={styles.notFound}>
           <h1>Product Not Found</h1>
@@ -43,8 +45,32 @@ export default function ProductDetail() {
 
   const currentImage = product.images?.[selectedImage] || product.images?.[0]
 
+  const handleShare = async () => {
+    const shareData = {
+      title: `${product.name} | BWR Works`,
+      text: `Check out this custom ${product.name} at BWR Works!\n\n${product.shortTagline}`,
+      url: window.location.href,
+    }
+    
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`)
+        alert('Link copied to clipboard!')
+      }
+    } catch (err) {
+      console.log('Error sharing:', err)
+    }
+  }
+
   return (
     <>
+      <SEO 
+        title={`${product.name} | BWR Works`}
+        description={product.description}
+        image={currentImage}
+      />
       <Navbar />
       {/* ── BREADCRUMB BAR ── */}
       <div className={styles.breadcrumbBar}>
@@ -117,7 +143,7 @@ export default function ProductDetail() {
               <div className={styles.darkInfoIcon}>🔬</div>
               <div>
                 <h3 className={styles.darkInfoTitle}>Premium Materials</h3>
-                <p className={styles.darkInfoText}>Made with high-quality PLA and precision-grade 3D printing technology for a flawless finish every time.</p>
+                <p className={styles.darkInfoText}>Made with high-quality, dense polymers formulated for an architectural finish. A flawless look that feels permanent to the touch.</p>
               </div>
             </div>
 
@@ -145,7 +171,18 @@ export default function ProductDetail() {
           <div className={styles.categoryBadge}>
             {product.category}
           </div>
-          <h1 className={styles.productName}>{product.name}</h1>
+          <div className={styles.titleRow}>
+            <h1 className={styles.productName}>{product.name}</h1>
+            <button className={styles.shareBtn} onClick={handleShare} aria-label="Share product">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+          </div>
           <p className={styles.tagline}>{product.shortTagline}</p>
 
           <div className={styles.priceBlock}>

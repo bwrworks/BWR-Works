@@ -38,7 +38,7 @@ export default function Hero() {
           ))}
         </h1>
         <p className={styles.sub}>
-          {cms('hero', 'subheadline', 'Premium 3D-designed objects for the moments that matter most. Memory. Identity. Spirit. Pride. Each piece made with intention — never in bulk, never without purpose.')}
+          {cms('hero', 'subheadline', 'Premium customized objects for the moments that matter most. Memory. Identity. Spirit. Pride. Each piece crafted with intention — never mass-produced, never without purpose.')}
         </p>
         <div className={styles.actions}>
           <a href="#products" className={styles.btnPrimary}>
@@ -58,8 +58,8 @@ export default function Hero() {
             <span className={styles.statLabel}>Day Delivery</span>
           </div>
           <div className={styles.statItem}>
-            <span className={styles.statNum}>0.12</span>
-            <span className={styles.statLabel}>mm Precision</span>
+            <span className={styles.statNum}>100</span>
+            <span className={styles.statLabel}>% Custom</span>
           </div>
         </div>
       </div>

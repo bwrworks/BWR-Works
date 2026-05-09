@@ -5,6 +5,7 @@ import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import Ticker from '../components/home/Ticker'
 import ProductGrid from '../components/product/ProductGrid'
+import SEO from '../components/layout/SEO'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import styles from './Products.module.css'
 
@@ -23,6 +24,10 @@ export default function Products() {
 
   return (
     <>
+      <SEO 
+        title="Shop Collection | BWR Works - Custom Keychains & Frames" 
+        description="Explore our premium collection of custom-made pieces, ready to be personalized with your story. Never mass-produced."
+      />
       <Navbar />
       <div>
         <Ticker
@@ -50,8 +55,8 @@ export default function Products() {
                 <span className={styles.outlineDark}>TELLS A STORY.</span>
               </h1>
               <p className={`${styles.subtitleDark} reveal reveal-delay-2`}>
-                Premium 3D-designed objects crafted with Bambu Lab P1S precision.
-                Each piece made to order — never mass-produced.
+                Premium customized objects designed for the moments that matter.
+                Each piece crafted exactly to your specifications — never mass-produced.
               </p>
             </div>
             <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
@@ -77,8 +82,8 @@ export default function Products() {
           variant="bottom"
           items={[
             'Made With Intention',
-            'Bambu Lab P1S Precision',
-            '0.12mm Layer Resolution',
+            'Precision Crafted',
+            'Perfectly Detailed',
             'Ships in 7 Days',
             'Each Piece Unique',
           ]}

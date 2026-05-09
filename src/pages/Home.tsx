@@ -8,6 +8,7 @@ import FeaturedDrop from '../components/home/FeaturedDrop'
 import ProcessSection from '../components/home/ProcessSection'
 import Testimonials from '../components/home/Testimonials'
 import CtaSection from '../components/home/CtaSection'
+import SEO from '../components/layout/SEO'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
 export default function Home() {
@@ -15,17 +16,21 @@ export default function Home() {
 
   return (
     <>
+      <SEO 
+        title="BWR Works | Custom High-Quality Gifts & Accessories" 
+        description="Premium customized keychains, key holders, and photo frames. Precision crafted and personalized to tell your story."
+      />
       <Navbar />
       <Hero />
       <Ticker
         variant="top"
         items={[
           'Made With Intention',
-          'Bambu Lab P1S Precision',
+          'Precision Crafted',
           'Black or White — Never Both By Accident',
-          '0.12mm Layer Resolution',
+          'Perfectly Detailed',
           'Designed in India',
-          'Premium PLA Matte Finish',
+          'Premium Matte Finish',
           'Ships in 7 Days',
           'Objects That Mean Something',
         ]}
@@ -36,7 +41,7 @@ export default function Home() {
         variant="light"
         items={[
           'Crafted Not Mass-Made',
-          'Premium PLA · Matte Finish',
+          'Premium Matte Finish',
           'Designed in India',
           'No Two Are The Same',
           'Objects That Mean Something',

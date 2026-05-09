@@ -4,6 +4,7 @@ import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useCms } from '../hooks/useCms'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import SEO from '../components/layout/SEO'
 import styles from './Craft.module.css'
 
 export default function Craft() {
@@ -16,6 +17,10 @@ export default function Craft() {
 
   return (
     <div className={styles.page}>
+      <SEO 
+        title="Our Craft | BWR Works" 
+        description="Discover how we hand-finish every BWR piece. We reject mass manufacturing to bring you premium, customized functional art."
+      />
       <Navbar />
       
       {/* ── HERO SHIFT (INK) ── */}
@@ -28,7 +33,7 @@ export default function Craft() {
                 The Process
               </div>
               <h1 className={`${styles.title} reveal reveal-delay-1`}>
-                {cms('about', 'title', 'MACHINED.\nREFINED.').split('\n').map((line, i) => (
+                {cms('about', 'title', 'CUSTOMIZED.\nPERFECTED.').split('\n').map((line, i) => (
                   <span key={i}>
                     {i > 0 && <br />}
                     {i > 0 ? <span className={styles.outline}>{line}</span> : line}
@@ -36,7 +41,7 @@ export default function Craft() {
                 ))}
               </h1>
               <p className={`${styles.description} reveal reveal-delay-2`}>
-                {cms('about', 'body', 'We reject the disposable culture of mass manufacturing. Every BWR piece is individually 3D-crafted using industrial-grade materials, taking hours to produce a single perfect unit.')}
+                {cms('about', 'body', 'We reject the disposable culture of mass manufacturing. Every BWR piece is individually crafted using premium materials, taking hours to produce a single perfect unit customized exactly for you.')}
               </p>
             </div>
             <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
@@ -59,12 +64,12 @@ export default function Craft() {
             <div className={`${styles.contentBox} reveal`}>
               <h2>The Materials</h2>
               <p>
-                We formulate our objects using specialized Matte PLA and PETG blends. These aren't your typical plastics; they are dense, high-impact polymers designed to absorb light, offering an architectural, stone-like finish that feels permanent to the touch.
+                We formulate our objects using specialized premium polymers. These aren't your typical plastics; they are dense, high-impact materials designed to absorb light, offering an architectural, stone-like finish that feels permanent to the touch.
               </p>
               <ul className={styles.specList}>
-                <li><strong>Matte Black PLA:</strong> Deep light absorption, perfect finish.</li>
-                <li><strong>Industrial PETG:</strong> High thermal resistance for car interiors.</li>
-                <li><strong>100% Solid Infill:</strong> Weighty, premium hand-feel.</li>
+                <li><strong>Matte Black Finish:</strong> Deep light absorption, perfect sleek look.</li>
+                <li><strong>Industrial Strength:</strong> High thermal resistance for car interiors and outdoor use.</li>
+                <li><strong>Solid Core Construction:</strong> Weighty, premium hand-feel unlike hollow mass-produced items.</li>
               </ul>
             </div>
             <div className={`${styles.visualBox} reveal reveal-delay-1`}>
@@ -83,16 +88,16 @@ export default function Craft() {
             <div className={`${styles.contentBox} reveal`}>
               <h2>The Precision</h2>
               <p>
-                Running on Bambu Lab P1S architecture, our print farm operates at a microscopic <strong>0.12mm layer height</strong>. This obsession with resolution ensures smooth gradients, sharp typography, and flawless geometric angles that factory molds can't replicate without massive waste.
+                Running on state-of-the-art precision architecture, our studio operates at a microscopic level. This obsession with detail ensures smooth gradients, sharp typography, and flawless geometric angles that standard factory molds simply can't replicate.
               </p>
               <div className={styles.statsRow}>
                 <div className={styles.stat}>
-                  <div className={styles.statVal}>0.12</div>
-                  <div className={styles.statLabel}>MM PRECISION</div>
+                  <div className={styles.statVal}>100%</div>
+                  <div className={styles.statLabel}>CUSTOMIZED</div>
                 </div>
                 <div className={styles.stat}>
                   <div className={styles.statVal}>14</div>
-                  <div className={styles.statLabel}>HOUR PRINT TIME</div>
+                  <div className={styles.statLabel}>HOUR CRAFT TIME</div>
                 </div>
               </div>
             </div>
