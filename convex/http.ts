@@ -116,10 +116,21 @@ http.route({
         if (apiKey) {
           try {
             console.log(`[Inbound] No body in webhook — fetching from Resend API: ${emailId}`);
-            const res = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
-              headers: { "Authorization": `Bearer ${apiKey}` },
-            });
-            if (res.ok) {
+            let res;
+            for (let i = 0; i < 5; i++) {
+              res = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
+                headers: { "Authorization": `Bearer ${apiKey}` },
+              });
+              if (res.ok) break;
+              if (res.status === 404) {
+                console.log(`[Inbound] Resend API 404 (Attempt ${i + 1}/5) — waiting 1.5s...`);
+                await new Promise(r => setTimeout(r, 1500));
+              } else {
+                break;
+              }
+            }
+            
+            if (res && res.ok) {
               const fullEmail = await res.json() as Record<string, any>;
               textBody = fullEmail.text || fullEmail.plain_text || "";
               if (!textBody && fullEmail.html) {
@@ -135,7 +146,7 @@ http.route({
                 textBody = fullEmail.body;
               }
               console.log(`[Inbound] Fetched email body, length=${textBody.length}`);
-            } else {
+            } else if (res) {
               const errText = await res.text();
               console.warn(`[Inbound] Resend API ${res.status}: ${errText}`);
             }
