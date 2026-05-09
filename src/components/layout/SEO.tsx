@@ -7,6 +7,7 @@ interface SEOProps {
   type?: string
   image?: string
   url?: string
+  schema?: Record<string, any>
 }
 
 export default function SEO({ 
@@ -15,7 +16,8 @@ export default function SEO({
   name = "BWR Works", 
   type = "website", 
   image, 
-  url 
+  url,
+  schema
 }: SEOProps) {
   const currentUrl = url || typeof window !== 'undefined' ? window.location.href : 'https://www.bwrworks.com'
 
@@ -36,6 +38,13 @@ export default function SEO({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       {image && <meta name="twitter:image" content={image} />}
+      
+      {/* JSON-LD Structured Data */}
+      {schema && (
+        <script type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      )}
     </Helmet>
   )
 }

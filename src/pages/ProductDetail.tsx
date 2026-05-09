@@ -64,12 +64,35 @@ export default function ProductDetail() {
     }
   }
 
+  // Generate JSON-LD Schema for Google Rich Results
+  const productSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images || [],
+    "description": product.description,
+    "sku": product._id,
+    "brand": {
+      "@type": "Brand",
+      "name": "BWR Works"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": typeof window !== 'undefined' ? window.location.href : '',
+      "priceCurrency": "INR",
+      "price": product.price ? (product.price / 100).toFixed(2) : "162.00",
+      "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+      "itemCondition": "https://schema.org/NewCondition"
+    }
+  }
+
   return (
     <>
       <SEO 
         title={`${product.name} | BWR Works`}
         description={product.description}
         image={currentImage}
+        schema={productSchema}
       />
       <Navbar />
       {/* ── BREADCRUMB BAR ── */}
