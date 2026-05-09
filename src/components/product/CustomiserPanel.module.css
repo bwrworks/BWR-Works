@@ -31,12 +31,14 @@
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 800;
+  font-size: 1.15rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--off-white);
   margin-bottom: 24px;
+  padding-left: 14px;
+  border-left: 3px solid var(--orange);
 }
 
 /* ── FIELD GROUP ── */
@@ -47,11 +49,12 @@
 .label {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
+  color: rgba(245, 240, 232, 0.7);
+  margin-bottom: 12px;
 }
 
 .required {
@@ -68,26 +71,32 @@
 
 .optionBtn {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 10px 16px;
-  background: rgba(245, 240, 232, 0.04);
-  border: 1px solid rgba(245, 240, 232, 0.12);
-  color: var(--muted);
+  padding: 12px 20px;
+  background: rgba(245, 240, 232, 0.05);
+  border: 1.5px solid rgba(245, 240, 232, 0.15);
+  color: rgba(245, 240, 232, 0.65);
   cursor: pointer;
   transition: all 0.2s;
+  border-radius: 8px;
+  min-height: 44px;
 }
 
 .optionBtn:hover {
-  border-color: rgba(245, 240, 232, 0.3);
+  border-color: rgba(245, 240, 232, 0.4);
   color: var(--off-white);
+  background: rgba(245, 240, 232, 0.08);
+  transform: translateY(-1px);
 }
 
 .optionActive {
   border-color: var(--orange) !important;
-  color: var(--orange) !important;
-  background: rgba(255, 92, 26, 0.1) !important;
+  color: #fff !important;
+  background: rgba(255, 92, 26, 0.18) !important;
+  box-shadow: 0 0 0 2px rgba(255, 92, 26, 0.15);
+  font-weight: 600;
 }
 
 /* ── TEXT INPUT ── */
@@ -99,20 +108,24 @@
   width: 100%;
   font-family: var(--font-body);
   font-size: 0.95rem;
-  padding: 14px 16px;
-  background: rgba(245, 240, 232, 0.04);
-  border: 1px solid rgba(245, 240, 232, 0.12);
+  padding: 14px 18px;
+  background: rgba(245, 240, 232, 0.05);
+  border: 1.5px solid rgba(245, 240, 232, 0.15);
   color: var(--off-white);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  border-radius: 8px;
+  box-sizing: border-box;
+  min-height: 44px;
 }
 
 .textInput:focus {
   border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 92, 26, 0.1);
 }
 
 .textInput::placeholder {
-  color: rgba(245, 240, 232, 0.2);
+  color: rgba(245, 240, 232, 0.25);
 }
 
 .charCount {
@@ -275,18 +288,21 @@
   border: none;
   padding: 18px 32px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+  min-height: 56px;
 }
 
 .addToCart:hover {
   background: var(--orange-hover);
-  transform: scale(1.02);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 92, 26, 0.25);
 }
 
 .addToCartAdded {
   background: #10B981 !important;
   transform: none !important;
+  box-shadow: none !important;
 }
 
 .addToCartAdded:hover {
@@ -303,10 +319,10 @@
   margin-top: 16px;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(245, 240, 232, 0.25);
+  color: rgba(245, 240, 232, 0.35);
 }
 
 .guarantee span {
@@ -321,32 +337,35 @@
 }
 
 .light .label {
-  color: #7a7068;
+  color: #6a6058;
 }
 
 .light .optionBtn {
   background: rgba(17, 17, 17, 0.03);
   border-color: rgba(17, 17, 17, 0.15);
-  color: #7a7068;
+  color: #5a5248;
+  border-radius: 8px;
 }
 
 .light .optionBtn:hover {
   border-color: rgba(17, 17, 17, 0.4);
   color: var(--ink);
+  background: rgba(17, 17, 17, 0.06);
 }
 
 .light .textInput {
   background: #fff;
-  border-color: rgba(17, 17, 17, 0.12);
+  border-color: rgba(17, 17, 17, 0.15);
   color: var(--ink);
+  border-radius: 8px;
 }
 
 .light .textInput::placeholder {
-  color: rgba(17, 17, 17, 0.25);
+  color: rgba(17, 17, 17, 0.3);
 }
 
 .light .charCount {
-  color: rgba(17, 17, 17, 0.25);
+  color: rgba(17, 17, 17, 0.3);
 }
 
 .light .qtyBtn {

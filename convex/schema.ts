@@ -344,6 +344,20 @@ export default defineSchema({
   }).index("by_adminUserId", ["adminUserId"]),
 
   // ─────────────────────────────────────────────────
+  // REVIEWS — Product reviews from verified users
+  // ─────────────────────────────────────────────────
+  reviews: defineTable({
+    productId: v.id("products"),
+    userId: v.string(),
+    userName: v.string(),
+    rating: v.number(),       // 1–5 integer
+    reviewText: v.string(),   // 1–500 chars
+    createdAt: v.number(),
+  })
+    .index("by_productId", ["productId"])
+    .index("by_userId_productId", ["userId", "productId"]),
+
+  // ─────────────────────────────────────────────────
   // MESSAGES — Full two-way email thread per inquiry
   // ─────────────────────────────────────────────────
   messages: defineTable({

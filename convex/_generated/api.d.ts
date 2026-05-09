@@ -26,6 +26,7 @@ import type * as paymentsInternal from "../paymentsInternal.js";
 import type * as pricing from "../pricing.js";
 import type * as products from "../products.js";
 import type * as rateLimits from "../rateLimits.js";
+import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 import type * as webhookHandler from "../webhookHandler.js";
@@ -55,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   pricing: typeof pricing;
   products: typeof products;
   rateLimits: typeof rateLimits;
+  reviews: typeof reviews;
   seed: typeof seed;
   users: typeof users;
   webhookHandler: typeof webhookHandler;

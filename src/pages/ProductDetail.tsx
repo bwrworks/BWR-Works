@@ -5,6 +5,8 @@ import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import CustomiserPanel from '../components/product/CustomiserPanel'
+import ReviewSection from '../components/product/ReviewSection'
+import RelatedProducts from '../components/product/RelatedProducts'
 import { formatPrice } from '../lib/formatters'
 import styles from './ProductDetail.module.css'
 
@@ -134,8 +136,20 @@ export default function ProductDetail() {
             productName={product.name}
             variant="light"
           />
+
+          {/* Reviews Section */}
+          <ReviewSection productId={product._id} />
         </div>
       </div>
+
+      {/* ── RELATED PRODUCTS ── */}
+      {slug && (
+        <RelatedProducts
+          currentSlug={slug}
+          currentCategory={product.category}
+        />
+      )}
+
       <Footer />
     </>
   )

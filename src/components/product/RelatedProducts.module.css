@@ -1,0 +1,88 @@
+/* ═══════════════════════════════════════════
+   BWR WORKS — Related Products
+   Horizontal scroll on mobile, grid on desktop
+   ═══════════════════════════════════════════ */
+
+.section {
+  padding: 60px 60px 80px;
+  background: var(--off-white);
+  border-top: 1px solid rgba(17, 17, 17, 0.06);
+}
+
+.sectionInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.subheading {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* ── Mobile: Horizontal scroll ── */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 40px 20px 60px;
+  }
+
+  .grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .grid > * {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid > * {
+    flex: 0 0 85%;
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.grid::-webkit-scrollbar {
+  height: 4px;
+}
+
+.grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.grid::-webkit-scrollbar-thumb {
+  background: rgba(17, 17, 17, 0.1);
+  border-radius: 2px;
+}
