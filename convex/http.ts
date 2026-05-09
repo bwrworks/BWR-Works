@@ -162,7 +162,14 @@ http.route({
       }
 
       // Strip quoted previous messages
-      let cleanBody = textBody
+      let cleanBody = textBody;
+      const onWroteRegex = /\nOn\s[\s\S]{1,150}wrote:/i;
+      const matchIndex = cleanBody.search(onWroteRegex);
+      if (matchIndex !== -1) {
+        cleanBody = cleanBody.substring(0, matchIndex).trim();
+      }
+      
+      cleanBody = cleanBody
         .split("\n")
         .filter((line: string) => !line.trim().startsWith(">") && !line.trim().startsWith("On "))
         .join("\n")

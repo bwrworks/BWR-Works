@@ -117,7 +117,11 @@ export default function AdminInquiries() {
           {inquiries === undefined ? (
             <div className={styles.loading}>Loading inquiries...</div>
           ) : inquiries.length === 0 ? (
-            <div className={styles.empty}>No inquiries in this category.</div>
+            <div className={styles.empty} style={{ padding: '60px 20px' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>✉️</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 700, color: 'var(--ink)' }}>All Caught Up</div>
+              <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'var(--muted)', marginTop: 8 }}>No inquiries in this category.</div>
+            </div>
           ) : inquiries.map(inq => (
             <div key={inq._id}
               onClick={() => { setSelected(inq); setReplyText('') }}
@@ -187,7 +191,7 @@ export default function AdminInquiries() {
             </div>
 
             {/* Thread messages */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 400 }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: 24, display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '60vh' }}>
               {thread === undefined ? (
                 <div style={{ color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', textAlign: 'center' }}>Loading messages...</div>
               ) : thread.length === 0 ? (
@@ -196,21 +200,26 @@ export default function AdminInquiries() {
                 <div key={i} style={{
                   alignSelf: msg.sender === 'admin' ? 'flex-end' : 'flex-start',
                   maxWidth: '85%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: msg.sender === 'admin' ? 'flex-end' : 'flex-start'
                 }}>
                   <div style={{
-                    background: msg.sender === 'admin' ? 'var(--ink)' : '#F3F4F6',
+                    background: msg.sender === 'admin' ? 'linear-gradient(135deg, var(--orange), #FF7B47)' : '#FFFFFF',
                     color: msg.sender === 'admin' ? 'white' : 'var(--ink)',
-                    padding: '10px 14px',
-                    borderRadius: msg.sender === 'admin' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                    padding: '12px 18px',
+                    borderRadius: msg.sender === 'admin' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    border: msg.sender === 'admin' ? 'none' : '1px solid rgba(17,17,17,0.08)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                     fontFamily: 'var(--font-body)',
-                    fontSize: '0.88rem',
+                    fontSize: '0.9rem',
                     lineHeight: 1.6,
                     whiteSpace: 'pre-wrap',
                   }}>
                     {msg.content}
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--muted)', marginTop: 4, textAlign: msg.sender === 'admin' ? 'right' : 'left' }}>
-                    {msg.sender === 'admin' ? 'BWR Works' : selected.name} · {new Date(msg.timestamp).toLocaleString('en-IN')}
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--muted)', marginTop: 6, opacity: 0.8 }}>
+                    {msg.sender === 'admin' ? 'BWR Works' : selected.name} · {new Date(msg.timestamp).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
               ))}

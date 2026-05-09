@@ -547,52 +547,61 @@ function ThreadView({ inquiryId, status }: { inquiryId: Id<'inquiries'>; status:
       gap: 'var(--space-md)',
     }}>
       {/* Messages */}
-      {(thread || []).map((msg, i) => (
-        <div
-          key={i}
-          style={{
-            padding: '12px 16px',
-            background: msg.sender === 'admin' ? 'rgba(255,92,26,0.06)' : '#fff',
-            borderLeft: `3px solid ${msg.sender === 'admin' ? '#FF5C1A' : '#D1D5DB'}`,
-            fontSize: '0.85rem',
-            lineHeight: 1.7,
-            color: 'var(--ink)',
-          }}
-        >
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', marginBottom: 4 }}>
-            <strong>{msg.sender === 'admin' ? 'BWR Works' : 'You'}</strong>
-            &nbsp;·&nbsp;{new Date(msg.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '60vh', overflowY: 'auto', padding: '12px 4px' }}>
+        {(thread || []).map((msg, i) => (
+          <div key={i} style={{
+            alignSelf: msg.sender === 'admin' ? 'flex-start' : 'flex-end',
+            maxWidth: '85%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: msg.sender === 'admin' ? 'flex-start' : 'flex-end'
+          }}>
+            <div style={{
+              background: msg.sender === 'admin' ? '#FFFFFF' : 'linear-gradient(135deg, var(--orange), #FF7B47)',
+              color: msg.sender === 'admin' ? 'var(--ink)' : 'white',
+              padding: '12px 18px',
+              borderRadius: msg.sender === 'admin' ? '16px 16px 16px 4px' : '16px 16px 4px 16px',
+              border: msg.sender === 'admin' ? '1px solid rgba(17,17,17,0.08)' : 'none',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.9rem',
+              lineHeight: 1.6,
+              whiteSpace: 'pre-wrap',
+            }}>
+              {msg.content}
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--muted)', marginTop: 6, opacity: 0.8 }}>
+              {msg.sender === 'admin' ? 'BWR Works' : 'You'} · {new Date(msg.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+            </div>
           </div>
-          <div style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       {/* Reply box (only if not closed) */}
       {status !== 'closed' && (
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'flex-end' }}>
           <textarea
             value={replyText}
             onChange={e => setReplyText(e.target.value)}
             placeholder="Type your reply..."
-            rows={2}
+            rows={1}
             style={{
-              flex: 1, resize: 'vertical', fontFamily: 'var(--font-body)', fontSize: '0.85rem',
-              padding: '10px 12px', border: '1px solid rgba(17,17,17,0.15)', background: '#fff',
-              borderRadius: 'var(--radius-sm)', outline: 'none',
+              flex: 1, resize: 'none', fontFamily: 'var(--font-body)', fontSize: '0.9rem',
+              padding: '12px 18px', border: '1px solid rgba(17,17,17,0.12)', background: '#fff',
+              borderRadius: '24px', outline: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
             }}
           />
           <button
             onClick={handleReply}
             disabled={sending || !replyText.trim()}
             style={{
-              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.75rem',
-              letterSpacing: '0.08em', textTransform: 'uppercase' as const,
-              background: 'var(--orange)', color: '#fff', border: 'none',
-              padding: '10px 18px', cursor: 'pointer', opacity: sending ? 0.6 : 1,
-              alignSelf: 'flex-end', whiteSpace: 'nowrap' as const,
+              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.85rem',
+              letterSpacing: '0.04em', background: 'var(--ink)', color: '#fff', border: 'none',
+              height: '44px', padding: '0 20px', cursor: 'pointer', opacity: sending ? 0.6 : 1,
+              borderRadius: '22px', whiteSpace: 'nowrap' as const, transition: 'background 0.2s',
             }}
           >
-            {sending ? 'Sending...' : 'Reply →'}
+            {sending ? '...' : 'Send'}
           </button>
         </div>
       )}

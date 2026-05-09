@@ -319,11 +319,11 @@ export const sendAdminReplyEmail = action({
     const resend = getResend();
 
     const threadHtml = (previousMessages || []).slice(-4).map(m =>
-      `<div style="margin:12px 0;padding-left:14px;border-left:3px solid ${m.sender === "admin" ? "#FF5C1A" : "#ccc"};">
-        <div style="font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">
-          <strong>${m.sender === "admin" ? "BWR Works" : esc(customerName)}</strong> • ${new Date(m.timestamp).toLocaleDateString("en-IN")}
+      `<div style="margin:16px 0;padding:16px 20px;border-radius:12px;background:${m.sender === "admin" ? "#FFF8F5" : "#F9FAFB"};border:1px solid ${m.sender === "admin" ? "rgba(255,92,26,0.15)" : "#E5E7EB"};">
+        <div style="font-size:11px;color:${m.sender === "admin" ? "#FF5C1A" : "#6B7280"};margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">
+          <strong>${m.sender === "admin" ? "BWR Works" : esc(customerName)}</strong> • ${new Date(m.timestamp).toLocaleDateString("en-IN", {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}
         </div>
-        <div style="font-size:14px;color:#333;line-height:1.6;white-space:pre-wrap;">${esc(m.content.slice(0, 300))}${m.content.length > 300 ? "..." : ""}</div>
+        <div style="font-size:14px;color:#111827;line-height:1.6;white-space:pre-wrap;">${esc(m.content.slice(0, 300))}${m.content.length > 300 ? "..." : ""}</div>
       </div>`
     ).join("");
 
