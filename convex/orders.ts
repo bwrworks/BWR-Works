@@ -2,7 +2,7 @@ import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { requireAdmin } from "./admin";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Order Queries & Mutations
@@ -89,6 +89,9 @@ export const createOrder = mutation({
     discountAmount: v.number(),
     couponCode: v.optional(v.string()),
     total: v.number(),
+    paymentMode: v.union(v.literal("online"), v.literal("cod")),
+    balanceDue: v.number(),
+    razorpayAmount: v.number(),
     addressSnapshot: v.object({
       name: v.string(),
       line1: v.string(),
@@ -201,15 +204,10 @@ export const createOrder = mutation({
     }
 
     // ═══════════════════════════════════════════════
-    // 🔒 STOCK DEDUCTION — Atomic per-item decrement
+    // 🔒 STOCK VALIDATION ONLY (Deduction moved to markOrderPaid)
     // ═══════════════════════════════════════════════
-    for (const item of validatedItems) {
-      const product = await ctx.db.get(item.productId as any);
-      if (product) {
-        const newStock = ((product as any).stock ?? 0) - item.quantity;
-        await ctx.db.patch(product._id, { stock: Math.max(0, newStock) } as any);
-      }
-    }
+    // Stock is validated above. We DO NOT decrement here to avoid
+    // abandoned carts permanently locking up inventory.
 
     // Generate BWR order ID with random suffix to prevent race condition duplicates
     const orderCount = await ctx.db.query("orders").collect();
@@ -226,6 +224,9 @@ export const createOrder = mutation({
       discountAmount: serverDiscount,
       couponCode: args.couponCode,
       total: serverTotal,
+      paymentMode: args.paymentMode,
+      balanceDue: args.balanceDue,
+      razorpayAmount: args.razorpayAmount,
       razorpayOrderId: args.razorpayOrderId,
       addressSnapshot: args.addressSnapshot,
       status: "received",
@@ -252,13 +253,45 @@ export const markOrderPaid = internalMutation({
 
     if (!order) throw new Error("Order not found.");
 
+    // 1. Idempotency Check (crucial for racing webhooks)
+    if (order.paymentStatus === "verified") {
+      return order;
+    }
+
+    // 2. Patch payment status to verified
     await ctx.db.patch(order._id, {
       paymentStatus: "verified",
       razorpayPaymentId,
       updatedAt: Date.now(),
     });
 
-    // Schedule order confirmation email
+    // 3. Deduct Stock safely now that payment is confirmed
+    for (const item of order.items) {
+      const product = await ctx.db.get(item.productId as any);
+      if (product) {
+        const newStock = ((product as any).stock ?? 0) - item.quantity;
+        // Clamp to 0 to prevent negative stock edge cases.
+        await ctx.db.patch(product._id, { stock: Math.max(0, newStock) } as any);
+      }
+    }
+
+    // 4. Record Coupon Usage (if any)
+    if (order.couponCode) {
+      const coupon = await ctx.db
+        .query("coupons")
+        .withIndex("by_code", (q) => q.eq("code", order.couponCode!))
+        .first();
+      
+      if (coupon && order.userId) {
+        await ctx.runMutation(internal.coupons.internalRecordCouponUse, {
+          couponId: coupon._id,
+          userId: order.userId,
+          orderId: order.orderId,
+        });
+      }
+    }
+
+    // 5. Schedule order confirmation email
     const user = order.userId ? await ctx.db.get(order.userId as any) : null;
     const customerEmail = (user as any)?.email;
     if (customerEmail) {

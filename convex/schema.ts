@@ -211,6 +211,9 @@ export default defineSchema({
     discountAmount: v.number(),
     couponCode: v.optional(v.string()),
     total: v.number(),
+    paymentMode: v.union(v.literal("online"), v.literal("cod")),
+    balanceDue: v.number(),
+    razorpayAmount: v.number(),
     status: v.union(
       v.literal("received"),
       v.literal("printing"),

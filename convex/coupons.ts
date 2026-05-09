@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { requireAdmin } from "./admin";
@@ -89,6 +89,46 @@ export const recordCouponUse = mutation({
   handler: async (ctx, { couponId, orderId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated.");
+
+    // Increment usage count
+    const coupon = await ctx.db.get(couponId);
+    if (coupon) {
+      await ctx.db.patch(couponId, {
+        currentUses: coupon.currentUses + 1,
+      });
+    }
+
+    // Record usage
+    await ctx.db.insert("couponUses", {
+      couponId,
+      userId,
+      orderId,
+      usedAt: Date.now(),
+    });
+  },
+});
+
+/**
+ * Record coupon usage internally from the webhook handler.
+ * Includes idempotency check.
+ */
+export const internalRecordCouponUse = internalMutation({
+  args: {
+    couponId: v.id("coupons"),
+    userId: v.string(),
+    orderId: v.string(),
+  },
+  handler: async (ctx, { couponId, userId, orderId }) => {
+    // Idempotency check: see if it was already used for this order
+    const existing = await ctx.db
+      .query("couponUses")
+      .withIndex("by_couponId_userId", (q) =>
+        q.eq("couponId", couponId).eq("userId", userId)
+      )
+      .filter((q) => q.eq(q.field("orderId"), orderId))
+      .first();
+
+    if (existing) return;
 
     // Increment usage count
     const coupon = await ctx.db.get(couponId);

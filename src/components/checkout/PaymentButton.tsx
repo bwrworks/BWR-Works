@@ -120,6 +120,9 @@ export default function PaymentButton({
         razorpayOrderId: rzpOrder.razorpayOrderId,
         items: buildOrderItems(),
         subtotal, gstAmount, discountAmount, couponCode, total,
+        paymentMode: 'online',
+        balanceDue: 0,
+        razorpayAmount: total,
         addressSnapshot: address,
       })
 
@@ -137,8 +140,8 @@ export default function PaymentButton({
         handler: () => { onSuccess(rzpOrder.razorpayOrderId) },
       })
       rzp.open()
-    } catch {
-      setError(getFriendlyError(arguments[0]))
+    } catch (err) {
+      setError(getFriendlyError(err))
       setLoading(false)
     }
   }
@@ -165,6 +168,9 @@ export default function PaymentButton({
         razorpayOrderId: rzpOrder.razorpayOrderId,
         items: buildOrderItems(),
         subtotal, gstAmount, discountAmount, couponCode, total,
+        paymentMode: 'cod',
+        balanceDue: total - advanceAmount,
+        razorpayAmount: advanceAmount,
         addressSnapshot: address,
       })
 

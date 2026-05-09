@@ -14,6 +14,14 @@ import styles from './ProductDetail.module.css'
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
   const product = useQuery(api.products.getBySlug, slug ? { slug } : 'skip')
+  
+  // Fetch pristine base price from pricing engine
+  const pricingData = useQuery(
+    api.pricing.getProductPrice,
+    product ? { productId: product._id } : 'skip'
+  )
+  const basePrice = pricingData?.unitPrice ?? 0
+
   const [selectedImage, setSelectedImage] = useState(0)
 
   if (product === undefined) {
@@ -80,7 +88,7 @@ export default function ProductDetail() {
       "@type": "Offer",
       "url": typeof window !== 'undefined' ? window.location.href : '',
       "priceCurrency": "INR",
-      "price": product.price ? (product.price / 100).toFixed(2) : "162.00",
+      "price": basePrice ? (basePrice / 100).toFixed(2) : "162.00",
       "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
       "itemCondition": "https://schema.org/NewCondition"
     }
@@ -210,7 +218,7 @@ export default function ProductDetail() {
 
           <div className={styles.priceBlock}>
             <span className={styles.price}>
-              {product.price ? formatPrice(product.price) : 'Custom'}
+              {basePrice ? formatPrice(basePrice) : 'Custom'}
             </span>
             <span className={styles.priceNote}>incl. GST · Free shipping over ₹999</span>
           </div>
