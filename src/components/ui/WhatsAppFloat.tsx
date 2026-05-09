@@ -1,7 +1,7 @@
 import styles from './WhatsAppFloat.module.css'
 
 const WA_NUMBER = '918431797007'
-const WA_MESSAGE = 'Hi BWR Works! I have a question about your custom 3D printing.'
+const WA_MESSAGE = 'Hi BWR Works! I have a question about your custom crafted products.'
 
 // Official WhatsApp SVG icon
 function WhatsAppIcon() {

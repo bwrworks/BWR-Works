@@ -68,6 +68,9 @@
   background: var(--surface);
   border: 1px solid rgba(245, 240, 232, 0.07);
   aspect-ratio: 1;
+  max-width: 80%; /* Reduce size slightly as requested */
+  margin: 0 auto;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,6 +159,7 @@
 /* ── THUMBNAIL ROW ── */
 .thumbRow {
   display: flex;
+  justify-content: center;
   gap: 10px;
   margin-top: 12px;
 }

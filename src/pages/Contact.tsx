@@ -22,7 +22,7 @@ const FAQS = [
   },
   {
     q: 'What is the material made of? Is it fragile?',
-    a: 'We use industrial Matte PLA and PETG. It is highly impact-resistant and feels solid and heavy. However, extreme heat (like leaving it on a car dashboard in the sun) is not recommended for PLA items.'
+    a: 'We use premium high-impact polymers formulated for an architectural finish. They feel solid and heavy. However, extreme heat (like leaving it on a car dashboard in the sun) is not recommended for some of our matte finishes.'
   }
 ]
 

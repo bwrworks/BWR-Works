@@ -24,10 +24,10 @@ function AdminQuickPanel() {
     { icon: '💰', label: 'Revenue', value: stats ? `₹${((stats.totalRevenue ?? 0) / 100).toLocaleString('en-IN')}` : '—', color: '#10B981' },
   ]
 
-  const statusMeta: Record<string, { label: string; color: string }> = {
+  const STATUS_CONFIG = {
     received: { label: 'Received', color: '#FF5C1A' },
-    printing: { label: 'Printing', color: '#8B5CF6' },
-    shipped:  { label: 'Shipped',  color: '#0EA5E9' },
+    printing: { label: 'Crafting', color: '#8B5CF6' },
+    shipped: { label: 'Shipped', color: '#0EA5E9' },
     delivered:{ label: 'Delivered',color: '#10B981' },
   }
 
@@ -63,8 +63,8 @@ function AdminQuickPanel() {
                 <span className={styles.adminOrderId}>{o.orderId}</span>
                 <span>{o.customerName}</span>
                 <span>
-                  <span className={styles.adminStatusBadge} style={{ background: (statusMeta[o.status]?.color ?? '#999') + '20', color: statusMeta[o.status]?.color ?? '#999' }}>
-                    {statusMeta[o.status]?.label ?? o.status}
+                  <span className={styles.adminStatusBadge} style={{ background: (STATUS_CONFIG[o.status as keyof typeof STATUS_CONFIG]?.color ?? '#999') + '20', color: STATUS_CONFIG[o.status as keyof typeof STATUS_CONFIG]?.color ?? '#999' }}>
+                    {STATUS_CONFIG[o.status as keyof typeof STATUS_CONFIG]?.label ?? o.status}
                   </span>
                 </span>
                 <span style={{ fontWeight: 600, color: 'var(--orange)' }}>₹{(o.total / 100).toLocaleString('en-IN')}</span>
@@ -81,9 +81,9 @@ function AdminQuickPanel() {
 const STATUS_META: Record<string, { label: string; color: string; icon: string }> = {
   pending:   { label: 'Payment Pending', color: '#F59E0B', icon: '⏳' },
   paid:      { label: 'Payment Received', color: '#3B82F6', icon: '✅' },
-  received:  { label: 'Order Received',   color: '#FF5C1A', icon: '📬' },
-  printing:  { label: 'Printing Now',     color: '#8B5CF6', icon: '🖨️' },
-  shipped:   { label: 'Shipped',          color: '#0EA5E9', icon: '🚚' },
+  received:  { label: 'Order Received', color: '#FF5C1A', icon: '📝' },
+  printing:  { label: 'Crafting Now',     color: '#8B5CF6', icon: '⚙️' },
+  shipped:   { label: 'Shipped',          color: '#0EA5E9', icon: '📦' },
   delivered: { label: 'Delivered',        color: '#10B981', icon: '🎉' },
 }
 

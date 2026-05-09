@@ -146,7 +146,7 @@ export default function AdminOrders() {
                           style={order.status === s ? { background: STATUS_COLOR[s] } : {}}
                           onClick={() => handleStatusChange(order.orderId, s)}
                         >
-                          {s}
+                          {s === 'printing' ? 'crafting' : s}
                         </button>
                       ))}
                     </div>

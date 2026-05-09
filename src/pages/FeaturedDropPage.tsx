@@ -85,7 +85,7 @@ export default function FeaturedDropPage() {
             <div className={`${styles.specsBox} reveal`}>
               <div className={styles.specItem}>
                 <h4>The Material</h4>
-                <p>Extruded from high-grade industrial PLA, offering a dense, matte finish that refuses to reflect glare. It feels substantial, permanent, and architectural.</p>
+                <p>Manufactured from high-grade industrial polymers, offering a dense, matte finish that refuses to reflect glare. It feels substantial, permanent, and architectural.</p>
               </div>
               <div className={styles.specItem}>
                 <h4>The Scale</h4>
@@ -93,7 +93,7 @@ export default function FeaturedDropPage() {
               </div>
               <div className={styles.specItem}>
                 <h4>The Customisation</h4>
-                <p>Every order is tailored to your specific vehicle profile. Our design team models your car's exact silhouette and number plate before the 14-hour print begins.</p>
+                <p>Every order is tailored to your specific vehicle profile. Our design team models your car's exact silhouette and number plate before the 14-hour crafting process begins.</p>
               </div>
             </div>
 
@@ -117,12 +117,12 @@ export default function FeaturedDropPage() {
               <div className={`${styles.step} reveal reveal-delay-1`}>
                 <div className={styles.stepNum}>02</div>
                 <h4>Digital Sculpting</h4>
-                <p>Our artists create a custom 3D profile of your vehicle, matching the exact aesthetic of the Drop.</p>
+                <p>Our artists create a custom digital profile of your vehicle, matching the exact aesthetic of the Drop.</p>
               </div>
               <div className={`${styles.step} reveal reveal-delay-2`}>
                 <div className={styles.stepNum}>03</div>
                 <h4>Fabrication</h4>
-                <p>A continuous 14-hour manufacturing process on our Bambu Lab P1S array.</p>
+                <p>A continuous 14-hour manufacturing process on our precision architecture arrays.</p>
               </div>
             </div>
           </div>

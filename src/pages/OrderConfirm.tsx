@@ -59,9 +59,9 @@ export default function OrderConfirm() {
               <div className={styles.timelineText}>Received</div>
             </div>
             <div className={styles.timelineLine} />
-            <div className={styles.timelineStep}>
+            <div className={styles.timelineItem}>
               <div className={styles.timelineDot} />
-              <div className={styles.timelineText}>Printing</div>
+              <div className={styles.timelineText}>Crafting</div>
             </div>
             <div className={styles.timelineLine} />
             <div className={styles.timelineStep}>

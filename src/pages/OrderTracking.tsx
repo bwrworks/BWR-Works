@@ -11,15 +11,15 @@ type OrderStatus = typeof STATUS_STEPS[number]
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   received: 'Order Received',
-  printing: 'Currently Printing',
+  printing: 'Currently Crafting',
   shipped: 'Shipped',
   delivered: 'Delivered',
 }
 
 const STATUS_DESCRIPTIONS: Record<OrderStatus, string> = {
-  received: "We've got your order! Our team will start crafting your piece very soon.",
-  printing: "Your custom piece is being printed right now. This usually takes 2–4 days.",
-  shipped: "Your order is on its way! Check the tracking number below.",
+  received: "We've received your order and are preparing the design.",
+  printing: "Your custom piece is being crafted right now. This usually takes 2–4 days.",
+  shipped: "Your order is with our delivery partner and on its way. Check the tracking number below.",
   delivered: "Your order has been delivered. Hope you love it! 🎉",
 }
 

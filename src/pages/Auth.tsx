@@ -170,7 +170,7 @@ export default function Auth() {
               </div>
               <div className={styles.perk}>
                 <h4>Order Repository</h4>
-                <p>View your complete history of commissioned 3D pieces, download invoices, and initiate re-orders.</p>
+                <p>View your complete history of commissioned custom pieces, download invoices, and initiate re-orders.</p>
               </div>
             </div>
           </div>

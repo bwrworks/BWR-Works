@@ -41,7 +41,7 @@ function StatusDonut({ byStatus }: { byStatus: Record<string, number> }) {
     received: '#FF5C1A', printing: '#8B5CF6', shipped: '#0EA5E9', delivered: '#10B981'
   }
   const labels: Record<string, string> = {
-    received: 'Received', printing: 'Printing', shipped: 'Shipped', delivered: 'Delivered'
+    received: 'Received', printing: 'Crafting', shipped: 'Shipped', delivered: 'Delivered'
   }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

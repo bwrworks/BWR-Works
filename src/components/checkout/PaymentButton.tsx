@@ -128,7 +128,7 @@ export default function PaymentButton({
         amount: rzpOrder.amount,
         currency: rzpOrder.currency,
         name: 'BWR Works',
-        description: 'Custom 3D Printed Products',
+        description: 'Premium Custom Crafted Products',
         image: '/logo.png',
         order_id: rzpOrder.razorpayOrderId,
         prefill: { name: address.name, contact: address.phone },
