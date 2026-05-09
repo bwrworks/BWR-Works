@@ -345,6 +345,54 @@
   color: var(--ink);
 }
 
+/* ── DARK INFO PANELS (below sticky image) ── */
+.darkInfoPanels {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.darkInfoCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px;
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px solid rgba(245, 240, 232, 0.08);
+  border-radius: 12px;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.darkInfoCard:hover {
+  background: rgba(245, 240, 232, 0.07);
+  border-color: rgba(255, 92, 26, 0.2);
+}
+
+.darkInfoIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.darkInfoTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  margin: 0 0 6px;
+}
+
+.darkInfoText {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(245, 240, 232, 0.45);
+  margin: 0;
+}
+
 /* ── MOBILE ── */
 @media (max-width: 900px) {
   .breadcrumbBar {
@@ -365,5 +413,9 @@
 
   .visualSticky {
     position: static;
+  }
+
+  .darkInfoPanels {
+    margin-top: 32px;
   }
 }

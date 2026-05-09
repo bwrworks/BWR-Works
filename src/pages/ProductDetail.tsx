@@ -101,6 +101,43 @@ export default function ProductDetail() {
               <span>Ships in 7 days</span>
             </div>
           </div>
+
+          {/* ── INFO PANELS (fill empty dark space below image) ── */}
+          <div className={styles.darkInfoPanels}>
+
+            <div className={styles.darkInfoCard}>
+              <div className={styles.darkInfoIcon}>🎨</div>
+              <div>
+                <h3 className={styles.darkInfoTitle}>Handcrafted to Order</h3>
+                <p className={styles.darkInfoText}>Every piece is custom-made just for you. No mass production — each item is individually crafted with care and precision.</p>
+              </div>
+            </div>
+
+            <div className={styles.darkInfoCard}>
+              <div className={styles.darkInfoIcon}>🔬</div>
+              <div>
+                <h3 className={styles.darkInfoTitle}>Premium Materials</h3>
+                <p className={styles.darkInfoText}>Made with high-quality PLA and precision-grade 3D printing technology for a flawless finish every time.</p>
+              </div>
+            </div>
+
+            <div className={styles.darkInfoCard}>
+              <div className={styles.darkInfoIcon}>📦</div>
+              <div>
+                <h3 className={styles.darkInfoTitle}>Ships in 5–7 Days</h3>
+                <p className={styles.darkInfoText}>Carefully packaged with premium protective materials. Free shipping on orders over ₹999 across India.</p>
+              </div>
+            </div>
+
+            <div className={styles.darkInfoCard}>
+              <div className={styles.darkInfoIcon}>🛡️</div>
+              <div>
+                <h3 className={styles.darkInfoTitle}>Quality Guarantee</h3>
+                <p className={styles.darkInfoText}>Not happy with your order? We'll remake it or refund you — no questions asked. Your satisfaction is our priority.</p>
+              </div>
+            </div>
+
+          </div>
         </div>
 
         {/* RIGHT — OFF-WHITE Product Info (50%) */}
