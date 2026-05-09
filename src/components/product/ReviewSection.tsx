@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
-import { Link } from 'react-router-dom'
+
 import { useToast } from '../../context/ToastContext'
 import styles from './ReviewSection.module.css'
 
@@ -36,7 +36,6 @@ export default function ReviewSection({ productId }: Props) {
 
   // Check if user is logged in (we can infer from whether the mutation is available)
   // We'll attempt submission and handle auth error gracefully
-  const isLoggedIn = true // We'll let backend reject if not authed
 
   const handleSubmit = async () => {
     if (rating === 0) {
