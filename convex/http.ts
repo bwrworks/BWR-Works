@@ -98,6 +98,17 @@ http.route({
 
       let textBody: string = emailData.text || emailData.plain_text || "";
 
+      // Sometimes the webhook payload might include HTML directly, so we can try to extract text from it
+      if (!textBody && emailData.html) {
+        textBody = emailData.html
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<p[^>]*>/gi, '\n')
+          .replace(/<[^>]*>?/gm, '')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/\n\s*\n/g, '\n')
+          .trim();
+      }
+
       // Resend webhook for email.received does NOT include the body!
       // We must fetch it via the Resend API using the email_id
       if (!textBody && emailId) {
@@ -105,7 +116,7 @@ http.route({
         if (apiKey) {
           try {
             console.log(`[Inbound] No body in webhook — fetching from Resend API: ${emailId}`);
-            const res = await fetch(`https://api.resend.com/emails/${emailId}`, {
+            const res = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
               headers: { "Authorization": `Bearer ${apiKey}` },
             });
             if (res.ok) {
