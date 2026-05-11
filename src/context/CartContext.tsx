@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Cart Context
@@ -73,6 +75,27 @@ function saveCart(items: CartItem[]) {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(loadCart)
   const [isOpen, setIsOpen] = useState(false)
+
+  // B-10: Fetch live product prices to revalidate stale localStorage prices
+  const products = useQuery(api.products.listActive)
+
+  useEffect(() => {
+    if (!products || items.length === 0) return
+
+    let updated = false
+    const refreshedItems = items.map((item) => {
+      const liveProduct = products.find((p: any) => p._id === item.productId)
+      if (liveProduct?.price && liveProduct.price !== item.unitPrice) {
+        updated = true
+        return { ...item, unitPrice: liveProduct.price }
+      }
+      return item
+    })
+
+    if (updated) {
+      setItems(refreshedItems)
+    }
+  }, [products]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist to localStorage on every cart change
   useEffect(() => {

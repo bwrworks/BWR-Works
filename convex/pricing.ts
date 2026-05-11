@@ -220,16 +220,17 @@ export const savePricingDefaults = mutation({
       })
     ),
     gstPercent: v.number(),
+    codAdvancePercent: v.number(),
   },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const admin = await requireAdmin(ctx);
 
     const existing = await ctx.db.query("pricingDefaults").first();
 
     const data = {
       ...args,
       updatedAt: Date.now(),
-      updatedBy: "admin", // TODO: Get from auth context
+      updatedBy: admin._id,
     };
 
     if (existing) {

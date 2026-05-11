@@ -2,6 +2,7 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAdmin } from "./admin";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import type { Id } from "./_generated/dataModel";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Admin Audit Logs
@@ -45,10 +46,10 @@ export const getRecent = query({
     // Enrich with admin user info
     const enriched = await Promise.all(
       logs.map(async (log) => {
-        const user = await ctx.db.get(log.adminUserId as any);
+        const user = await ctx.db.get(log.adminUserId as Id<"users">);
         return {
           ...log,
-          adminName: (user as any)?.name || (user as any)?.email || "Unknown",
+          adminName: user?.name || user?.email || "Unknown",
         };
       })
     );

@@ -8,16 +8,23 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 // BWR WORKS — Inquiries + Email Thread System
 // ═══════════════════════════════════════════════════
 
-/** Generate a human-readable sequential ticket ID like BWRSUP0001 */
+/** Generate a human-readable sequential ticket ID like BWRSUP0001 (atomic counter) */
 async function makeThreadId(ctx: any): Promise<string> {
-  try {
-    const allInquiries = await ctx.db.query("inquiries").collect();
-    const nextNum = allInquiries.length + 1;
-    return `BWRSUP${String(nextNum).padStart(4, "0")}`;
-  } catch {
-    // Fallback if count fails
-    return `BWRSUP${String(Date.now()).slice(-6)}`;
+  const counter = await ctx.db
+    .query("counters")
+    .withIndex("by_name", (q: any) => q.eq("name", "inquiries"))
+    .first();
+
+  let nextNum: number;
+  if (counter) {
+    nextNum = counter.value + 1;
+    await ctx.db.patch(counter._id, { value: nextNum });
+  } else {
+    nextNum = 1;
+    await ctx.db.insert("counters", { name: "inquiries", value: 1 });
   }
+
+  return `BWRSUP${String(nextNum).padStart(4, "0")}`;
 }
 
 /** Customer submits a contact form inquiry — creates the thread */

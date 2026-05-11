@@ -27,6 +27,7 @@ import PricingCalculator from './pages/admin/PricingCalculator'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import WhatsAppFloat from './components/ui/WhatsAppFloat'
+import NotFound from './pages/NotFound'
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -61,6 +62,9 @@ function AnimatedRoutes() {
           <Route path="inquiries" element={<AdminInquiries />} />
           <Route path="pricing" element={<PricingCalculator />} />
         </Route>
+
+        {/* ── 404 CATCH-ALL ── */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   )

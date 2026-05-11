@@ -3,11 +3,8 @@ import { useParams, Navigate } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useCms } from '../hooks/useCms'
-// react-qr-code CJS→ESM interop is broken in Vite prod builds:
-// default export resolves to module namespace { QRCode, default } instead of the component.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import _QRCodeModule from 'react-qr-code'
-const QRCode: any = (_QRCodeModule as any)?.QRCode ?? (_QRCodeModule as any)?.default ?? _QRCodeModule
+import { fmt, safe } from '../lib/formatters'
+import QRCode from 'react-qr-code'
 import styles from './Invoice.module.css'
 
 /** Generate a simple Code128-style barcode as inline SVG */
@@ -65,14 +62,6 @@ export default function Invoice() {
 
   const siteUrl = window.location.origin
 
-  // Safely convert any value to a renderable string — prevents React Error #130
-  const safe = (val: unknown): string => {
-    if (val === null || val === undefined) return ''
-    if (typeof val === 'string') return val
-    if (typeof val === 'number' || typeof val === 'boolean') return String(val)
-    try { return JSON.stringify(val) } catch { return '' }
-  }
-
 
 
   useEffect(() => {
@@ -91,7 +80,6 @@ export default function Invoice() {
     return <Navigate to="/dashboard" />
   }
 
-  const fmt = (paise: number) => `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
   const hsnCode = cms('invoice', 'hsn_code', '3926')
 
   const handlePrint = () => {

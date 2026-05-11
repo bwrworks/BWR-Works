@@ -30,8 +30,10 @@ export const get = query({
 export const getSection = query({
   args: { section: v.string() },
   handler: async (ctx, { section }) => {
-    const all = await ctx.db.query("cmsContent").collect();
-    return all.filter((c) => c.section === section);
+    return await ctx.db
+      .query("cmsContent")
+      .withIndex("by_section_key", (q) => q.eq("section", section))
+      .collect();
   },
 });
 

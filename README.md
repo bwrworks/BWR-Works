@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# BWR Works
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Premium 3D-crafted physical goods platform. Built with React, Vite, Convex, and Cloudinary.
 
-Currently, two official plugins are available:
+## Tech Stack
+- **Frontend**: React 18, Vite, React Router, plain CSS Modules (No Tailwind)
+- **Backend & Database**: Convex (Serverless TS)
+- **File Storage**: Cloudinary
+- **Emails / Webhooks**: Resend
+- **Payments**: Razorpay
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Setup
 
-## React Compiler
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. Environment Variables (`.env.local`):
+   ```env
+   # Convex
+   CONVEX_DEPLOYMENT=your_deployment_id
+   VITE_CONVEX_URL=your_convex_url
 
-## Expanding the ESLint configuration
+   # Razorpay
+   VITE_RAZORPAY_KEY_ID=your_rzp_key
+   RAZORPAY_KEY_SECRET=your_rzp_secret
+   RAZORPAY_WEBHOOK_SECRET=your_rzp_webhook_secret
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+   # Resend
+   AUTH_RESEND_KEY=your_resend_key
+   RESEND_WEBHOOK_SECRET=your_resend_webhook_secret
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+   # Cloudinary
+   VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+   # Admin
+   ADMIN_EMAIL=your_admin_email@example.com
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. Start dev server:
+   ```bash
+   npm run dev
+   ```
+   *Note: Convex dev server will run automatically in parallel.*
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Key Scripts
+- `npm run dev`: Starts Vite + Convex dev servers
+- `npm run build`: Type-checks and builds for production
+- `npm run lint`: Runs ESLint

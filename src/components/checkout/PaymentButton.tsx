@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAction, useMutation } from 'convex/react'
+import { useAction, useMutation, useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import styles from './PaymentButton.module.css'
 
@@ -84,8 +84,10 @@ export default function PaymentButton({
 
   const createRazorpayOrder = useAction(api.payments.createRazorpayOrder)
   const createOrder = useMutation(api.orders.createOrder)
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
 
-  const advanceAmount = Math.ceil(total / 2) // 50% for COD
+  const codAdvancePercent = pricingDefaults?.codAdvancePercent ?? 50
+  const advanceAmount = Math.ceil((total * codAdvancePercent) / 100)
 
   const buildOrderItems = () => items.map(item => ({
     productId: item.productId,
@@ -157,7 +159,7 @@ export default function PaymentButton({
         return
       }
 
-      // Create Razorpay order for 50% advance only
+      // Create Razorpay order for advance only
       const rzpOrder = await createRazorpayOrder({
         amount: advanceAmount,
         currency: 'INR',
@@ -179,7 +181,7 @@ export default function PaymentButton({
         amount: rzpOrder.amount,
         currency: rzpOrder.currency,
         name: 'BWR Works — COD Advance',
-        description: `50% advance for COD order. Balance ₹${((total - advanceAmount) / 100).toFixed(0)} on delivery.`,
+        description: `${codAdvancePercent}% advance for COD order. Balance ₹${((total - advanceAmount) / 100).toFixed(0)} on delivery.`,
         image: '/logo.png',
         order_id: rzpOrder.razorpayOrderId,
         prefill: { name: address.name, contact: address.phone },
@@ -223,7 +225,7 @@ export default function PaymentButton({
           <span className={styles.modeIcon}>🚚</span>
           <div className={styles.modeInfo}>
             <div className={styles.modeName}>Cash on Delivery</div>
-            <div className={styles.modeDesc}>50% advance now · Balance on delivery</div>
+            <div className={styles.modeDesc}>{codAdvancePercent}% advance now · Balance on delivery</div>
           </div>
           <div className={styles.modeAmount}>{fmt(advanceAmount)} now</div>
           <div className={`${styles.modeCheck} ${payMode === 'cod' ? styles.modeCheckOn : ''}`} />

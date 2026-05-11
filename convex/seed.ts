@@ -16,7 +16,10 @@ export const seedPricingDefaults = mutation({
   handler: async (ctx) => {
     // Check if already seeded
     const existing = await ctx.db.query("pricingDefaults").first();
-    if (existing) return { message: "Already seeded", id: existing._id };
+    if (existing) {
+      await ctx.db.patch(existing._id, { codAdvancePercent: 50 });
+      return { message: "Already seeded, patched with codAdvancePercent", id: existing._id };
+    }
 
     const id = await ctx.db.insert("pricingDefaults", {
       // ── MATERIAL ──
@@ -54,8 +57,9 @@ export const seedPricingDefaults = mutation({
         { minQty: 501, maxQty: 99999, marginPercent: 20 }, // Retainer
       ],
 
-      // ── GST ──
+      // ── GST & COD ──
       gstPercent: 18,
+      codAdvancePercent: 50,
 
       updatedAt: Date.now(),
       updatedBy: "system-seed",
@@ -88,7 +92,7 @@ export const seedProducts = mutation({
       shortTagline: "Your plate · Your name · Your pocket",
       emotionalAngle:
         "Every time you pick up your keys, you see YOUR plate. It's not just a keychain — it's identity you carry.",
-      images: [], // TODO: Add Cloudinary URLs
+      images: [], // ⚠️ DEV ONLY — Add real Cloudinary URLs in Admin → Products before going live
       isActive: true,
       stock: 50,
       customisationConfig: [

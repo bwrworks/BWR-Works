@@ -1,6 +1,7 @@
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { Link } from 'react-router-dom'
+import { fmt, safe } from '../../lib/formatters'
 import styles from './AdminDashboard.module.css'
 
 // ── Pure-CSS bar chart (no external deps) ──
@@ -82,16 +83,7 @@ const STATUS_COLOR: Record<string, string> = {
   received: '#FF5C1A', printing: '#8B5CF6', shipped: '#0EA5E9', delivered: '#10B981',
 }
 
-function fmt(paise: number) {
-  return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`
-}
 
-function safe(val: unknown): string {
-  if (val === null || val === undefined) return ''
-  if (typeof val === 'string') return val
-  if (typeof val === 'number' || typeof val === 'boolean') return String(val)
-  try { return JSON.stringify(val) } catch { return '' }
-}
 
 // Generate last 7 day labels
 function getLast7Days() {

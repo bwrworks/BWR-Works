@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { Link, useSearchParams } from 'react-router-dom'
+import { fmt, safe } from '../../lib/formatters'
 import styles from './AdminOrders.module.css'
 
 const STATUSES = ['all', 'received', 'printing', 'shipped', 'delivered']
@@ -9,16 +10,7 @@ const STATUS_COLOR: Record<string, string> = {
   received: '#FF5C1A', printing: '#F57C00', shipped: '#1565C0', delivered: '#2E7D32',
 }
 
-function fmt(paise: number) {
-  return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`
-}
 
-function safe(val: unknown): string {
-  if (val === null || val === undefined) return ''
-  if (typeof val === 'string') return val
-  if (typeof val === 'number' || typeof val === 'boolean') return String(val)
-  try { return JSON.stringify(val) } catch { return '' }
-}
 
 export default function AdminOrders() {
   const [searchParams, setSearchParams] = useSearchParams()

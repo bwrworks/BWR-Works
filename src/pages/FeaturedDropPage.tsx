@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import { formatPrice } from '../lib/formatters'
 import styles from './FeaturedDropPage.module.css'
 
 export default function FeaturedDropPage() {
@@ -11,6 +14,10 @@ export default function FeaturedDropPage() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  // B-06: Pull featured product from DB instead of hardcoding
+  const products = useQuery(api.products.listActive)
+  const featured = products?.find((p: any) => p.isFeatured) ?? products?.[0]
 
   return (
     <div className={styles.page}>
@@ -26,26 +33,43 @@ export default function FeaturedDropPage() {
                 Limited Release
               </div>
               <h1 className={styles.title}>
-                CAR GARAGE<br />
-                <span className={styles.outline}>KEY HOLDER</span>
+                {featured ? (
+                  <>
+                    {featured.name.split(' ').slice(0, 2).join(' ')}<br />
+                    <span className={styles.outline}>
+                      {featured.name.split(' ').slice(2).join(' ') || 'EDITION'}
+                    </span>
+                  </>
+                ) : (
+                  <>FEATURED<br /><span className={styles.outline}>DROP</span></>
+                )}
               </h1>
               <p className={styles.description}>
-                Museum-quality scale meets everyday utility. The Drop 001 Car Garage Key Holder features permanent matte black PLA, edge-lit LED accents, and enough presence to anchor an entire room.
+                {featured?.description || 'Loading featured product...'}
               </p>
               <div className={styles.tags}>
-                <span className={styles.chip}>Matte Black PLA</span>
-                <span className={styles.chip}>0.12mm Precision</span>
-                <span className={styles.chip}>LED Capable</span>
+                {featured?.category && <span className={styles.chip}>{featured.category}</span>}
+                <span className={styles.chip}>Made to Order</span>
+                <span className={styles.chip}>Premium Finish</span>
               </div>
             </div>
             
             <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
               <div className={styles.shapeContainer}>
-                <div className={styles.shapeMain}>
-                  <div className={styles.shapeInner}>
-                    <div className={styles.shapeCore} />
+                {featured?.images?.[0] ? (
+                  <img
+                    src={featured.images[0]}
+                    alt={featured?.name || 'Featured Product'}
+                    className={styles.shapeMain}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+                  />
+                ) : (
+                  <div className={styles.shapeMain}>
+                    <div className={styles.shapeInner}>
+                      <div className={styles.shapeCore} />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -61,7 +85,9 @@ export default function FeaturedDropPage() {
             <div className={`${styles.pricingBox} reveal`}>
               <h3 className={styles.boxTitle}>Investment</h3>
               <div className={styles.priceRow}>
-                <div className={styles.price}>₹5,000+</div>
+                <div className={styles.price}>
+                  {featured?.price ? formatPrice(featured.price) : 'Custom'}
+                </div>
                 <div className={styles.priceNote}>
                   Starting price<br />
                   Custom sizing available
@@ -69,15 +95,25 @@ export default function FeaturedDropPage() {
               </div>
               <div className={styles.availability}>
                 <div className={styles.availProgress}>
-                  <div className={styles.availBar} style={{ width: '70%' }} />
+                  <div
+                    className={styles.availBar}
+                    style={{
+                      width: featured?.stock
+                        ? `${Math.min(100, (featured.stock / 10) * 100)}%`
+                        : '70%'
+                    }}
+                  />
                 </div>
                 <div className={styles.availText}>
-                  <strong>7 / 10</strong> Units Available This Month
+                  <strong>{featured?.stock ?? '—'}</strong> Units Available
                 </div>
               </div>
               
-              <Link to="/contact?subject=bulk_order" className={styles.btnPrimary}>
-                Enquire For Drop 001 →
+              <Link
+                to={featured ? `/products/${featured.slug}` : '/products'}
+                className={styles.btnPrimary}
+              >
+                {featured ? `Shop ${featured.name} →` : 'Browse Collection →'}
               </Link>
             </div>
 
@@ -89,11 +125,11 @@ export default function FeaturedDropPage() {
               </div>
               <div className={styles.specItem}>
                 <h4>The Scale</h4>
-                <p>Designed to be seen from across the room. While most key holders blend into the wall, the Garage demands attention and anchors your entryway.</p>
+                <p>Designed to be seen from across the room. While most products blend into the background, every BWR Works piece demands attention and anchors your space.</p>
               </div>
               <div className={styles.specItem}>
                 <h4>The Customisation</h4>
-                <p>Every order is tailored to your specific vehicle profile. Our design team models your car's exact silhouette and number plate before the 14-hour crafting process begins.</p>
+                <p>Every order is tailored to your specifications. Our design team models your exact requirements before the precision crafting process begins.</p>
               </div>
             </div>
 
@@ -101,28 +137,28 @@ export default function FeaturedDropPage() {
 
           <div className={`${styles.divider} reveal`}></div>
 
-          {/* New Content: The Process */}
+          {/* The Process */}
           <div className={styles.processSection}>
             <div className={`${styles.processHeader} reveal`}>
               <h3 className={styles.boxTitle}>Acquisition Process</h3>
-              <p className={styles.processSub}>Due to the bespoke nature of Drop 001, each piece follows a strict timeline.</p>
+              <p className={styles.processSub}>Due to the bespoke nature of each piece, every order follows a strict timeline.</p>
             </div>
             
             <div className={styles.processSteps}>
               <div className={`${styles.step} reveal`}>
                 <div className={styles.stepNum}>01</div>
                 <h4>Consultation</h4>
-                <p>We discuss your vehicle model and specific customization requirements.</p>
+                <p>We discuss your specific customization requirements.</p>
               </div>
               <div className={`${styles.step} reveal reveal-delay-1`}>
                 <div className={styles.stepNum}>02</div>
                 <h4>Digital Sculpting</h4>
-                <p>Our artists create a custom digital profile of your vehicle, matching the exact aesthetic of the Drop.</p>
+                <p>Our artists create a custom digital profile matching your exact aesthetic.</p>
               </div>
               <div className={`${styles.step} reveal reveal-delay-2`}>
                 <div className={styles.stepNum}>03</div>
                 <h4>Fabrication</h4>
-                <p>A continuous 14-hour manufacturing process on our precision architecture arrays.</p>
+                <p>A continuous precision manufacturing process on our architecture arrays.</p>
               </div>
             </div>
           </div>

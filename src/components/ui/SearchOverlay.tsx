@@ -5,8 +5,16 @@ import { Link } from 'react-router-dom'
 
 export default function SearchOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [term, setTerm] = useState('')
+  const [debouncedTerm, setDebouncedTerm] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const results = useQuery(api.products.search, term.length >= 2 ? { term } : 'skip')
+
+  // 300ms debounce
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedTerm(term.trim()), 300)
+    return () => clearTimeout(timer)
+  }, [term])
+
+  const results = useQuery(api.products.search, debouncedTerm.length >= 2 ? { term: debouncedTerm } : 'skip')
 
   useEffect(() => {
     if (isOpen) {

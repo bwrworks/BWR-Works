@@ -1,8 +1,7 @@
-import { mutation, internalQuery, query } from "./_generated/server";
+import { internalQuery, query } from "./_generated/server";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
-const ADMIN_EMAIL = "bwrworks.in@gmail.com";
 
 // Verify user is an admin securely on the backend
 export async function requireAdmin(ctx: MutationCtx | QueryCtx) {
@@ -22,20 +21,6 @@ export const checkIsAdmin = internalQuery({
   }
 });
 
-// Check and upgrade the master admin email account automatically
-export const ensureAdminRole = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return false;
-    const user = await ctx.db.get(userId);
-    if (!user || user.email !== ADMIN_EMAIL) return false;
-    if (user.role !== "admin") {
-      await ctx.db.patch(userId, { role: "admin" });
-    }
-    return true;
-  }
-});
 
 // Admin dashboard quick stats
 export const getDashboardStats = query({

@@ -40,6 +40,22 @@ export const submitReview = mutation({
     const product = await ctx.db.get(productId);
     if (!product) throw new Error("Product not found.");
 
+    // B-07: Verified purchase gate — must have a paid order containing this product
+    const userOrders = await ctx.db
+      .query("orders")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    const hasPurchased = userOrders.some(
+      (order) =>
+        order.paymentStatus === "verified" &&
+        order.items.some((item) => item.productId === productId)
+    );
+
+    if (!hasPurchased) {
+      throw new Error("You can only review products you have purchased.");
+    }
+
     // One review per user per product
     const existing = await ctx.db
       .query("reviews")

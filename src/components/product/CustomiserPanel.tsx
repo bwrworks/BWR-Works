@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useCart } from '../../context/CartContext'
-import { useQuery } from 'convex/react'
+import { useQuery, useAction } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { useToast } from '../../context/ToastContext'
 import styles from './CustomiserPanel.module.css'
@@ -22,16 +22,19 @@ interface Props {
   config: CustomField[]
   productId: string
   productName: string
+  productSlug: string
   image?: string
   variant?: 'dark' | 'light'
 }
 
-export default function CustomiserPanel({ config, productId, productName, image, variant = 'dark' }: Props) {
+export default function CustomiserPanel({ config, productId, productName, productSlug, image, variant = 'dark' }: Props) {
   const [values, setValues] = useState<Record<string, string | number | boolean>>({})
   const [files, setFiles] = useState<Record<string, File | null>>({})
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const { addItem } = useCart()
+  const uploadFile = useAction(api.cloudinary.uploadCustomerFile)
   const { success, error: toastError, warning } = useToast()
 
   const hasQtyField = config.some(f => f.type === 'quantity')
@@ -44,22 +47,53 @@ export default function CustomiserPanel({ config, productId, productName, image,
   const set = (fieldId: string, value: string | number | boolean) =>
     setValues(prev => ({ ...prev, [fieldId]: value }))
 
-  const handleAddToCart = () => {
-    const missing = config
-      .filter(f => f.required && !values[f.fieldId] && f.type !== 'quantity')
-      .map(f => f.label)
+  const handleAddToCart = async () => {
+    const missing = config.filter(f => f.required && !values[f.fieldId] && f.type !== 'quantity' && f.type !== 'file')
+    const missingFiles = config.filter(f => f.required && f.type === 'file' && !files[f.fieldId])
 
-    if (missing.length > 0) {
-      warning(`Please fill in: ${missing.join(', ')}`)
+    if (missing.length > 0 || missingFiles.length > 0) {
+      const labels = [...missing, ...missingFiles].map(f => f.label)
+      warning(`Please fill in: ${labels.join(', ')}`)
       return
     }
 
+    setIsUploading(true)
+    const finalValues = { ...values }
+
+    try {
+      for (const [fieldId, file] of Object.entries(files)) {
+        if (!file) continue;
+        
+        const base64Data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string).split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const secureUrl = await uploadFile({
+          productId: productId as any,
+          fieldId,
+          base64Data,
+          fileName: file.name,
+          fileType: file.type
+        });
+
+        finalValues[fieldId] = secureUrl;
+      }
+    } catch (err: any) {
+      setIsUploading(false)
+      toastError(err.message || 'File upload failed');
+      return;
+    }
+
+    setIsUploading(false)
+
     const quantity = hasQtyField ? ((values['quantity'] as number) || 1) : qty
-    const slug = productName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
     addItem({
       productId,
-      productSlug: slug,
+      productSlug,
       productName,
       unitPrice: priceData?.unitPrice ?? 0,
       quantity,
@@ -69,7 +103,7 @@ export default function CustomiserPanel({ config, productId, productName, image,
         subtotalCost: 0, riskBuffer: 0, trueCost: 0, margin: 0,
         sellingPrice: priceData?.unitPrice ?? 0,
       },
-      customisations: values,
+      customisations: finalValues,
       imageRef: image,
     })
 
@@ -199,8 +233,9 @@ export default function CustomiserPanel({ config, productId, productName, image,
       {/* ── ADD TO CART ── */}
       <button type="button"
         className={`${styles.addToCart} ${added ? styles.addToCartAdded : ''}`}
-        onClick={handleAddToCart}>
-        {added ? '✓ Added to Cart' : 'Add to Cart →'}
+        onClick={handleAddToCart}
+        disabled={isUploading}>
+        {isUploading ? 'Uploading...' : added ? '✓ Added to Cart' : 'Add to Cart →'}
       </button>
 
       <div className={styles.guarantee}>

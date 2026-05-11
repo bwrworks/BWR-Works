@@ -1,10 +1,16 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAdmin } from "./admin";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Product Queries & Mutations
 // ═══════════════════════════════════════════════════
+export const getProductInternal = internalQuery({
+  args: { productId: v.id("products") },
+  handler: async (ctx, { productId }) => {
+    return await ctx.db.get(productId);
+  },
+});
 
 /**
  * Get all active products for storefront
@@ -228,12 +234,34 @@ export const deleteProduct = mutation({
   args: { id: v.id("products") },
   handler: async (ctx, { id }) => {
     await requireAdmin(ctx);
+
+    // Block deletion if there are active (non-delivered/cancelled) orders referencing this product
+    const allOrders = await ctx.db.query("orders").collect();
+    const activeOrders = allOrders.filter(
+      (o) =>
+        o.items.some((item) => item.productId === id) &&
+        o.status !== "delivered"
+    );
+    if (activeOrders.length > 0) {
+      throw new Error(
+        `Cannot delete: ${activeOrders.length} active order(s) reference this product.`
+      );
+    }
+
     // Remove associated pricing
     const pricing = await ctx.db
       .query("productPricing")
       .withIndex("by_productId", (q) => q.eq("productId", id))
       .collect();
     for (const p of pricing) await ctx.db.delete(p._id);
+
+    // Remove associated reviews
+    const reviews = await ctx.db
+      .query("reviews")
+      .withIndex("by_productId", (q) => q.eq("productId", id))
+      .collect();
+    for (const r of reviews) await ctx.db.delete(r._id);
+
     await ctx.db.delete(id);
   },
 });

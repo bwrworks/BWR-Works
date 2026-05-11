@@ -47,14 +47,18 @@ export const addAddress = mutation({
     if (!/^\d{6}$/.test(pincode)) throw new Error("Pincode must be exactly 6 digits.");
     if (!/^[\d\s\-+()]{10,15}$/.test(phone)) throw new Error("Please enter a valid phone number (10-15 digits).");
 
+    const existingAddresses = await ctx.db
+      .query("addresses")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    if (existingAddresses.length >= 10) {
+      throw new Error("Maximum of 10 addresses allowed per account.");
+    }
+
     // If making default, unset other defaults
     if (args.isDefault) {
-      const existing = await ctx.db
-        .query("addresses")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
-        .collect();
-        
-      for (const addr of existing) {
+      for (const addr of existingAddresses) {
         if (addr.isDefault) {
           await ctx.db.patch(addr._id, { isDefault: false });
         }

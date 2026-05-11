@@ -26,6 +26,7 @@ interface GlobalDefaults {
   riskBufferPercent: number
   b2cMarginPercent: number
   gstPercent: number
+  codAdvancePercent: number
   b2bMarginSlabs: { minQty: number; maxQty: number; marginPercent: number }[]
 }
 
@@ -77,6 +78,7 @@ const DEFAULT_GLOBALS: GlobalDefaults = {
   riskBufferPercent: 15,
   b2cMarginPercent: 60,
   gstPercent: 18,
+  codAdvancePercent: 50,
   b2bMarginSlabs: [
     { minQty: 1, maxQty: 20, marginPercent: 50 },
     { minQty: 21, maxQty: 100, marginPercent: 37 },
@@ -124,6 +126,7 @@ export default function PricingCalculator() {
         riskBufferPercent: dbDefaults.riskBufferPercent,
         b2cMarginPercent: dbDefaults.b2cMarginPercent,
         gstPercent: dbDefaults.gstPercent,
+        codAdvancePercent: dbDefaults.codAdvancePercent,
         b2bMarginSlabs: dbDefaults.b2bMarginSlabs,
       })
     }

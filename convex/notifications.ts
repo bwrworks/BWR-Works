@@ -24,7 +24,7 @@ const FROM_SUPPORT = "BWR Works Support <support@bwrworks.com>";
 const FROM_ORDERS = "BWR Works <orders@bwrworks.com>";
 const REPLY_TO_SUPPORT = "support@bwrworks.com";
 const REPLY_TO_ORDERS = "orders@bwrworks.com";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "bwrworks.in@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const SITE_URL = process.env.SITE_URL || "https://bwrworks.com";
 
 /** Escape HTML special chars to prevent injection in email templates */
@@ -242,6 +242,8 @@ export const sendContactFormEmail = action({
     };
     const subjectLabel = subjectLabels[subject] || subject;
 
+    if (!ADMIN_EMAIL) throw new Error("ADMIN_EMAIL not set");
+
     // 1. Notify admin
     const { error: adminError } = await resend.emails.send({
       from: FROM_SUPPORT,
@@ -397,7 +399,7 @@ export const sendWhatsAppOrderConfirmation = action({
 
     const whatsappUrl = `https://wa.me/${fullPhone}?text=${message}`;
 
-    console.log(`[WhatsApp] Order confirmation link generated for ${orderId}: ${whatsappUrl}`);
+
 
     return { whatsappUrl, phone: fullPhone };
   },
@@ -441,7 +443,7 @@ export const sendWhatsAppStatusUpdate = action({
 
     const whatsappUrl = `https://wa.me/${fullPhone}?text=${message}`;
 
-    console.log(`[WhatsApp] Status update link generated for ${orderId}: ${whatsappUrl}`);
+
 
     return { whatsappUrl, phone: fullPhone };
   },

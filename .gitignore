@@ -37,4 +37,12 @@ dist-ssr
 .claude/
 .continue/
 .windsurf/
+.gemini/
 .vercel
+
+# ⚠️ PRODUCTION LOGS — Never commit (Q-04)
+logs*.txt
+prod_logs*.txt
+
+# AI tool internals (Q-05)
+skills-lock.json

@@ -19,7 +19,7 @@ export default function SEO({
   url,
   schema
 }: SEOProps) {
-  const currentUrl = url || typeof window !== 'undefined' ? window.location.href : 'https://www.bwrworks.com'
+  const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://www.bwrworks.com')
 
   return (
     <Helmet>

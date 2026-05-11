@@ -45,3 +45,74 @@ export const generateSignature = action({
     };
   },
 });
+
+/**
+ * S-07: Secure server-side file upload verification
+ * Receives base64 file data from the client, validates size/type against product config,
+ * and securely uploads to Cloudinary using the backend SDK.
+ */
+export const uploadCustomerFile = action({
+  args: {
+    productId: v.id("products"),
+    fieldId: v.string(),
+    base64Data: v.string(),
+    fileName: v.string(),
+    fileType: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // 1. Fetch the product to get the configuration rules
+    const product: any = await ctx.runQuery(internal.products.getProductInternal, { productId: args.productId });
+    if (!product) throw new Error("Product not found");
+
+    const fieldConfig: any = product.customisationConfig.find((f: any) => f.fieldId === args.fieldId);
+    if (!fieldConfig || fieldConfig.type !== "file" || !fieldConfig.fileConfig) {
+      throw new Error("Invalid customisation field configuration");
+    }
+
+    const { maxSizeMB, allowedTypes } = fieldConfig.fileConfig;
+
+    // 2. Server-side Type Validation
+    if (!allowedTypes.includes(args.fileType)) {
+      throw new Error(`Invalid file type. Server only allows: ${allowedTypes.join(", ")}`);
+    }
+
+    // 3. Server-side Size Validation
+    // Base64 is ~33% larger than raw binary.
+    const approximateSizeBytes = (args.base64Data.length * 3) / 4;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    
+    if (approximateSizeBytes > maxSizeBytes) {
+      throw new Error(`File too large. Server limit is ${maxSizeMB}MB.`);
+    }
+
+    // 4. Secure Upload to Cloudinary
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+    if (!cloudName || !apiKey || !apiSecret) {
+      throw new Error("Cloudinary secrets are missing in Convex Dashboard");
+    }
+
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+    });
+
+    const fileUri: string = `data:${args.fileType};base64,${args.base64Data}`;
+
+    try {
+      const result: any = await cloudinary.uploader.upload(fileUri, {
+        folder: "bwr-works/customer-uploads",
+        resource_type: "auto",
+        public_id: `upload_${Date.now()}_${args.fileName.replace(/[^a-zA-Z0-9]/g, '_')}`
+      });
+
+      return result.secure_url;
+    } catch (error: any) {
+      console.error("[Cloudinary Error]", error);
+      throw new Error(`Cloudinary upload failed: ${error?.message || "Unknown error"}`);
+    }
+  },
+});

@@ -56,3 +56,22 @@ export function formatDateTime(timestamp: number): string {
 export function formatOrderId(id: string): string {
   return id.startsWith('BWR-') ? id : `BWR-${id}`
 }
+
+/**
+ * Short alias for formatPriceExact — used in invoices, order tables, admin views.
+ * Converts paise to ₹X.XX display.
+ */
+export function fmt(paise: number): string {
+  return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+}
+
+/**
+ * Safely convert any value to a renderable string — prevents React Error #130.
+ * Handles null, undefined, objects, arrays gracefully.
+ */
+export function safe(val: unknown): string {
+  if (val === null || val === undefined) return ''
+  if (typeof val === 'string') return val
+  if (typeof val === 'number' || typeof val === 'boolean') return String(val)
+  try { return JSON.stringify(val) } catch { return '' }
+}

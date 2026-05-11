@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { requireAdmin } from "./admin";
 import { api, internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 
 // ═══════════════════════════════════════════════════
 // BWR WORKS — Order Queries & Mutations
@@ -18,11 +19,20 @@ export const getMyOrders = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
-    return await ctx.db
+    const orders = await ctx.db
       .query("orders")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
+
+    // Strip sensitive cost breakdown from items
+    return orders.map(order => ({
+      ...order,
+      items: order.items.map(item => {
+        const { costBreakdown, ...safeItem } = item;
+        return safeItem;
+      })
+    })) as typeof orders;
   },
 });
 
@@ -44,6 +54,14 @@ export const getOrderById = query({
     if (!order) return null;
     if (order.userId !== userId && user?.role !== "admin") return null;
     
+    // Strip sensitive cost breakdown for non-admins
+    if (user?.role !== "admin") {
+      order.items = order.items.map(item => {
+        const { costBreakdown, ...safeItem } = item;
+        return safeItem;
+      }) as typeof order.items;
+    }
+
     return order;
   },
 });
@@ -125,16 +143,16 @@ export const createOrder = mutation({
       }
 
       // Fetch the product to verify it exists and is active
-      const product = await ctx.db.get(item.productId as any);
+      const product = await ctx.db.get(item.productId as Id<"products">);
       if (!product) {
         throw new Error(`Product not found: ${item.productName}.`);
       }
-      if ((product as any).isActive === false) {
+      if (product.isActive === false) {
         throw new Error(`Product is no longer available: ${item.productName}.`);
       }
 
       // ─── Stock Validation ───
-      const currentStock = (product as any).stock ?? 0;
+      const currentStock = product.stock ?? 0;
       if (currentStock < item.quantity) {
         throw new Error(
           `Insufficient stock for ${item.productName}. Only ${currentStock} left.`
@@ -144,7 +162,7 @@ export const createOrder = mutation({
       // Fetch the server-side B2C price for this product
       const pricing = await ctx.db
         .query("productPricing")
-        .withIndex("by_productId", (q) => q.eq("productId", item.productId as any))
+        .withIndex("by_productId", (q) => q.eq("productId", item.productId as Id<"products">))
         .first();
 
       if (!pricing) {
@@ -209,9 +227,22 @@ export const createOrder = mutation({
     // Stock is validated above. We DO NOT decrement here to avoid
     // abandoned carts permanently locking up inventory.
 
-    // Generate BWR order ID with random suffix to prevent race condition duplicates
-    const orderCount = await ctx.db.query("orders").collect();
-    const orderNumber = String(orderCount.length + 1).padStart(4, "0");
+    // Generate BWR order ID using atomic counter (B-02 fix)
+    const counter = await ctx.db
+      .query("counters")
+      .withIndex("by_name", (q) => q.eq("name", "orders"))
+      .first();
+
+    let nextNum: number;
+    if (counter) {
+      nextNum = counter.value + 1;
+      await ctx.db.patch(counter._id, { value: nextNum });
+    } else {
+      nextNum = 1;
+      await ctx.db.insert("counters", { name: "orders", value: 1 });
+    }
+
+    const orderNumber = String(nextNum).padStart(4, "0");
     const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
     const orderId = `BWR${orderNumber}${suffix}`;
 
@@ -267,11 +298,11 @@ export const markOrderPaid = internalMutation({
 
     // 3. Deduct Stock safely now that payment is confirmed
     for (const item of order.items) {
-      const product = await ctx.db.get(item.productId as any);
+      const product = await ctx.db.get(item.productId as Id<"products">);
       if (product) {
-        const newStock = ((product as any).stock ?? 0) - item.quantity;
+        const newStock = (product.stock ?? 0) - item.quantity;
         // Clamp to 0 to prevent negative stock edge cases.
-        await ctx.db.patch(product._id, { stock: Math.max(0, newStock) } as any);
+        await ctx.db.patch(product._id, { stock: Math.max(0, newStock) });
       }
     }
 
@@ -292,8 +323,8 @@ export const markOrderPaid = internalMutation({
     }
 
     // 5. Schedule order confirmation email
-    const user = order.userId ? await ctx.db.get(order.userId as any) : null;
-    const customerEmail = (user as any)?.email;
+    const user = order.userId ? await ctx.db.get(order.userId as Id<"users">) : null;
+    const customerEmail = user?.email;
     if (customerEmail) {
       await ctx.scheduler.runAfter(0, api.notifications.sendOrderConfirmationEmail, {
         customerEmail,
@@ -396,8 +427,8 @@ export const updateOrderStatus = mutation({
 
     // Trigger status notification email to customer
     if (status !== "received") {
-      const user = order.userId ? await ctx.db.get(order.userId as any) : null;
-      const customerEmail = (user as any)?.email;
+      const user = order.userId ? await ctx.db.get(order.userId as Id<"users">) : null;
+      const customerEmail = user?.email;
       const customerName = order.addressSnapshot?.name || "Customer";
       if (customerEmail) {
         await ctx.scheduler.runAfter(0, api.notifications.sendStatusUpdateEmail, {

@@ -124,6 +124,7 @@ export default defineSchema({
       })
     ),
     gstPercent: v.number(),
+    codAdvancePercent: v.number(),
     updatedAt: v.number(),
     updatedBy: v.string(),
   }),
@@ -370,4 +371,12 @@ export default defineSchema({
     timestamp: v.number(),
     resendEmailId: v.optional(v.string()), // dedup incoming webhooks
   }).index("by_inquiryId", ["inquiryId"]),
+
+  // ─────────────────────────────────────────────────
+  // COUNTERS — Atomic sequential IDs (orders, inquiries)
+  // ─────────────────────────────────────────────────
+  counters: defineTable({
+    name: v.string(),   // e.g. "orders", "inquiries"
+    value: v.number(),  // current count
+  }).index("by_name", ["name"]),
 });

@@ -124,14 +124,19 @@ export default function ProductDetail() {
                   src={currentImage}
                   alt={product.name}
                   className={styles.productImage}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const shape = e.currentTarget.parentElement?.querySelector(`.${styles.shape}`) as HTMLElement;
+                    if (shape) shape.style.display = '';
+                  }}
                 />
-              ) : (
-                <div className={styles.shape}>
-                  <div className={styles.shapeInner}>
-                    <div className={styles.shapeCore} />
-                  </div>
+              ) : null}
+              {/* Placeholder shape — hidden when image loads, shown on error */}
+              <div className={styles.shape} style={currentImage ? { display: 'none' } : undefined}>
+                <div className={styles.shapeInner}>
+                  <div className={styles.shapeCore} />
                 </div>
-              )}
+              </div>
             </div>
             {/* Thumbnail gallery for multiple images */}
             {product.images && product.images.length > 1 && (
@@ -239,6 +244,7 @@ export default function ProductDetail() {
             config={product.customisationConfig}
             productId={product._id}
             productName={product.name}
+            productSlug={product.slug}
             image={product.images?.[0]}
             variant="light"
           />
