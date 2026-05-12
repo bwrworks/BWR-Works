@@ -126,7 +126,7 @@ export default defineSchema({
       })
     ),
     gstPercent: v.number(),
-    codAdvancePercent: v.number(),
+    codAdvancePercent: v.optional(v.number()),
     updatedAt: v.number(),
     updatedBy: v.string(),
   }),
@@ -214,9 +214,9 @@ export default defineSchema({
     discountAmount: v.number(),
     couponCode: v.optional(v.string()),
     total: v.number(),
-    paymentMode: v.union(v.literal("online"), v.literal("cod")),
-    balanceDue: v.number(),
-    razorpayAmount: v.number(),
+    paymentMode: v.optional(v.union(v.literal("online"), v.literal("cod"))),
+    balanceDue: v.optional(v.number()),
+    razorpayAmount: v.optional(v.number()),
     status: v.union(
       v.literal("received"),
       v.literal("printing"),

@@ -126,7 +126,7 @@ export default function PricingCalculator() {
         riskBufferPercent: dbDefaults.riskBufferPercent,
         b2cMarginPercent: dbDefaults.b2cMarginPercent,
         gstPercent: dbDefaults.gstPercent,
-        codAdvancePercent: dbDefaults.codAdvancePercent,
+        codAdvancePercent: dbDefaults.codAdvancePercent ?? 50,
         b2bMarginSlabs: dbDefaults.b2bMarginSlabs,
       })
     }
