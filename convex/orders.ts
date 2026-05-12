@@ -54,12 +54,37 @@ export const getOrderById = query({
     if (!order) return null;
     if (order.userId !== userId && user?.role !== "admin") return null;
     
-    // Strip sensitive cost breakdown for non-admins
+    // Strip sensitive cost breakdown for non-admins (S-01)
     if (user?.role !== "admin") {
-      order.items = order.items.map(item => {
-        const { costBreakdown, ...safeItem } = item;
-        return safeItem;
-      }) as typeof order.items;
+      return {
+        _id: order._id,
+        _creationTime: order._creationTime,
+        orderId: order.orderId,
+        status: order.status,
+        paymentStatus: order.paymentStatus,
+        paymentMode: order.paymentMode,
+        balanceDue: order.balanceDue,
+        subtotal: order.subtotal,
+        gstAmount: order.gstAmount,
+        discountAmount: order.discountAmount,
+        couponCode: order.couponCode,
+        total: order.total,
+        trackingNumber: order.trackingNumber,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        addressSnapshot: order.addressSnapshot,
+        razorpayOrderId: order.razorpayOrderId,
+        items: order.items.map(item => ({
+          productId: item.productId,
+          productName: item.productName,
+          productSlug: item.productSlug,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          customisations: item.customisations,
+          customText: item.customText,
+          imageRef: item.imageRef,
+        })),
+      };
     }
 
     return order;
@@ -554,5 +579,33 @@ export const recordPayment = internalMutation({
       verifiedAt: Date.now(),
       createdAt: Date.now(),
     });
+  },
+});
+
+/**
+ * Mark an order as payment failed — called from Razorpay webhook payment.failed
+ * Updates order state so admin can see it and it doesn't stay "pending" forever.
+ */
+export const markOrderFailed = internalMutation({
+  args: {
+    razorpayOrderId: v.string(),
+  },
+  handler: async (ctx, { razorpayOrderId }) => {
+    const order = await ctx.db
+      .query("orders")
+      .withIndex("by_razorpayOrderId", (q) =>
+        q.eq("razorpayOrderId", razorpayOrderId)
+      )
+      .first();
+
+    if (!order) return;
+
+    // Only update if still pending — don't override a verified payment
+    if (order.paymentStatus === "pending") {
+      await ctx.db.patch(order._id, {
+        paymentStatus: "failed",
+        updatedAt: Date.now(),
+      });
+    }
   },
 });

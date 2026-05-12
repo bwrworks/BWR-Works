@@ -256,7 +256,7 @@ export default function AdminDashboard() {
                 </span>
                 <span className={styles.cell}>{new Date(order.createdAt).toLocaleDateString('en-IN')}</span>
                 <span>
-                  <Link to={`/admin/orders`} className={styles.viewLink}>View →</Link>
+                  <Link to={`/admin/orders?highlight=${order.orderId}`} className={styles.viewLink}>View →</Link>
                 </span>
               </div>
             ))}

@@ -89,7 +89,14 @@ export const razorpayWebhook = httpAction(async (ctx, request) => {
   }
 
   if (event.event === "payment.failed") {
-    // Payment failure logic can be added here
+    const { order_id } = event.payload.payment.entity;
+    try {
+      await ctx.runMutation(internal.orders.markOrderFailed, {
+        razorpayOrderId: order_id,
+      });
+    } catch (err) {
+      console.error("Webhook payment.failed processing error:", err);
+    }
   }
 
   return new Response("OK", { status: 200 });

@@ -91,6 +91,8 @@ export default defineSchema({
         ),
       })
     ),
+    isFeatured: v.optional(v.boolean()),
+    specifications: v.optional(v.any()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

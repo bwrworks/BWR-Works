@@ -11,6 +11,25 @@ import CtaSection from '../components/home/CtaSection'
 import SEO from '../components/layout/SEO'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "BWR Works",
+  "url": "https://www.bwrworks.com",
+  "logo": "https://www.bwrworks.com/favicon.svg",
+  "description": "Premium customized keychains, key holders, and photo frames. Precision crafted and personalized to tell your story.",
+  "sameAs": [
+    "https://instagram.com/bwrworks",
+    "https://wa.me/918431797007"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+91-8431797007",
+    "contactType": "customer service",
+    "availableLanguage": ["English", "Hindi"]
+  }
+}
+
 export default function Home() {
   useScrollReveal()
 
@@ -19,6 +38,7 @@ export default function Home() {
       <SEO 
         title="BWR Works | Custom High-Quality Gifts & Accessories" 
         description="Premium customized keychains, key holders, and photo frames. Precision crafted and personalized to tell your story."
+        schema={organizationSchema}
       />
       <Navbar />
       <Hero />
@@ -49,17 +69,7 @@ export default function Home() {
         ]}
       />
       <FeaturedDrop />
-      <div style={{
-        width: '100%',
-        height: '4px',
-        background: 'linear-gradient(to right, var(--orange) 0%, var(--gold) 50%, #6B21FF 100%)'
-      }} />
       <ProcessSection />
-      <div style={{
-        width: '100%',
-        height: '4px',
-        background: 'linear-gradient(to right, var(--orange) 0%, var(--gold) 50%, #6B21FF 100%)'
-      }} />
       <Testimonials />
       <CtaSection />
       <Ticker

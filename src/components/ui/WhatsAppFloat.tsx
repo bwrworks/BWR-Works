@@ -1,4 +1,5 @@
 import styles from './WhatsAppFloat.module.css'
+import { useLocation } from 'react-router-dom'
 
 const WA_NUMBER = '918431797007'
 const WA_MESSAGE = 'Hi BWR Works! I have a question about your custom crafted products.'
@@ -24,6 +25,11 @@ function WhatsAppIcon() {
 }
 
 export default function WhatsAppFloat() {
+  const { pathname } = useLocation()
+  
+  // Hide on checkout to prevent overlapping the payment button (UX-9)
+  if (pathname === '/checkout') return null
+
   const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_MESSAGE)}`
 
   return (

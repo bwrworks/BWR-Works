@@ -50,6 +50,7 @@ export default function ProductCard({
             alt={name}
             className={styles.cardImage}
             loading="lazy"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
           />
         ) : (
           <div className={styles.shape}>

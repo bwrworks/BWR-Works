@@ -3,44 +3,6 @@ import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import styles from './Testimonials.module.css'
 
-const DEFAULT_TESTIMONIALS = [
-  {
-    quote: "Got my bike's number plate on a keychain. It's solid, looks premium, and now everyone in my riding group keeps asking where I got it.",
-    author: 'Arjun K.',
-    city: 'Bengaluru',
-    tag: 'Keychains',
-    light: false,
-  },
-  {
-    quote: "Gifted the key holder for a housewarming. The way the LED lights up when you grab the keys is such a neat touch. They loved it.",
-    author: 'Priya M.',
-    city: 'Mumbai',
-    tag: 'Key Holder',
-    light: true,
-  },
-  {
-    quote: "The photo frame was for my parents' anniversary. It feels so well-made, definitely doesn't look like your usual store-bought stuff.",
-    author: 'Rohan S.',
-    city: 'Hyderabad',
-    tag: 'Photo Frame',
-    light: false,
-  },
-  {
-    quote: "I keep a few of these in my auto accessories shop. They always sell out quickly because the finish is just that good.",
-    author: 'Nandita R.',
-    city: 'Pune',
-    tag: 'Key Holder',
-    light: true,
-  },
-  {
-    quote: "You can really tell these are made with care. The weight is perfect and the matte finish gives it a very clean look.",
-    author: 'Sneha V.',
-    city: 'Delhi',
-    tag: 'Keychains',
-    light: false,
-  },
-]
-
 export default function Testimonials() {
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
@@ -52,12 +14,12 @@ export default function Testimonials() {
       return fetchedReviews.map((r, index) => ({
         quote: r.reviewText,
         author: r.userName,
-        city: '', // User location isn't stored in reviews currently
+        city: '',
         tag: r.productCategory,
-        light: index % 2 !== 0, // Alternate dark/light cards
+        light: index % 2 !== 0,
       }))
     }
-    return DEFAULT_TESTIMONIALS
+    return []
   }, [fetchedReviews])
 
   const total = testimonials.length

@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import styles from './OrderConfirm.module.css'
@@ -8,6 +10,11 @@ export default function OrderConfirm() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const rzpOrderId = params.get('rzp') || ''
+
+  // UX-8: Fetch actual BWR order ID from DB
+  const orders = useQuery(api.orders.getMyOrders)
+  const matchedOrder = orders?.find(o => o.razorpayOrderId === rzpOrderId)
+  const displayRef = matchedOrder?.orderId || rzpOrderId.slice(-10).toUpperCase()
 
   useEffect(() => { window.scrollTo(0, 0) }, [])
   useEffect(() => {
@@ -41,7 +48,7 @@ export default function OrderConfirm() {
           <div className={styles.infoCard}>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>REFERENCE</span>
-              <span className={styles.infoValue}>{rzpOrderId.slice(-10).toUpperCase()}</span>
+              <span className={styles.infoValue}>{displayRef}</span>
             </div>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>STATUS</span>

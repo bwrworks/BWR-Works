@@ -68,7 +68,7 @@ export default function ProductDetail() {
         alert('Link copied to clipboard!')
       }
     } catch (err) {
-      console.log('Error sharing:', err)
+      // Share failed silently
     }
   }
 
@@ -236,6 +236,23 @@ export default function ProductDetail() {
             <span className={styles.quoteIcon}>"</span>
             {product.emotionalAngle}
           </div>
+
+          {/* Specifications Table (UX-10) */}
+          {product.specifications && typeof product.specifications === 'object' && Object.keys(product.specifications).length > 0 && (
+            <div className={styles.specsSection}>
+              <h3 className={styles.specsTitle}>Specifications</h3>
+              <table className={styles.specsTable}>
+                <tbody>
+                  {Object.entries(product.specifications as Record<string, string>).map(([key, value]) => (
+                    <tr key={key}>
+                      <td className={styles.specLabel}>{key}</td>
+                      <td className={styles.specValue}>{String(value)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <div className={styles.divider} />
 

@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /checkout
+Disallow: /invoice
+Disallow: /order
+Disallow: /order-confirm
+Disallow: /auth
 
 Sitemap: https://www.bwrworks.com/sitemap.xml

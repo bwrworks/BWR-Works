@@ -24,11 +24,7 @@ export default function FeaturedProducts() {
       <div className={styles.container}>
         <div className="section-eyebrow reveal">The Collection</div>
         <h2 className="section-title reveal">
-          {products && products.length > 0
-            ? `${products.length === 1 ? 'ONE' : products.length === 2 ? 'TWO' : products.length === 3 ? 'THREE' : products.length} ${products.length === 1 ? 'PRODUCT' : 'PRODUCTS'}.`
-            : 'THE COLLECTION.'
-          }
-          <br />
+          THE COLLECTION.<br />
           <span className="outline">INFINITE STORIES.</span>
         </h2>
         <div className={styles.grid}>
@@ -61,6 +57,7 @@ export default function FeaturedProducts() {
                         src={p.images[0]}
                         alt={p.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                       />
                     ) : (
                       <div className={styles.shape}>
@@ -83,7 +80,7 @@ export default function FeaturedProducts() {
                     <div className={styles.tagline}>{p.shortTagline}</div>
                     <div className={styles.footer}>
                       <span className={styles.price}>
-                        {p.price ? formatPrice(p.price) : 'Custom pricing'}
+                        {p.price ? `Starting at ${formatPrice(p.price)}` : 'Custom pricing'}
                       </span>
                       <div className={styles.arrow}>→</div>
                     </div>

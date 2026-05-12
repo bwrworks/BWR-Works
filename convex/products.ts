@@ -45,6 +45,34 @@ export const listActive = query({
 });
 
 /**
+ * Get the single featured product for Hero + FeaturedDropPage
+ * Falls back to the first active product if none is marked featured.
+ */
+export const getFeaturedProduct = query({
+  args: {},
+  handler: async (ctx) => {
+    // Look for the product flagged as featured
+    const allActive = await ctx.db
+      .query("products")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .collect();
+
+    const featured = allActive.find((p) => p.isFeatured === true) || allActive[0] || null;
+    if (!featured) return null;
+
+    const pricing = await ctx.db
+      .query("productPricing")
+      .withIndex("by_productId", (q) => q.eq("productId", featured._id))
+      .first();
+
+    return {
+      ...featured,
+      price: pricing?.calculatedB2CPrice ?? null,
+    };
+  },
+});
+
+/**
  * Search active products by name using native Convex search index
  * Returns matching products with prices
  */
@@ -148,6 +176,8 @@ export const create = mutation({
     emotionalAngle: v.string(),
     images: v.array(v.string()),
     isActive: v.boolean(),
+    isFeatured: v.optional(v.boolean()),
+    specifications: v.optional(v.any()),
     stock: v.number(),
     customisationConfig: v.array(
       v.object({
@@ -179,6 +209,15 @@ export const create = mutation({
     await requireAdmin(ctx);
     const existing = await ctx.db.query("products").withIndex("by_slug", (q) => q.eq("slug", args.slug)).first();
     if (existing) throw new Error(`Product with slug "${args.slug}" already exists`);
+
+    if (args.isFeatured) {
+      const allProducts = await ctx.db.query("products").collect();
+      const featuredProducts = allProducts.filter(p => p.isFeatured === true);
+      for (const fp of featuredProducts) {
+        await ctx.db.patch(fp._id, { isFeatured: false });
+      }
+    }
+
     return await ctx.db.insert("products", { ...args, createdAt: Date.now(), updatedAt: Date.now() });
   },
 });
@@ -195,6 +234,8 @@ export const update = mutation({
     emotionalAngle: v.optional(v.string()),
     images: v.optional(v.array(v.string())),
     isActive: v.optional(v.boolean()),
+    isFeatured: v.optional(v.boolean()),
+    specifications: v.optional(v.any()),
     stock: v.optional(v.number()),
     customisationConfig: v.optional(
       v.array(
@@ -226,6 +267,17 @@ export const update = mutation({
   },
   handler: async (ctx, { id, ...updates }) => {
     await requireAdmin(ctx);
+
+    if (updates.isFeatured) {
+      const allProducts = await ctx.db.query("products").collect();
+      const featuredProducts = allProducts.filter(p => p.isFeatured === true);
+      for (const fp of featuredProducts) {
+        if (fp._id !== id) {
+          await ctx.db.patch(fp._id, { isFeatured: false });
+        }
+      }
+    }
+
     await ctx.db.patch(id, { ...updates, updatedAt: Date.now() });
   },
 });

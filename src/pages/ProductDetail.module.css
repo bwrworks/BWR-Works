@@ -312,6 +312,52 @@
   margin-right: 4px;
 }
 
+/* ── SPECIFICATIONS TABLE ── */
+.specsSection {
+  margin: 24px 0 8px;
+}
+
+.specsTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.specsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.specsTable tr {
+  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+}
+
+.specsTable tr:last-child {
+  border-bottom: none;
+}
+
+.specLabel {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7a7068;
+  padding: 10px 12px 10px 0;
+  width: 40%;
+  vertical-align: top;
+}
+
+.specValue {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink);
+  padding: 10px 0;
+}
+
 /* ── LOADING ── */
 .loading {
   background: var(--ink);

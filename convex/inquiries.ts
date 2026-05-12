@@ -170,7 +170,7 @@ export const storeInboundMessage = internalMutation({
     if (!inquiry) {
       // If it's a new reply to an Order or old format, create a new inquiry automatically!
       if (threadId.startsWith("BWR")) {
-        console.log(`[Inbound] Creating new inquiry thread for unrecognized ID: ${threadId}`);
+        console.warn(`[Inbound] Creating new inquiry thread for unrecognized ID: ${threadId}`);
         // Try to find the order to get the customer name
         const order = await ctx.db.query("orders").withIndex("by_orderId", q => q.eq("orderId", threadId)).first();
         const name = order ? order.addressSnapshot.name : senderEmail.split("@")[0];

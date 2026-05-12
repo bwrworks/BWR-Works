@@ -1,26 +1,15 @@
-import { useMemo } from 'react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { useCms } from '../../hooks/useCms'
 import styles from './Hero.module.css'
 
 export default function Hero() {
-  const products = useQuery(api.products.listActive)
+  // UX-3: Use the isFeatured product instead of random
+  const featured = useQuery(api.products.getFeaturedProduct)
   const { cms } = useCms()
 
-  // Pick a random product on each page load (stable for the session)
-  const featured = useMemo(() => {
-    if (!products || products.length === 0) return null
-    const idx = Math.floor(Math.random() * products.length)
-    return products[idx]
-  }, [products])
-
-  // Pick a random image from the featured product's gallery
-  const heroImage = useMemo(() => {
-    if (!featured?.images?.length) return null
-    const idx = Math.floor(Math.random() * featured.images.length)
-    return featured.images[idx]
-  }, [featured])
+  // Use first image from the featured product
+  const heroImage = featured?.images?.[0] ?? null
 
   return (
     <section className={styles.hero}>
@@ -48,10 +37,11 @@ export default function Hero() {
             See The Process
           </a>
         </div>
+        {/* UX-4: Replace dynamic product count with premium craft stats */}
         <div className={styles.statBar}>
           <div className={styles.statItem}>
-            <span className={styles.statNum}>{products?.length ?? '3'}</span>
-            <span className={styles.statLabel}>Products Live</span>
+            <span className={styles.statNum}>0.12mm</span>
+            <span className={styles.statLabel}>Precision</span>
           </div>
           <div className={styles.statItem}>
             <span className={styles.statNum}>7</span>
@@ -72,6 +62,7 @@ export default function Hero() {
                 src={heroImage}
                 alt={featured?.name || 'BWR Works Product'}
                 className={styles.productImage}
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
               />
             </div>
           ) : (

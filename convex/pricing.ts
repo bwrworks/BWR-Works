@@ -167,6 +167,33 @@ export const getProductPrice = query({
 });
 
 /**
+ * Get prices for multiple products in a single query (batch)
+ * Used by CartDrawer to refresh prices without N subscriptions.
+ */
+export const getBatchPrices = query({
+  args: {
+    productIds: v.array(v.string()),
+  },
+  handler: async (ctx, { productIds }) => {
+    const results: Record<string, number | null> = {};
+
+    for (const pid of productIds) {
+      try {
+        const pricing = await ctx.db
+          .query("productPricing")
+          .withIndex("by_productId", (q) => q.eq("productId", pid as any))
+          .first();
+        results[pid] = pricing?.calculatedB2CPrice ?? null;
+      } catch {
+        results[pid] = null;
+      }
+    }
+
+    return results;
+  },
+});
+
+/**
  * Get product pricing for ADMIN view (includes full cost breakdown)
  */
 export const getProductPricingAdmin = query({
