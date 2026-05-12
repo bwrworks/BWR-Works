@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
@@ -12,6 +12,7 @@ import styles from './Products.module.css'
 export default function Products() {
   const products = useQuery(api.products.listActive)
   const location = useLocation()
+  const navigate = useNavigate()
   useScrollReveal()
 
   const searchParams = new URLSearchParams(location.search)
@@ -25,8 +26,8 @@ export default function Products() {
   return (
     <>
       <SEO 
-        title="Shop Collection | BWR Works - Custom Keychains & Frames" 
-        description="Explore our premium collection of custom-made pieces, ready to be personalized with your story. Never mass-produced."
+        title="Shop Custom Keychains & Gifts | BWR Works India" 
+        description="Explore our premium collection of custom-made pieces, ready to be personalized with your story. Never mass-produced. Made in Bengaluru."
       />
       <Navbar />
       <div>
@@ -73,7 +74,24 @@ export default function Products() {
 
         {/* ── OFF-WHITE PRODUCTS GRID (Bottom 50%) ── */}
         <div className={styles.lightSection}>
+          {/* P-06: Category filter tabs */}
           <div className={`${styles.gridContainer} reveal`}>
+            <div className={styles.filterTabs}>
+              {[
+                { label: 'All', value: '' },
+                { label: 'Keychains', value: 'keychain' },
+                { label: 'Key Holders', value: 'keyholder' },
+                { label: 'Photo Frames', value: 'photoframe' },
+              ].map(tab => (
+                <button
+                  key={tab.value}
+                  className={`${styles.filterTab} ${(catFilter ?? '') === tab.value ? styles.filterTabActive : ''}`}
+                  onClick={() => navigate(tab.value ? `/products?cat=${tab.value}` : '/products')}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
             <ProductGrid products={filteredProducts} />
           </div>
         </div>

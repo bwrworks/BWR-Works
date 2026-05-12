@@ -164,6 +164,37 @@ export const listAll = query({
 });
 
 /**
+ * Set a product as featured by slug (admin only).
+ * Clears isFeatured on all other products first.
+ */
+export const setFeaturedBySlug = mutation({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    await requireAdmin(ctx);
+
+    const product = await ctx.db
+      .query("products")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .first();
+
+    if (!product) throw new Error(`Product with slug "${slug}" not found`);
+
+    // Clear featured flag on all other products
+    const allProducts = await ctx.db.query("products").collect();
+    for (const p of allProducts) {
+      if (p.isFeatured === true && p._id !== product._id) {
+        await ctx.db.patch(p._id, { isFeatured: false });
+      }
+    }
+
+    // Set this product as featured
+    await ctx.db.patch(product._id, { isFeatured: true });
+    return { success: true, productId: product._id, name: product.name };
+  },
+});
+
+
+/**
  * Create a new product (admin only)
  */
 export const create = mutation({

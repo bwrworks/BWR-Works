@@ -1,0 +1,123 @@
+.page {
+  min-height: 100vh;
+  background: var(--off-white);
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 80px 60px 120px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin: var(--space-sm) 0 var(--space-3xl);
+  line-height: 0.95;
+}
+
+.section {
+  margin-bottom: var(--space-3xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--line);
+}
+
+.text {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--black-soft);
+  margin-bottom: var(--space-md);
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-lg);
+}
+
+.list li {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: var(--black-soft);
+  padding-left: 20px;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--orange);
+}
+
+.highlight {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: var(--space-md);
+  display: block;
+}
+
+.contactNote {
+  margin-top: var(--space-3xl);
+  padding: var(--space-xl);
+  background: var(--ink);
+  color: var(--off-white);
+  border-radius: var(--radius-md);
+}
+
+.contactNote h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-sm);
+}
+
+.contactNote p {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.contactNote a {
+  color: var(--orange);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.contactNote a:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 900px) {
+  .container {
+    padding: 60px 24px 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 40px 16px 60px;
+  }
+}

@@ -75,7 +75,7 @@ export default function Hero() {
             </div>
           )}
           <div className={styles.productLabel}>{featured?.name ?? 'Car Garage Key Holder'}</div>
-          <div className={styles.productSub}>{featured?.shortTagline ?? 'Matte Black PLA · LED Accent'}</div>
+          <div className={styles.productSub}>{featured?.shortTagline ?? 'Premium Matte Finish · LED Accent'}</div>
         </div>
         <div className={styles.rightCorner}>
           BWR — Black &amp; White Rogue<br />

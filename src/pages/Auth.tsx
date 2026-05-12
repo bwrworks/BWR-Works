@@ -18,6 +18,10 @@ export default function Auth() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  // CC-04: Detect if user was redirected from checkout
+  const searchParams = new URLSearchParams(location.search)
+  const fromCheckout = searchParams.get('redirect') === '/checkout'
+
   // Determine where to redirect after login
   const redirectTo = (location.state as any)?.from?.pathname || '/dashboard'
 
@@ -76,12 +80,26 @@ export default function Auth() {
           <div className={styles.leftContent}>
             
             <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>
-              IDENTIFICATION
+              WELCOME BACK
             </div>
             <h1 className={styles.title}>
-              ACCESS<br />
-              <span className={styles.outline}>PORTAL</span>
+              SIGN<br />
+              <span className={styles.outline}>IN</span>
             </h1>
+
+            {/* CC-04: Checkout redirect context */}
+            {fromCheckout && (
+              <div style={{
+                marginBottom: 20, padding: '14px 18px',
+                background: 'rgba(255,92,26,0.08)',
+                border: '1px solid rgba(255,92,26,0.2)',
+                borderRadius: 4,
+                fontFamily: 'var(--font-body)', fontSize: '0.85rem',
+                color: 'var(--off-white)', lineHeight: 1.6,
+              }}>
+                Almost there — sign in to complete your order. Your cart is saved and will be ready after sign in.
+              </div>
+            )}
             
             {error && <div className={styles.errorBox}>{error}</div>}
 
@@ -127,7 +145,7 @@ export default function Auth() {
             ) : (
               <form className={styles.form} onSubmit={handleVerifyOTP}>
                 <p className={styles.instruction}>
-                  A 6-character access code was dispatched to <strong>{email}</strong>.
+                  We sent a 6-character code to <strong>{email}</strong>.
                 </p>
                 <div className={styles.inputGroup}>
                   <label>Access Code</label>
@@ -155,22 +173,22 @@ export default function Auth() {
         {/* ── RIGHT: INFO (LIGHT) ── */}
         <div className={styles.rightHalf}>
           <div className={styles.rightContent}>
-            <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>CLIENT PROFILE</div>
+            <div className="section-eyebrow" style={{ color: 'var(--orange)' }}>YOUR ACCOUNT</div>
             <h2 className={styles.infoTitle}>
-              YOUR PERSONAL GARAGE
+              YOUR PERSONAL DASHBOARD
             </h2>
             <div className={styles.perksList}>
               <div className={styles.perk}>
-                <h4>Track Production</h4>
-                <p>Since our pieces take up to 24 hours to craft, monitor your order's real-time journey from the digital render to physical extrusion.</p>
+                <h4>Track Your Orders</h4>
+                <p>Since our pieces take up to 24 hours to craft, follow your order's journey from design to delivery.</p>
               </div>
               <div className={styles.perk}>
                 <h4>Manage Addresses</h4>
-                <p>Securely store your shipping details for rapid checkout on future limited-edition drops.</p>
+                <p>Securely store your shipping details for faster checkout on future orders.</p>
               </div>
               <div className={styles.perk}>
-                <h4>Order Repository</h4>
-                <p>View your complete history of commissioned custom pieces, download invoices, and initiate re-orders.</p>
+                <h4>Order History</h4>
+                <p>View your past orders, download invoices, and reorder your favourite pieces.</p>
               </div>
             </div>
           </div>

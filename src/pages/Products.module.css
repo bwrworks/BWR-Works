@@ -145,6 +145,38 @@
   margin: 0 auto;
 }
 
+/* P-06: Category filter tabs */
+.filterTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterTab:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.filterTabActive {
+  background: var(--ink);
+  color: var(--off-white);
+  border-color: var(--ink);
+}
+
 /* ── PRODUCT GRID ── */
 .grid {
   display: grid;

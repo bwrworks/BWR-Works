@@ -6,6 +6,7 @@ import FeaturedDropPage from './pages/FeaturedDropPage'
 import Craft from './pages/Craft'
 import Contact from './pages/Contact'
 import Auth from './pages/Auth'
+import Policy from './pages/Policy'
 import Dashboard from './pages/Dashboard'
 import Checkout from './pages/Checkout'
 import OrderConfirm from './pages/OrderConfirm'
@@ -41,6 +42,7 @@ function AnimatedRoutes() {
         <Route path="/featured-drop" element={<FeaturedDropPage />} />
         <Route path="/the-craft" element={<Craft />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/policy" element={<Policy />} />
         <Route path="/auth" element={<Auth />} />
 
         {/* ── CUSTOMER SECURE ROUTES ── */}

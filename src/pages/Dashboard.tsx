@@ -120,7 +120,7 @@ export default function Dashboard() {
                 <div className={styles.statIcon}>💰</div>
                 <div className={styles.statInfo}>
                   <div className={styles.statValue}>{orders ? fmt(totalSpend) : '—'}</div>
-                  <div className={styles.statLabel}>Total Spent</div>
+                  <div className={styles.statLabel}>Total Spent (incl. GST)</div>
                 </div>
               </div>
               <div className={styles.statCard}>

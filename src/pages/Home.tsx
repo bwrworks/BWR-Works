@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <>
       <SEO 
-        title="BWR Works | Custom High-Quality Gifts & Accessories" 
+        title="BWR Works | Custom Precision-Crafted Gifts — Bengaluru, India" 
         description="Premium customized keychains, key holders, and photo frames. Precision crafted and personalized to tell your story."
         schema={organizationSchema}
       />

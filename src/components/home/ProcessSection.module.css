@@ -1,6 +1,7 @@
 .section {
   padding: 100px 0;
   background: var(--off-white);
+  scroll-margin-top: 80px; /* H-01: offset for sticky nav */
 }
 
 .container {

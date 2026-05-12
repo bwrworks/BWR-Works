@@ -33,6 +33,7 @@ export default function Footer() {
             <li><Link to="/the-craft">The Craft</Link></li>
             <li><Link to="/featured-drop">Featured Drop</Link></li>
             <li><Link to="/contact">Contact Us</Link></li>
+            <li><Link to="/policy">Shipping & Returns</Link></li>
           </ul>
         </div>
         <div>
@@ -46,6 +47,9 @@ export default function Footer() {
       </div>
       <div className={styles.bottom}>
         <span className={styles.copy}>© 2026 BWR — Black &amp; White Rogue. All rights reserved.</span>
+        {/* B-05: GSTIN — Uncomment and replace when you have your actual GSTIN:
+            <span className={styles.copy}>GSTIN: YOUR_GSTIN_HERE | MSME Registered</span>
+        */}
         <span className={styles.copy}>Crafted with intention. Never mass-made.</span>
       </div>
     </footer>

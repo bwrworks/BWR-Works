@@ -482,12 +482,16 @@
     grid-template-columns: 1fr;
   }
 
-  .darkHalf {
-    padding: 40px 24px;
+  /* M-01: On mobile, show purchase content (lightHalf) before visual (darkHalf).
+     Sequence: name/price → customiser → image/trust info */
+  .lightHalf {
+    order: -1;
+    padding: 40px 24px 60px;
   }
 
-  .lightHalf {
-    padding: 40px 24px 60px;
+  .darkHalf {
+    order: 1;
+    padding: 40px 24px;
   }
 
   .visualSticky {
@@ -498,3 +502,4 @@
     margin-top: 32px;
   }
 }
+

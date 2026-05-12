@@ -103,6 +103,16 @@ export default function Checkout() {
     <div className={styles.page}>
       <Navbar />
 
+      {/* CC-06: Sticky mobile order summary bar — visible only on mobile via CSS */}
+      <div className={styles.mobileSummaryBar}>
+        <span className={styles.mobileSummaryCount}>
+          {items.length} item{items.length !== 1 ? 's' : ''} in cart
+        </span>
+        <span className={styles.mobileSummaryTotal}>
+          ₹{total.toLocaleString('en-IN')}
+        </span>
+      </div>
+
       <div className={`${styles.container} page-enter`}>
         {/* ── PAGE HEADER ── */}
         <div className={styles.header}>

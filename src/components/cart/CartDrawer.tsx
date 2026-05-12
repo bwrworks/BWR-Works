@@ -62,6 +62,22 @@ export default function CartDrawer() {
             <div className={styles.emptyIcon}>◇</div>
             <p>Your cart is empty</p>
             <span>Add something beautiful</span>
+            {/* CC-03: Browse button so empty cart isn't a dead end */}
+            <button
+              className={styles.browseBtn}
+              onClick={() => { setIsOpen(false); navigate('/products') }}
+              style={{
+                marginTop: 20, padding: '12px 28px',
+                fontFamily: 'var(--font-display)', fontWeight: 700,
+                fontSize: '0.75rem', letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                background: 'var(--ink)', color: 'var(--off-white)',
+                border: 'none', cursor: 'pointer',
+                transition: 'background 0.2s',
+              }}
+            >
+              Browse Collection →
+            </button>
           </div>
         ) : (
           <>

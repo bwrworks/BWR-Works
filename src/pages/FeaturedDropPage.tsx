@@ -15,9 +15,8 @@ export default function FeaturedDropPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  // B-06: Pull featured product from DB instead of hardcoding
-  const products = useQuery(api.products.listActive)
-  const featured = products?.find((p: any) => p.isFeatured) ?? products?.[0]
+  // B-06: Pull featured product from DB — same query as Hero for consistency
+  const featured = useQuery(api.products.getFeaturedProduct)
 
   return (
     <div className={styles.page}>
@@ -52,6 +51,36 @@ export default function FeaturedDropPage() {
                 <span className={styles.chip}>Made to Order</span>
                 <span className={styles.chip}>Premium Finish</span>
               </div>
+              {/* H-05: Price + direct CTA in hero */}
+              {featured?.price && (
+                <div style={{ marginTop: 20 }}>
+                  <span style={{
+                    fontFamily: 'var(--font-display)', fontWeight: 900,
+                    fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', color: 'var(--off-white)',
+                  }}>
+                    {formatPrice(featured.price)}
+                  </span>
+                  <span style={{
+                    fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
+                    color: 'var(--muted)', marginLeft: 12, letterSpacing: '0.08em',
+                  }}>
+                    INCL. GST
+                  </span>
+                </div>
+              )}
+              <Link
+                to={featured ? `/products/${featured.slug}` : '/products'}
+                style={{
+                  display: 'inline-block', marginTop: 20,
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  fontSize: '0.82rem', letterSpacing: '0.08em',
+                  textTransform: 'uppercase', color: 'var(--ink)',
+                  background: 'var(--off-white)', padding: '14px 32px',
+                  textDecoration: 'none', transition: 'all 0.2s',
+                }}
+              >
+                {featured ? `Shop ${featured.name} →` : 'Browse Collection →'}
+              </Link>
             </div>
             
             <div className={`${styles.heroVisual} reveal reveal-delay-1`}>

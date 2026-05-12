@@ -50,6 +50,43 @@
 @media (max-width: 900px) {
   .layout { grid-template-columns: 1fr; }
   .right { order: -1; }
+  .container { padding: 24px 16px var(--space-3xl); }
+}
+
+/* CC-06: Mobile sticky order summary bar */
+.mobileSummaryBar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobileSummaryBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--ink);
+    color: var(--off-white);
+    padding: 12px 20px;
+    position: sticky;
+    top: 60px;
+    z-index: 50;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid rgba(245,240,232,0.1);
+  }
+
+  .mobileSummaryTotal {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--orange);
+  }
+
+  .mobileSummaryCount {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
 }
 
 /* Step indicator */
