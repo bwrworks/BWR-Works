@@ -59,10 +59,6 @@ export default function Invoice() {
   const order = useQuery(api.orders.getOrderById, { orderId: orderId || '' })
   const { cms } = useCms()
 
-  const siteUrl = window.location.origin
-
-
-
   useEffect(() => {
     window.scrollTo(0, 0)
     document.body.style.backgroundColor = '#e5e7eb'
