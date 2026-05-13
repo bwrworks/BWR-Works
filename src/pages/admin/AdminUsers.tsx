@@ -1,6 +1,6 @@
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
-import styles from './AdminPages.module.css'
+import styles from './AdminDashboard.module.css'
 
 export default function AdminUsers() {
   const users = useQuery(api.users.getAllWithStats)
