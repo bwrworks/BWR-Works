@@ -47,12 +47,17 @@ export default function AddressForm({ onSave, onCancel, initial = {} }: Props) {
 
   const validate = (): boolean => {
     const e: Partial<AddressData> = {}
-    if (!form.name.trim()) e.name = 'Full name is required'
+    if (!form.name.trim()) {
+      e.name = 'Full name is required'
+    } else if (!/^[A-Za-z\s.'-]+$/.test(form.name)) {
+      e.name = 'Please enter a valid name (letters only)'
+    }
+    
     if (!form.line1.trim()) e.line1 = 'Address line 1 is required'
     if (!form.city.trim()) e.city = 'City is required'
     if (!form.state) e.state = 'State is required'
-    if (!/^\d{6}$/.test(form.pincode)) e.pincode = 'Enter a valid 6-digit pincode'
-    if (!/^\d{10}$/.test(form.phone)) e.phone = 'Enter a valid 10-digit phone number'
+    if (!/^\d{6}$/.test(form.pincode)) e.pincode = 'Please enter a valid 6-digit pincode (e.g. 560001)'
+    if (!/^\d{10}$/.test(form.phone)) e.phone = 'Please enter a valid 10-digit mobile number'
     setErrors(e)
     return Object.keys(e).length === 0
   }

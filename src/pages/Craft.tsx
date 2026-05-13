@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useCms } from '../hooks/useCms'
@@ -8,6 +10,7 @@ import SEO from '../components/layout/SEO'
 import styles from './Craft.module.css'
 
 export default function Craft() {
+  const featured = useQuery(api.products.getFeaturedProduct)
   useScrollReveal()
   const { cms } = useCms()
 
@@ -44,13 +47,29 @@ export default function Craft() {
                 {cms('about', 'body', 'We reject the disposable culture of mass manufacturing. Every BWR piece is individually crafted using premium materials, taking hours to produce a single perfect unit customized exactly for you.')}
               </p>
             </div>
-            <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
-              <div className={styles.shapeContainer}>
-                <div className={styles.shapeMain}>
+            <div className={`${styles.heroVisual} reveal reveal-delay-1`} style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div className={styles.shapeContainer} style={{ position: 'relative' }}>
+                <div className={styles.shapeMain} style={{ position: 'absolute', inset: 0, margin: 'auto' }}>
                   <div className={styles.shapeInner}>
                     <div className={styles.shapeCore} />
                   </div>
                 </div>
+                {featured && featured.images && featured.images[0] && (
+                  <img 
+                    src={featured.images[0]} 
+                    alt="Featured Product" 
+                    style={{
+                      position: 'absolute',
+                      maxWidth: '85%',
+                      maxHeight: '85%',
+                      objectFit: 'contain',
+                      zIndex: 10,
+                      inset: 0,
+                      margin: 'auto',
+                      filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))'
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>

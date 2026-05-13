@@ -14,6 +14,7 @@ import OrderTracking from './pages/OrderTracking'
 import Invoice from './pages/Invoice'
 import CartDrawer from './components/cart/CartDrawer'
 import CustomCursor from './components/ui/CustomCursor'
+import ScrollToTop from './components/layout/ScrollToTop'
 import { AuthGuard } from './components/auth/AuthGuard'
 import { AdminGuard } from './components/auth/AdminGuard'
 import AdminLayout from './pages/admin/AdminLayout'
@@ -22,6 +23,7 @@ import AdminOrders from './pages/admin/AdminOrders'
 import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminContent from './pages/admin/AdminContent'
+import AdminUsers from './pages/admin/AdminUsers'
 import AdminInventory from './pages/admin/AdminInventory'
 import AdminInquiries from './pages/admin/AdminInquiries'
 import PricingCalculator from './pages/admin/PricingCalculator'
@@ -60,6 +62,7 @@ function AnimatedRoutes() {
           <Route path="coupons" element={<AdminCoupons />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="content" element={<AdminContent />} />
+          <Route path="users" element={<AdminUsers />} />
           <Route path="inventory" element={<AdminInventory />} />
           <Route path="inquiries" element={<AdminInquiries />} />
           <Route path="pricing" element={<PricingCalculator />} />
@@ -75,6 +78,7 @@ function AnimatedRoutes() {
 function App() {
   return (
     <>
+      <ScrollToTop />
       <AnimatedRoutes />
       {/* Global overlays — available on every page */}
       <CartDrawer />

@@ -101,12 +101,18 @@ export default function Invoice() {
           <div className={styles.companyInfo}>
             <h1 className={styles.companyName}>BWR WORKS</h1>
             <p className={styles.companyDetail}>Made in Bengaluru</p>
-            <p className={styles.companyDetail}>GSTIN: {cms('invoice', 'gstin', '[Enter GST in Admin → Content]')}</p>
-            <p className={styles.companyDetail}>{cms('invoice', 'company_address', '[Enter Address in Admin → Content]')}</p>
-            <p className={styles.companyDetail}>Email: {cms('invoice', 'contact_email', 'contact@bwrworks.com')}</p>
+            {cms('invoice', 'gstin', '[Enter GST in Admin → Content]') !== '[Enter GST in Admin → Content]' && (
+              <p className={styles.companyDetail}>GSTIN: {cms('invoice', 'gstin', '')}</p>
+            )}
+            {cms('invoice', 'company_address', '[Enter Address in Admin → Content]') !== '[Enter Address in Admin → Content]' && (
+              <p className={styles.companyDetail}>{cms('invoice', 'company_address', '')}</p>
+            )}
+            {cms('invoice', 'contact_email', 'contact@bwrworks.com') !== 'contact@bwrworks.com' && (
+              <p className={styles.companyDetail}>Email: {cms('invoice', 'contact_email', '')}</p>
+            )}
           </div>
           <div className={styles.invoiceInfo}>
-            <h2 className={styles.invoiceTitle}>Tax Invoice / Bill of Supply</h2>
+            <h2 className={styles.invoiceTitle}>{isGstEnabled ? 'TAX INVOICE' : 'INVOICE / BILL OF SUPPLY'}</h2>
             <div className={styles.infoGrid}>
               <span className={styles.infoLabel}>Order ID:</span>
               <span className={styles.infoValue}>{safe(order.orderId)}</span>

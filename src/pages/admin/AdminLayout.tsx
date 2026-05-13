@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { path: '/admin/coupons', label: 'Coupons', icon: '🏷️' },
   { path: '/admin/inventory', label: 'Inventory', icon: '📊' },
   { path: '/admin/inquiries', label: 'Inquiries', icon: '✉️' },
+  { path: '/admin/users', label: 'Users', icon: '👥' },
   { path: '/admin/content', label: 'Content CMS', icon: '✏️' },
 ]
 

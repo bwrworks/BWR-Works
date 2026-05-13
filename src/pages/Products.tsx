@@ -11,6 +11,7 @@ import styles from './Products.module.css'
 
 export default function Products() {
   const products = useQuery(api.products.listActive)
+  const featured = useQuery(api.products.getFeaturedProduct)
   const location = useLocation()
   const navigate = useNavigate()
   useScrollReveal()
@@ -60,13 +61,29 @@ export default function Products() {
                 Each piece crafted exactly to your specifications — never mass-produced.
               </p>
             </div>
-            <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
-              <div className={styles.shapeContainer}>
-                <div className={styles.shapeMain}>
+            <div className={`${styles.heroVisual} reveal reveal-delay-1`} style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div className={styles.shapeContainer} style={{ position: 'relative' }}>
+                <div className={styles.shapeMain} style={{ position: 'absolute', inset: 0, margin: 'auto' }}>
                   <div className={styles.shapeInner}>
                     <div className={styles.shapeCore} />
                   </div>
                 </div>
+                {featured && featured.images && featured.images[0] && (
+                  <img 
+                    src={featured.images[0]} 
+                    alt="Featured Product" 
+                    style={{
+                      position: 'absolute',
+                      maxWidth: '85%',
+                      maxHeight: '85%',
+                      objectFit: 'contain',
+                      zIndex: 10,
+                      inset: 0,
+                      margin: 'auto',
+                      filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))'
+                    }}
+                  />
+                )}
               </div>
             </div>
           </div>

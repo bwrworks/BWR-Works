@@ -23,6 +23,19 @@ export default function Policy() {
           SHIPPING, RETURNS<br />& PRIVACY
         </h1>
 
+        {/* ── COMPANY INFO ── */}
+        <div className={`${styles.section} reveal`}>
+          <h2 className={styles.sectionTitle}>Company Information</h2>
+          <p className={styles.text}>
+            BWR Works operates out of Bengaluru, India. We specialize in custom-made, high-quality personalized items. 
+          </p>
+          <ul className={styles.list}>
+            <li><strong>Business Name:</strong> BWR Works</li>
+            <li><strong>GSTIN:</strong> Registration Pending</li>
+            <li><strong>Address:</strong> Bengaluru, Karnataka, India</li>
+          </ul>
+        </div>
+
         {/* ── SHIPPING ── */}
         <div className={`${styles.section} reveal`}>
           <h2 className={styles.sectionTitle}>Shipping</h2>

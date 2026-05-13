@@ -120,7 +120,7 @@ export default function FeaturedDropPage() {
             
             {/* Scarcity / Price */}
             <div className={`${styles.pricingBox} reveal`}>
-              <h3 className={styles.boxTitle}>Investment</h3>
+              <h3 className={styles.boxTitle}>Purchase Details</h3>
               <div className={styles.priceRow}>
                 <div className={styles.price}>
                   {featured?.price ? formatPrice(featured.price) : 'Custom'}
@@ -177,7 +177,7 @@ export default function FeaturedDropPage() {
           {/* The Process */}
           <div className={styles.processSection}>
             <div className={`${styles.processHeader} reveal`}>
-              <h3 className={styles.boxTitle}>Acquisition Process</h3>
+              <h3 className={styles.boxTitle}>How It Works</h3>
               <p className={styles.processSub}>Due to the bespoke nature of each piece, every order follows a strict timeline.</p>
             </div>
             

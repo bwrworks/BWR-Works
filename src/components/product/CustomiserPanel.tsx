@@ -28,7 +28,13 @@ interface Props {
 }
 
 export default function CustomiserPanel({ config, productId, productName, productSlug, image, variant = 'dark' }: Props) {
-  const [values, setValues] = useState<Record<string, string | number | boolean>>({})
+  const [values, setValues] = useState<Record<string, string | number | boolean>>(() => {
+    const initial: Record<string, string | number | boolean> = {}
+    config.forEach(f => {
+      if (f.label.toLowerCase().includes('lanyard')) initial[f.fieldId] = true
+    })
+    return initial
+  })
   const [files, setFiles] = useState<Record<string, File | null>>({})
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
@@ -55,6 +61,17 @@ export default function CustomiserPanel({ config, productId, productName, produc
       const labels = [...missing, ...missingFiles].map(f => f.label)
       warning(`Please fill in: ${labels.join(', ')}`)
       return
+    }
+
+    // Number Plate Regex Validation
+    const numberPlateField = config.find(f => f.label.toLowerCase().includes('number plate'))
+    if (numberPlateField && values[numberPlateField.fieldId]) {
+      const val = String(values[numberPlateField.fieldId]).trim().toUpperCase()
+      const regex = /^[A-Z]{2}\s\d{2}\s[A-Z]{1,2}\s\d{1,4}$|^\d{2}\sBH\s\d{4}\s[A-Z]{2}$/
+      if (!regex.test(val)) {
+        warning('Please enter in format: KA 01 AB 1234')
+        return
+      }
     }
 
     setIsUploading(true)
@@ -151,11 +168,39 @@ export default function CustomiserPanel({ config, productId, productName, produc
 
           {field.type === 'select' && field.options && (
             <div className={styles.optionsGrid}>
-              {field.options.map(opt => (
-                <button key={opt} type="button"
-                  className={`${styles.optionBtn} ${values[field.fieldId] === opt ? styles.optionActive : ''}`}
-                  onClick={() => set(field.fieldId, opt)}>{opt}</button>
-              ))}
+              {field.options.map(opt => {
+                const isColor = field.label.toLowerCase().includes('color')
+                const isFont = field.label.toLowerCase().includes('font')
+                
+                const COLOR_MAP: Record<string, string> = {
+                  'matte black': '#222222',
+                  'matte white': '#f5f5f5',
+                  'yellow': '#fbbf24',
+                  'red': '#ef4444',
+                  'blue': '#3b82f6'
+                }
+                
+                const FONT_MAP: Record<string, string> = {
+                  'standard': 'Inter, sans-serif',
+                  'bold': 'Inter, sans-serif',
+                  'retro': '"Courier New", Courier, monospace'
+                }
+                
+                return (
+                  <button key={opt} type="button"
+                    className={`${styles.optionBtn} ${values[field.fieldId] === opt ? styles.optionActive : ''}`}
+                    style={isFont ? { 
+                      fontFamily: FONT_MAP[opt.toLowerCase()] || 'inherit', 
+                      fontWeight: opt.toLowerCase() === 'bold' ? 800 : 'normal' 
+                    } : undefined}
+                    onClick={() => set(field.fieldId, opt)}>
+                    {isColor && COLOR_MAP[opt.toLowerCase()] && (
+                      <span className={styles.colorSwatch} style={{ backgroundColor: COLOR_MAP[opt.toLowerCase()] }} />
+                    )}
+                    {opt}
+                  </button>
+                )
+              })}
             </div>
           )}
 
@@ -198,7 +243,7 @@ export default function CustomiserPanel({ config, productId, productName, produc
                 onClick={() => set(field.fieldId, !values[field.fieldId])}>
                 <div className={styles.toggleKnob} />
               </button>
-              {field.priceModifier && (
+              {field.priceModifier && !field.label.toLowerCase().includes('lanyard') && (
                 <span className={styles.togglePrice}>+₹{(field.priceModifier / 100).toFixed(0)}</span>
               )}
             </div>
