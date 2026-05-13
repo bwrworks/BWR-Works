@@ -58,6 +58,7 @@ export default function Invoice() {
   const { orderId } = useParams<{ orderId: string }>()
   const order = useQuery(api.orders.getOrderById, { orderId: orderId || '' })
   const { cms } = useCms()
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -76,7 +77,6 @@ export default function Invoice() {
   }
 
   const hsnCode = cms('invoice', 'hsn_code', '3926')
-  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
   const isGstEnabled = pricingDefaults ? pricingDefaults.gstPercent > 0 : false
 
   const handlePrint = () => {
