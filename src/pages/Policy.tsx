@@ -7,6 +7,68 @@ import styles from './Policy.module.css'
 export default function Policy() {
   useScrollReveal()
 
+  const policies = [
+    {
+      id: 'company',
+      icon: '🏢',
+      title: 'Company Information',
+      desc: 'BWR Works operates out of Bengaluru, India. We specialize in custom-made, high-quality personalized items.',
+      bullets: [
+        'Business Name: BWR Works',
+        'GSTIN: Registration Pending',
+        'Address: Bengaluru, Karnataka, India'
+      ]
+    },
+    {
+      id: 'shipping',
+      icon: '📦',
+      title: 'Shipping & Delivery',
+      desc: 'Every BWR Works piece is crafted individually after your order is confirmed. Since nothing is pre-made, please allow 5–7 business days for crafting.',
+      highlight: 'Made to Order · Ships within 7 business days',
+      bullets: [
+        'Crafting time: 5–7 business days',
+        'Shipping via trusted courier partners (Delhivery, DTDC, India Post)',
+        'Delivery within 3–5 business days after dispatch',
+        'Tracking number provided once your order ships',
+        'Free shipping on orders above ₹999',
+        'Currently shipping within India only'
+      ]
+    },
+    {
+      id: 'returns',
+      icon: '🔄',
+      title: 'Returns & Exchanges',
+      desc: 'Because each piece is custom-made to your exact specifications, we cannot accept returns for change of mind or incorrect customisation details.',
+      highlight: 'Custom products · Limited return eligibility',
+      subheading: 'We will replace or refund if:',
+      bullets: [
+        'The product arrives damaged or broken during shipping',
+        'The product has a manufacturing defect (layer separation, warping, etc.)',
+        'The wrong product or customisation was delivered'
+      ],
+      footer: 'To initiate a return, contact us within 48 hours of delivery with photos of the issue. We\'ll arrange a replacement or full refund at our discretion.'
+    },
+    {
+      id: 'cancellations',
+      icon: '⏱️',
+      title: 'Cancellations',
+      desc: 'Orders can be cancelled within 2 hours of placement if production hasn\'t started. Once crafting begins, cancellation is not possible as the product is custom-made. Refunds for eligible cancellations are processed within 5–7 business days.'
+    },
+    {
+      id: 'privacy',
+      icon: '🔒',
+      title: 'Privacy Policy',
+      desc: 'Your privacy matters to us. We collect only the information necessary to fulfil your order and improve your experience.',
+      subheading: 'What we collect vs what we don\'t do:',
+      bullets: [
+        'Name, email, phone number, and delivery address for order fulfilment',
+        'Payment information is processed securely by Razorpay',
+        'We never sell your personal data to third parties',
+        'We never store payment card details on our servers'
+      ]
+    }
+  ]
+
   return (
     <div className={styles.page}>
       <SEO 
@@ -15,110 +77,64 @@ export default function Policy() {
       />
       <Navbar />
 
+      {/* Hero Section */}
+      <div className={styles.heroSection}>
+        <div className={styles.heroInner}>
+          <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
+            THE FINE PRINT
+          </div>
+          <h1 className={`${styles.title} reveal reveal-delay-1`}>
+            SHIPPING, RETURNS<br />
+            <span className={styles.outlineDark}>& PRIVACY</span>
+          </h1>
+          <p className={`${styles.subtitle} reveal reveal-delay-2`}>
+            Clear, transparent policies for a premium custom experience. No surprises.
+          </p>
+        </div>
+        <div className={styles.heroBg} />
+      </div>
+
       <div className={styles.container}>
-        <div className="section-eyebrow reveal" style={{ color: 'var(--orange)' }}>
-          POLICIES
-        </div>
-        <h1 className={`${styles.title} reveal reveal-delay-1`}>
-          SHIPPING, RETURNS<br />& PRIVACY
-        </h1>
-
-        {/* ── COMPANY INFO ── */}
-        <div className={`${styles.section} reveal`}>
-          <h2 className={styles.sectionTitle}>Company Information</h2>
-          <p className={styles.text}>
-            BWR Works operates out of Bengaluru, India. We specialize in custom-made, high-quality personalized items. 
-          </p>
-          <ul className={styles.list}>
-            <li><strong>Business Name:</strong> BWR Works</li>
-            <li><strong>GSTIN:</strong> Registration Pending</li>
-            <li><strong>Address:</strong> Bengaluru, Karnataka, India</li>
-          </ul>
-        </div>
-
-        {/* ── SHIPPING ── */}
-        <div className={`${styles.section} reveal`}>
-          <h2 className={styles.sectionTitle}>Shipping</h2>
-          <span className={styles.highlight}>Made to Order · Ships within 7 business days</span>
-          <p className={styles.text}>
-            Every BWR Works piece is crafted individually after your order is confirmed. 
-            Since nothing is pre-made, please allow 5–7 business days for crafting before 
-            your piece ships.
-          </p>
-          <ul className={styles.list}>
-            <li>Crafting time: 5–7 business days</li>
-            <li>Shipping via trusted courier partners (Delhivery, DTDC, India Post)</li>
-            <li>Delivery within 3–5 business days after dispatch</li>
-            <li>Tracking number provided once your order ships</li>
-            <li>Free shipping on orders above ₹999</li>
-            <li>Currently shipping within India only</li>
-          </ul>
-        </div>
-
-        {/* ── RETURNS ── */}
-        <div className={`${styles.section} reveal`}>
-          <h2 className={styles.sectionTitle}>Returns & Exchanges</h2>
-          <span className={styles.highlight}>Custom products · Limited return eligibility</span>
-          <p className={styles.text}>
-            Because each piece is custom-made to your exact specifications, we cannot 
-            accept returns for change of mind or incorrect customisation details provided 
-            by the buyer.
-          </p>
-          <p className={styles.text}><strong>We will replace or refund if:</strong></p>
-          <ul className={styles.list}>
-            <li>The product arrives damaged or broken during shipping</li>
-            <li>The product has a manufacturing defect (layer separation, warping, etc.)</li>
-            <li>The wrong product or customisation was delivered</li>
-          </ul>
-          <p className={styles.text}>
-            To initiate a return, contact us within 48 hours of delivery with photos of the 
-            issue. We'll arrange a replacement or full refund at our discretion.
-          </p>
-        </div>
-
-        {/* ── CANCELLATIONS ── */}
-        <div className={`${styles.section} reveal`}>
-          <h2 className={styles.sectionTitle}>Cancellations</h2>
-          <p className={styles.text}>
-            Orders can be cancelled within 2 hours of placement if production hasn't started. 
-            Once crafting begins, cancellation is not possible as the product is custom-made. 
-            Refunds for eligible cancellations are processed within 5–7 business days.
-          </p>
-        </div>
-
-        {/* ── PRIVACY ── */}
-        <div className={`${styles.section} reveal`}>
-          <h2 className={styles.sectionTitle}>Privacy Policy</h2>
-          <p className={styles.text}>
-            Your privacy matters to us. We collect only the information necessary to 
-            fulfil your order and improve your experience.
-          </p>
-          <p className={styles.text}><strong>What we collect:</strong></p>
-          <ul className={styles.list}>
-            <li>Name, email, phone number, and delivery address for order fulfilment</li>
-            <li>Order history and customisation preferences</li>
-            <li>Payment information (processed securely by Razorpay — we never store card details)</li>
-          </ul>
-          <p className={styles.text}><strong>What we don't do:</strong></p>
-          <ul className={styles.list}>
-            <li>We never sell your personal data to third parties</li>
-            <li>We never share your information without your consent</li>
-            <li>We never store payment card details on our servers</li>
-          </ul>
+        <div className={styles.grid}>
+          {policies.map((p, i) => (
+            <div key={p.id} className={`${styles.card} reveal reveal-delay-${i % 3}`}>
+              <div className={styles.cardHeader}>
+                <span className={styles.cardIcon}>{p.icon}</span>
+                <h2 className={styles.cardTitle}>{p.title}</h2>
+              </div>
+              {p.highlight && <div className={styles.highlight}>{p.highlight}</div>}
+              <p className={styles.text}>{p.desc}</p>
+              
+              {p.subheading && <div className={styles.subheading}>{p.subheading}</div>}
+              
+              {p.bullets && (
+                <ul className={styles.list}>
+                  {p.bullets.map((b, idx) => (
+                    <li key={idx}>{b}</li>
+                  ))}
+                </ul>
+              )}
+              
+              {p.footer && <p className={styles.text} style={{ marginTop: '16px', fontStyle: 'italic' }}>{p.footer}</p>}
+            </div>
+          ))}
         </div>
 
         {/* ── CONTACT ── */}
         <div className={`${styles.contactNote} reveal`}>
-          <h3>Questions?</h3>
-          <p>
-            Reach us anytime on{' '}
-            <a href="https://wa.me/918431797007" target="_blank" rel="noopener noreferrer">
-              WhatsApp
-            </a>
-            {' '}or email us at{' '}
-            <a href="mailto:hello@bwrworks.com">hello@bwrworks.com</a>.
-            We respond within 24 hours.
-          </p>
+          <div className={styles.contactContent}>
+            <h3>Still have questions?</h3>
+            <p>
+              We're always here to help. Reach us on{' '}
+              <a href="https://wa.me/918431797007" target="_blank" rel="noopener noreferrer">
+                WhatsApp
+              </a>
+              {' '}or email us at{' '}
+              <a href="mailto:hello@bwrworks.com">hello@bwrworks.com</a>.
+              We aim to respond within 24 hours.
+            </p>
+          </div>
+          <div className={styles.contactVisual}>✉️</div>
         </div>
       </div>
 

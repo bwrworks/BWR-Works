@@ -3,37 +3,105 @@
   background: var(--off-white);
 }
 
-.container {
+.heroSection {
+  background: var(--ink);
+  padding: 80px 60px 100px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.heroInner {
+  position: relative;
+  z-index: 2;
   max-width: 800px;
   margin: 0 auto;
-  padding: 80px 60px 120px;
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 92, 26, 0.15) 0%, transparent 70%);
+  z-index: 1;
 }
 
 .title {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ink);
-  margin: var(--space-sm) 0 var(--space-3xl);
   line-height: 0.95;
+  letter-spacing: -0.01em;
+  color: var(--off-white);
+  margin: var(--space-sm) 0 var(--space-md);
 }
 
-.section {
-  margin-bottom: var(--space-3xl);
+.outlineDark {
+  -webkit-text-stroke: 1.5px var(--off-white);
+  color: transparent;
 }
 
-.sectionTitle {
+.subtitle {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: rgba(245, 240, 232, 0.6);
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 80px 60px 120px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 32px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 12px;
+  padding: 32px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  border-color: rgba(255, 92, 26, 0.2);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cardIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.cardTitle {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.3rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--ink);
-  margin-bottom: var(--space-md);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--line);
+  margin: 0;
+}
+
+.subheading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ink);
+  margin-top: 24px;
+  margin-bottom: 12px;
 }
 
 .text {
@@ -41,23 +109,23 @@
   font-size: 0.95rem;
   line-height: 1.8;
   color: var(--black-soft);
-  margin-bottom: var(--space-md);
+  margin: 0;
 }
 
 .list {
   list-style: none;
   padding: 0;
-  margin: 0 0 var(--space-lg);
+  margin: 16px 0 0 0;
 }
 
 .list li {
   font-family: var(--font-body);
   font-size: 0.92rem;
-  line-height: 1.8;
+  line-height: 1.6;
   color: var(--black-soft);
   padding-left: 20px;
   position: relative;
-  margin-bottom: 4px;
+  margin-bottom: 12px;
 }
 
 .list li::before {
@@ -68,36 +136,67 @@
 }
 
 .highlight {
+  display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.65rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--orange);
-  margin-bottom: var(--space-md);
-  display: block;
+  background: rgba(255, 92, 26, 0.08);
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
 }
 
 .contactNote {
-  margin-top: var(--space-3xl);
-  padding: var(--space-xl);
+  margin-top: 80px;
+  padding: 48px;
   background: var(--ink);
   color: var(--off-white);
-  border-radius: var(--radius-md);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.contactNote::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(201, 150, 58, 0.15) 0%, transparent 60%);
+}
+
+.contactContent {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.contactVisual {
+  position: relative;
+  z-index: 2;
+  font-size: 6rem;
+  opacity: 0.8;
 }
 
 .contactNote h3 {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: var(--space-sm);
+  margin: 0 0 16px 0;
+  color: #fff;
 }
 
 .contactNote p {
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   line-height: 1.7;
-  color: var(--muted);
+  color: rgba(245, 240, 232, 0.7);
+  margin: 0;
 }
 
 .contactNote a {
@@ -111,13 +210,39 @@
 }
 
 @media (max-width: 900px) {
+  .heroSection {
+    padding: 60px 24px 80px;
+  }
+  
   .container {
     padding: 60px 24px 80px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .contactNote {
+    flex-direction: column;
+    text-align: center;
+    padding: 32px 24px;
+  }
+  
+  .contactVisual {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
+  .heroSection {
+    padding: 40px 16px 60px;
+  }
+
   .container {
     padding: 40px 16px 60px;
+  }
+  
+  .card {
+    padding: 24px;
   }
 }

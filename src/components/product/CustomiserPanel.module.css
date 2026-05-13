@@ -75,9 +75,9 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 12px 20px;
-  background: rgba(245, 240, 232, 0.05);
-  border: 1.5px solid rgba(245, 240, 232, 0.15);
-  color: rgba(245, 240, 232, 0.65);
+  background: #ffffff;
+  border: 1.5px solid rgba(17, 17, 17, 0.15);
+  color: rgba(17, 17, 17, 0.7);
   cursor: pointer;
   transition: all 0.2s;
   border-radius: 8px;
@@ -85,18 +85,23 @@
 }
 
 .optionBtn:hover {
-  border-color: rgba(245, 240, 232, 0.4);
-  color: var(--off-white);
-  background: rgba(245, 240, 232, 0.08);
+  border-color: rgba(17, 17, 17, 0.4);
+  color: var(--ink);
+  background: #faf8f5;
   transform: translateY(-1px);
 }
 
 .optionActive {
   border-color: var(--orange) !important;
   color: #fff !important;
-  background: rgba(255, 92, 26, 0.18) !important;
-  box-shadow: 0 0 0 2px rgba(255, 92, 26, 0.15);
-  font-weight: 600;
+  background: var(--orange) !important;
+  box-shadow: 0 0 0 3px rgba(255, 92, 26, 0.15);
+  font-weight: 700;
+}
+
+.colorFilledBtn {
+  border: 1.5px solid rgba(17, 17, 17, 0.15);
+  font-weight: 700;
 }
 
 .colorSwatch {
@@ -119,9 +124,9 @@
   font-family: var(--font-body);
   font-size: 0.95rem;
   padding: 14px 18px;
-  background: rgba(245, 240, 232, 0.05);
-  border: 1.5px solid rgba(245, 240, 232, 0.15);
-  color: var(--off-white);
+  background: #ffffff;
+  border: 1.5px solid rgba(17, 17, 17, 0.15);
+  color: var(--ink);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   border-radius: 8px;
@@ -135,7 +140,7 @@
 }
 
 .textInput::placeholder {
-  color: rgba(245, 240, 232, 0.25);
+  color: rgba(17, 17, 17, 0.35);
 }
 
 .charCount {
@@ -158,34 +163,36 @@
 .qtyBtn {
   width: 44px;
   height: 44px;
-  background: rgba(245, 240, 232, 0.04);
-  border: 1px solid rgba(245, 240, 232, 0.12);
-  color: var(--off-white);
-  font-size: 1.2rem;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  background: #ffffff;
+  border: 1.5px solid rgba(17, 17, 17, 0.15);
+  color: rgba(17, 17, 17, 0.7);
+  font-size: 1.2rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .qtyBtn:hover {
-  background: rgba(245, 240, 232, 0.1);
+  background: #faf8f5;
+  color: var(--ink);
+  border-color: rgba(17, 17, 17, 0.4);
 }
 
 .qtyValue {
-  width: 60px;
-  height: 44px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 50px;
+  text-align: center;
+  color: var(--ink);
+  border-top: 1.5px solid rgba(17, 17, 17, 0.15);
+  border-bottom: 1.5px solid rgba(17, 17, 17, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: var(--off-white);
-  background: rgba(245, 240, 232, 0.02);
-  border-top: 1px solid rgba(245, 240, 232, 0.12);
-  border-bottom: 1px solid rgba(245, 240, 232, 0.12);
 }
 
 .qtyMax {

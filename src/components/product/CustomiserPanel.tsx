@@ -174,10 +174,21 @@ export default function CustomiserPanel({ config, productId, productName, produc
                 
                 const COLOR_MAP: Record<string, string> = {
                   'matte black': '#222222',
-                  'matte white': '#f5f5f5',
+                  'matte white': '#fdfdfd',
                   'yellow': '#fbbf24',
                   'red': '#ef4444',
-                  'blue': '#3b82f6'
+                  'blue': '#3b82f6',
+                  'carbon': '#333333'
+                }
+                
+                // Determine text color based on background luminance
+                const TEXT_COLOR_MAP: Record<string, string> = {
+                  'matte black': '#ffffff',
+                  'matte white': '#111111',
+                  'yellow': '#111111',
+                  'red': '#ffffff',
+                  'blue': '#ffffff',
+                  'carbon': '#ffffff'
                 }
                 
                 const FONT_MAP: Record<string, string> = {
@@ -186,17 +197,27 @@ export default function CustomiserPanel({ config, productId, productName, produc
                   'retro': '"Courier New", Courier, monospace'
                 }
                 
+                const isActive = values[field.fieldId] === opt;
+                
+                let dynamicStyle: React.CSSProperties = {};
+                if (isFont) {
+                  dynamicStyle.fontFamily = FONT_MAP[opt.toLowerCase()] || 'inherit';
+                  dynamicStyle.fontWeight = opt.toLowerCase() === 'bold' ? 800 : 'normal';
+                }
+                if (isColor && COLOR_MAP[opt.toLowerCase()]) {
+                  dynamicStyle.backgroundColor = COLOR_MAP[opt.toLowerCase()];
+                  dynamicStyle.color = TEXT_COLOR_MAP[opt.toLowerCase()] || '#111111';
+                  dynamicStyle.borderColor = isActive ? 'var(--orange)' : 'rgba(17,17,17,0.15)';
+                  if (isActive) {
+                    dynamicStyle.boxShadow = '0 0 0 3px rgba(255, 92, 26, 0.4)';
+                  }
+                }
+                
                 return (
                   <button key={opt} type="button"
-                    className={`${styles.optionBtn} ${values[field.fieldId] === opt ? styles.optionActive : ''}`}
-                    style={isFont ? { 
-                      fontFamily: FONT_MAP[opt.toLowerCase()] || 'inherit', 
-                      fontWeight: opt.toLowerCase() === 'bold' ? 800 : 'normal' 
-                    } : undefined}
+                    className={`${styles.optionBtn} ${isActive && !isColor ? styles.optionActive : ''} ${isColor ? styles.colorFilledBtn : ''}`}
+                    style={Object.keys(dynamicStyle).length > 0 ? dynamicStyle : undefined}
                     onClick={() => set(field.fieldId, opt)}>
-                    {isColor && COLOR_MAP[opt.toLowerCase()] && (
-                      <span className={styles.colorSwatch} style={{ backgroundColor: COLOR_MAP[opt.toLowerCase()] }} />
-                    )}
                     {opt}
                   </button>
                 )
@@ -236,14 +257,14 @@ export default function CustomiserPanel({ config, productId, productName, produc
             </div>
           )}
 
-          {field.type === 'toggle' && (
+          {field.type === 'toggle' && !field.label.toLowerCase().includes('lanyard') && (
             <div className={styles.toggleWrap}>
               <button type="button"
                 className={`${styles.toggle} ${values[field.fieldId] ? styles.toggleOn : ''}`}
                 onClick={() => set(field.fieldId, !values[field.fieldId])}>
                 <div className={styles.toggleKnob} />
               </button>
-              {field.priceModifier && !field.label.toLowerCase().includes('lanyard') && (
+              {field.priceModifier && (
                 <span className={styles.togglePrice}>+₹{(field.priceModifier / 100).toFixed(0)}</span>
               )}
             </div>
