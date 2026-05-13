@@ -22,6 +22,9 @@ export default function ProductDetail() {
   )
   const basePrice = pricingData?.unitPrice ?? 0
 
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
+  const isGstEnabled = pricingDefaults ? pricingDefaults.gstPercent > 0 : false
+
   const [selectedImage, setSelectedImage] = useState(0)
 
   if (product === undefined) {
@@ -225,7 +228,7 @@ export default function ProductDetail() {
             <span className={styles.price}>
               {basePrice ? formatPrice(basePrice) : 'Custom'}
             </span>
-            <span className={styles.priceNote}>incl. GST · Free shipping over ₹999</span>
+            <span className={styles.priceNote}>{isGstEnabled ? 'incl. GST · ' : ''}Free shipping over ₹999</span>
           </div>
 
           <div className={styles.divider} />

@@ -4,8 +4,7 @@ import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useCms } from '../hooks/useCms'
 import { fmt, safe } from '../lib/formatters'
-import * as QRCodeLib from 'react-qr-code'
-const QRCode = (QRCodeLib as any).default || QRCodeLib
+import QRCode from 'react-qr-code'
 import styles from './Invoice.module.css'
 
 /** Generate a simple Code128-style barcode as inline SVG */
@@ -77,12 +76,13 @@ export default function Invoice() {
     return <div className={styles.loading}>Loading Invoice...</div>
   }
 
-  if (order === null) {
+  if (!order || !order.addressSnapshot || !order.items) {
     return <Navigate to="/dashboard" />
   }
 
   const hsnCode = cms('invoice', 'hsn_code', '3926')
-  const isGstEnabled = cms('invoice', 'gst_enabled', 'true') === 'true'
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
+  const isGstEnabled = pricingDefaults ? pricingDefaults.gstPercent > 0 : false
 
   const handlePrint = () => {
     window.print()

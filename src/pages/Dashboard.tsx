@@ -28,6 +28,8 @@ export default function Dashboard() {
   const addresses = useQuery(api.addresses.getMyAddresses)
   const orders = useQuery(api.orders.getMyOrders)
   const deleteAddress = useMutation(api.addresses.deleteAddress)
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
+  const isGstEnabled = pricingDefaults ? pricingDefaults.gstPercent > 0 : false
 
   const [activeTab, setActiveTab] = useState<'orders' | 'support' | 'profile'>('orders')
   const [showAddressForm, setShowAddressForm] = useState(false)
@@ -120,7 +122,7 @@ export default function Dashboard() {
                 <div className={styles.statIcon}>💰</div>
                 <div className={styles.statInfo}>
                   <div className={styles.statValue}>{orders ? fmt(totalSpend) : '—'}</div>
-                  <div className={styles.statLabel}>Total Spent (incl. GST)</div>
+                  <div className={styles.statLabel}>Total Spent {isGstEnabled ? '(incl. GST)' : ''}</div>
                 </div>
               </div>
               <div className={styles.statCard}>

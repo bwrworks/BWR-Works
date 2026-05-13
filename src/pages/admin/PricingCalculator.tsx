@@ -343,14 +343,27 @@ export default function PricingCalculator() {
               />
             </div>
             <div className={styles.field}>
-              <label className={styles.fieldLabel}>GST (%)</label>
-              <input
-                type="number"
+              <label className={styles.fieldLabel}>Enable GST</label>
+              <select
                 className={styles.fieldInput}
-                value={globals.gstPercent}
-                onChange={e => updateGlobal('gstPercent', Number(e.target.value))}
-              />
+                value={globals.gstPercent > 0 ? 'yes' : 'no'}
+                onChange={e => updateGlobal('gstPercent', e.target.value === 'yes' ? 18 : 0)}
+              >
+                <option value="yes">Yes (Enabled)</option>
+                <option value="no">No (Disabled)</option>
+              </select>
             </div>
+            {globals.gstPercent > 0 && (
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>GST (%)</label>
+                <input
+                  type="number"
+                  className={styles.fieldInput}
+                  value={globals.gstPercent}
+                  onChange={e => updateGlobal('gstPercent', Number(e.target.value))}
+                />
+              </div>
+            )}
           </div>
 
           {/* B2B Volume Slabs */}

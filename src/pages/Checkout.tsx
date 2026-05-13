@@ -10,7 +10,7 @@ import OrderSummary, { calculateTotals } from '../components/checkout/OrderSumma
 import PaymentButton from '../components/checkout/PaymentButton'
 import styles from './Checkout.module.css'
 import { useScrollReveal } from '../hooks/useScrollReveal'
-import { useCms } from '../hooks/useCms'
+
 
 type Step = 'address' | 'review' | 'payment'
 
@@ -18,7 +18,7 @@ export default function Checkout() {
   useScrollReveal()
   const navigate = useNavigate()
   const { items, clearCart } = useCart()
-  const { cms } = useCms()
+
   const user = useQuery(api.users.current)
   const addresses = useQuery(api.addresses.getMyAddresses)
   const validateCoupon = useMutation(api.coupons.validateCoupon)
@@ -51,7 +51,9 @@ export default function Checkout() {
     }
   }, [addresses])
 
-  if (user === undefined || addresses === undefined) {
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
+
+  if (user === undefined || addresses === undefined || pricingDefaults === undefined) {
     return (
       <div className={styles.page}>
         <Navbar />
@@ -74,8 +76,7 @@ export default function Checkout() {
     imageRef: item.imageRef,
   }))
 
-  const isGstEnabled = cms('invoice', 'gst_enabled', 'true') === 'true'
-  const gstPercent = isGstEnabled ? 0.18 : 0
+  const gstPercent = pricingDefaults ? (pricingDefaults.gstPercent ?? 0) / 100 : 0
 
   const { subtotal, discount, gstAmount, total } = calculateTotals(
     checkoutItems, coupon?.discountAmount ?? 0, gstPercent

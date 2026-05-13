@@ -33,7 +33,7 @@ export default function Footer() {
             <li><Link to="/the-craft">The Craft</Link></li>
             <li><Link to="/featured-drop">Featured Drop</Link></li>
             <li><Link to="/contact">Contact Us</Link></li>
-            <li><Link to="/policy">Shipping & Returns</Link></li>
+            <li><Link to="/policy">Shipping, Returns & Policies</Link></li>
           </ul>
         </div>
         <div>

@@ -233,7 +233,6 @@
   aspect-ratio: 1;
   border-radius: 4px;
   overflow: hidden;
-  animation: float 6s ease-in-out infinite;
   box-shadow: 0 24px 60px rgba(0,0,0,0.5);
 }
 

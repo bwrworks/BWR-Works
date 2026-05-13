@@ -4,14 +4,14 @@ import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { useCart } from '../../context/CartContext'
 import { formatPrice } from '../../lib/formatters'
-import { useCms } from '../../hooks/useCms'
+
 import styles from './CartDrawer.module.css'
 
 export default function CartDrawer() {
   const navigate = useNavigate()
   const { items, itemCount, subtotal, removeItem, updateQuantity, isOpen, setIsOpen } = useCart()
   const [priceWarning, setPriceWarning] = useState(false)
-  const { cms } = useCms()
+
 
   // B-10: Batch-fetch fresh prices for all cart items using a single query
   const productIds = items.map(i => i.productId)
@@ -35,9 +35,10 @@ export default function CartDrawer() {
     if (changed) setPriceWarning(true)
   }, [freshPrices]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // UX-7: Estimate GST (18%)
-  const isGstEnabled = cms('invoice', 'gst_enabled', 'true') === 'true'
-  const estimatedGst = isGstEnabled ? Math.round(subtotal * 0.18) : 0
+  // UX-7: Estimate GST
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
+  const isGstEnabled = pricingDefaults ? pricingDefaults.gstPercent > 0 : false
+  const estimatedGst = isGstEnabled ? Math.round(subtotal * (pricingDefaults!.gstPercent / 100)) : 0
   const estimatedTotal = subtotal + estimatedGst
 
   const handleCheckout = () => {
@@ -155,7 +156,7 @@ export default function CartDrawer() {
               {/* UX-7: Show estimated GST */}
               {isGstEnabled && (
                 <div className={styles.subtotalRow} style={{ opacity: 0.6, fontSize: '0.8rem' }}>
-                  <span>Est. GST (18%)</span>
+                  <span>Est. GST ({pricingDefaults?.gstPercent}%)</span>
                   <span>{formatPrice(estimatedGst)}</span>
                 </div>
               )}

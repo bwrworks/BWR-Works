@@ -17,6 +17,8 @@ export default function FeaturedDropPage() {
 
   // B-06: Pull featured product from DB — same query as Hero for consistency
   const featured = useQuery(api.products.getFeaturedProduct)
+  const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
+  const isGstEnabled = pricingDefaults ? pricingDefaults.gstPercent > 0 : false
 
   return (
     <div className={styles.page}>
@@ -64,7 +66,7 @@ export default function FeaturedDropPage() {
                     fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
                     color: 'var(--muted)', marginLeft: 12, letterSpacing: '0.08em',
                   }}>
-                    INCL. GST
+                    {isGstEnabled ? 'INCL. GST' : 'TAX INCLUDED'}
                   </span>
                 </div>
               )}
@@ -83,24 +85,29 @@ export default function FeaturedDropPage() {
               </Link>
             </div>
             
-            <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
+            <div className={`${styles.heroVisual} reveal reveal-delay-1`} style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div className={styles.shapeContainer} style={{ position: 'relative' }}>
                 <div className={styles.shapeMain} style={{ position: 'absolute', inset: 0, margin: 'auto' }}>
                   <div className={styles.shapeInner}>
                     <div className={styles.shapeCore} />
                   </div>
                 </div>
-                {featured?.images?.[0] && (
-                  <img
-                    src={featured.images[0]}
-                    alt={featured?.name || 'Featured Product'}
-                    style={{
-                      width: '80%', height: '80%', objectFit: 'contain',
-                      position: 'relative', zIndex: 2, filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5))'
-                    }}
-                  />
-                )}
               </div>
+              {featured?.images?.[0] && (
+                <img
+                  src={featured.images[0]}
+                  alt={featured?.name || 'Featured Product'}
+                  style={{
+                    position: 'absolute',
+                    zIndex: 2,
+                    width: '100%',
+                    maxWidth: '400px',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5))'
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
