@@ -96,7 +96,7 @@ export default function FeaturedDropPage() {
                     alt={featured?.name || 'Featured Product'}
                     style={{
                       width: '80%', height: '80%', objectFit: 'contain',
-                      position: 'relative', zIndex: 2, dropShadow: '0 20px 40px rgba(0,0,0,0.5)'
+                      position: 'relative', zIndex: 2, filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.5))'
                     }}
                   />
                 )}
