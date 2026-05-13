@@ -4,7 +4,6 @@ import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useCms } from '../hooks/useCms'
 import { fmt, safe } from '../lib/formatters'
-import QRCode from 'react-qr-code'
 import styles from './Invoice.module.css'
 
 /** Generate a simple Code128-style barcode as inline SVG */
@@ -188,14 +187,9 @@ export default function Invoice() {
         </table>
 
         <div className={styles.totalsSection}>
-          <div className={styles.qrCodeBox}>
-            <QRCode value={`${siteUrl}/order/${order.orderId}`} size={80} level="M" />
-            <div className={styles.qrText}>Scan to Track</div>
-          </div>
-
-          {/* Barcode */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <Barcode value={order.orderId} />
+            <div className={styles.qrText}>Order ID</div>
           </div>
 
           <div className={styles.totalsTable}>
