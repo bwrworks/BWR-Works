@@ -4,7 +4,8 @@ import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useCms } from '../hooks/useCms'
 import { fmt, safe } from '../lib/formatters'
-import QRCode from 'react-qr-code'
+import * as QRCodeLib from 'react-qr-code'
+const QRCode = (QRCodeLib as any).default || QRCodeLib
 import styles from './Invoice.module.css'
 
 /** Generate a simple Code128-style barcode as inline SVG */
@@ -81,6 +82,7 @@ export default function Invoice() {
   }
 
   const hsnCode = cms('invoice', 'hsn_code', '3926')
+  const isGstEnabled = cms('invoice', 'gst_enabled', 'true') === 'true'
 
   const handlePrint = () => {
     window.print()
@@ -155,8 +157,8 @@ export default function Invoice() {
               <th style={{ width: '5%' }}>Sl.</th>
               <th style={{ width: '45%' }}>Description</th>
               <th style={{ width: '10%', textAlign: 'center' }}>Qty</th>
-              <th style={{ width: '15%', textAlign: 'right' }}>Gross</th>
-              <th style={{ width: '10%', textAlign: 'right' }}>Tax(18%)</th>
+              {isGstEnabled && <th style={{ width: '15%', textAlign: 'right' }}>Gross</th>}
+              {isGstEnabled && <th style={{ width: '10%', textAlign: 'right' }}>Tax(18%)</th>}
               <th style={{ width: '15%', textAlign: 'right' }}>Total</th>
             </tr>
           </thead>
@@ -176,8 +178,8 @@ export default function Invoice() {
                     </div>
                   </td>
                   <td style={{ textAlign: 'center' }}>{item.quantity}</td>
-                  <td style={{ textAlign: 'right' }}>{fmt(preTax)}</td>
-                  <td style={{ textAlign: 'right' }}>{fmt(tax)}</td>
+                  {isGstEnabled && <td style={{ textAlign: 'right' }}>{fmt(preTax)}</td>}
+                  {isGstEnabled && <td style={{ textAlign: 'right' }}>{fmt(tax)}</td>}
                   <td style={{ textAlign: 'right' }}>{fmt(itemTotal)}</td>
                 </tr>
               )
@@ -207,10 +209,12 @@ export default function Invoice() {
                 <span>-{fmt(order.discountAmount)}</span>
               </div>
             )}
-            <div className={styles.totalsRow}>
-              <span>IGST (18%):</span>
-              <span>{fmt(order.gstAmount)}</span>
-            </div>
+            {isGstEnabled && (
+              <div className={styles.totalsRow}>
+                <span>IGST (18%):</span>
+                <span>{fmt(order.gstAmount)}</span>
+              </div>
+            )}
             <div className={`${styles.totalsRow} ${styles.grandTotal}`}>
               <span>Grand Total:</span>
               <span>{fmt(order.total)}</span>

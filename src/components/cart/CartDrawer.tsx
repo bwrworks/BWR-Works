@@ -4,12 +4,14 @@ import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { useCart } from '../../context/CartContext'
 import { formatPrice } from '../../lib/formatters'
+import { useCms } from '../../hooks/useCms'
 import styles from './CartDrawer.module.css'
 
 export default function CartDrawer() {
   const navigate = useNavigate()
   const { items, itemCount, subtotal, removeItem, updateQuantity, isOpen, setIsOpen } = useCart()
   const [priceWarning, setPriceWarning] = useState(false)
+  const { cms } = useCms()
 
   // B-10: Batch-fetch fresh prices for all cart items using a single query
   const productIds = items.map(i => i.productId)
@@ -34,7 +36,8 @@ export default function CartDrawer() {
   }, [freshPrices]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // UX-7: Estimate GST (18%)
-  const estimatedGst = Math.round(subtotal * 0.18)
+  const isGstEnabled = cms('invoice', 'gst_enabled', 'true') === 'true'
+  const estimatedGst = isGstEnabled ? Math.round(subtotal * 0.18) : 0
   const estimatedTotal = subtotal + estimatedGst
 
   const handleCheckout = () => {
@@ -150,10 +153,12 @@ export default function CartDrawer() {
                 <span className={styles.subtotalPrice}>{formatPrice(subtotal)}</span>
               </div>
               {/* UX-7: Show estimated GST */}
-              <div className={styles.subtotalRow} style={{ opacity: 0.6, fontSize: '0.8rem' }}>
-                <span>Est. GST (18%)</span>
-                <span>{formatPrice(estimatedGst)}</span>
-              </div>
+              {isGstEnabled && (
+                <div className={styles.subtotalRow} style={{ opacity: 0.6, fontSize: '0.8rem' }}>
+                  <span>Est. GST (18%)</span>
+                  <span>{formatPrice(estimatedGst)}</span>
+                </div>
+              )}
               <div className={styles.subtotalRow} style={{ fontWeight: 700, marginTop: 4 }}>
                 <span>Est. Total</span>
                 <span className={styles.subtotalPrice}>{formatPrice(estimatedTotal)}</span>

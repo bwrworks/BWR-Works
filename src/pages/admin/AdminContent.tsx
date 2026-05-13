@@ -44,6 +44,7 @@ const SECTIONS = [
       { key: 'company_address', label: 'Company Address', type: 'text' as const },
       { key: 'contact_email', label: 'Contact Email', type: 'text' as const },
       { key: 'hsn_code', label: 'Default HSN Code', type: 'text' as const },
+      { key: 'gst_enabled', label: 'Enable GST (true/false)', type: 'text' as const },
     ],
   },
   {

@@ -118,6 +118,14 @@
   background: var(--off-white);
 }
 
+.nameRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 6px;
+}
+
 .cardName {
   font-family: var(--font-heading);
   font-weight: 700;
@@ -125,7 +133,18 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--black-soft);
-  margin: 0 0 6px;
+  margin: 0;
+}
+
+.craftBadge {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+  padding: 3px 6px;
+  border-radius: 2px;
+  background: var(--line);
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .cardTagline {

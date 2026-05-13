@@ -90,10 +90,12 @@ export default function OrderSummary({ items, coupon, gstPercent = GST }: Props)
       )}
 
       {/* GST */}
-      <div className={`${styles.row} ${styles.rowGst}`}>
-        <span className={styles.rowLabel}>GST (18%)</span>
-        <span className={styles.rowValue}>{formatRupees(gstAmount)}</span>
-      </div>
+      {gstPercent > 0 && (
+        <div className={`${styles.row} ${styles.rowGst}`}>
+          <span className={styles.rowLabel}>GST (18%)</span>
+          <span className={styles.rowValue}>{formatRupees(gstAmount)}</span>
+        </div>
+      )}
 
       <div className={styles.divider} />
 
@@ -103,7 +105,9 @@ export default function OrderSummary({ items, coupon, gstPercent = GST }: Props)
         <span className={styles.totalValue}>{formatRupees(total)}</span>
       </div>
 
-      <p className={styles.gstNote}>GST included in final price · All amounts in INR</p>
+      <p className={styles.gstNote}>
+        {gstPercent > 0 ? 'GST included in final price · ' : ''}All amounts in INR
+      </p>
     </div>
   )
 }

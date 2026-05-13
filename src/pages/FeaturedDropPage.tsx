@@ -84,20 +84,21 @@ export default function FeaturedDropPage() {
             </div>
             
             <div className={`${styles.heroVisual} reveal reveal-delay-1`}>
-              <div className={styles.shapeContainer}>
-                {featured?.images?.[0] ? (
+              <div className={styles.shapeContainer} style={{ position: 'relative' }}>
+                <div className={styles.shapeMain} style={{ position: 'absolute', inset: 0, margin: 'auto' }}>
+                  <div className={styles.shapeInner}>
+                    <div className={styles.shapeCore} />
+                  </div>
+                </div>
+                {featured?.images?.[0] && (
                   <img
                     src={featured.images[0]}
                     alt={featured?.name || 'Featured Product'}
-                    className={styles.shapeMain}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+                    style={{
+                      width: '80%', height: '80%', objectFit: 'contain',
+                      position: 'relative', zIndex: 2, dropShadow: '0 20px 40px rgba(0,0,0,0.5)'
+                    }}
                   />
-                ) : (
-                  <div className={styles.shapeMain}>
-                    <div className={styles.shapeInner}>
-                      <div className={styles.shapeCore} />
-                    </div>
-                  </div>
                 )}
               </div>
             </div>

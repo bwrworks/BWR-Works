@@ -66,7 +66,10 @@ export default function ProductCard({
 
       {/* Light info section */}
       <div className={styles.cardInfo}>
-        <h2 className={styles.cardName}>{name}</h2>
+        <div className={styles.nameRow}>
+          <h2 className={styles.cardName}>{name}</h2>
+          <span className={styles.craftBadge}>~20hrs crafting</span>
+        </div>
         <p className={styles.cardTagline}>{shortTagline}</p>
         <p className={styles.cardDesc}>
           {description.length > 100 ? description.slice(0, 100) + '...' : description}
@@ -85,7 +88,7 @@ export default function ProductCard({
         )}
         <div className={styles.cardFooter}>
           <span className={styles.cardPrice}>
-            {price ? `Starting at ${formatPrice(price)}` : 'Custom pricing'}
+            {price ? formatPrice(price) : 'Custom pricing'}
           </span>
           <span className={styles.cardArrow}>View →</span>
         </div>
