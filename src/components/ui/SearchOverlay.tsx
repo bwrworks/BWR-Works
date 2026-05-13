@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { Link } from 'react-router-dom'
+import { formatPrice } from '../../lib/formatters'
 
 export default function SearchOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [term, setTerm] = useState('')
@@ -36,8 +37,7 @@ export default function SearchOverlay({ isOpen, onClose }: { isOpen: boolean; on
 
   if (!isOpen) return null
 
-  const fmt = (paise: number | null) =>
-    paise ? `₹${(paise / 100).toLocaleString('en-IN')}` : ''
+
 
   return (
     <div
@@ -187,7 +187,7 @@ export default function SearchOverlay({ isOpen, onClose }: { isOpen: boolean; on
                 color: 'var(--orange)',
                 flexShrink: 0,
               }}>
-                {fmt(product.price)}
+                {product.price ? formatPrice(product.price) : ''}
               </div>
             </Link>
           ))}

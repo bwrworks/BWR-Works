@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { useToast } from '../../context/ToastContext'
+import { formatPrice } from '../../lib/formatters'
 import styles from './AdminDashboard.module.css'
 
 export default function AdminCoupons() {
@@ -50,7 +51,7 @@ export default function AdminCoupons() {
     } finally { setDeleting(null) }
   }
 
-  const fmt = (paise: number) => `₹${(paise / 100).toLocaleString('en-IN')}`
+
 
   const is = { padding: '10px 14px', border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-body)', fontSize: '0.85rem', outline: 'none', width: '100%' }
   const ls = { fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.1em', color: 'var(--muted)', display: 'block', marginBottom: 6 }
@@ -108,10 +109,10 @@ export default function AdminCoupons() {
               <div key={c._id} style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 'var(--radius-md)', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' as const }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--ink)', minWidth: 100 }}>{c.code}</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--orange)', fontWeight: 600 }}>
-                  {c.discountType === 'flat' ? fmt(c.discountValue) : `${c.discountValue}%`} OFF
+                  {c.discountType === 'flat' ? formatPrice(c.discountValue) : `${c.discountValue}%`} OFF
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--muted)' }}>
-                  {c.minOrderAmount ? `Min ${fmt(c.minOrderAmount)}` : 'No min'} · Uses: {c.currentUses}{c.maxUses ? `/${c.maxUses}` : ''}
+                  {c.minOrderAmount ? `Min ${formatPrice(c.minOrderAmount)}` : 'No min'} · Uses: {c.currentUses}{c.maxUses ? `/${c.maxUses}` : ''}
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--muted)' }}>
                   {c.expiresAt ? `Expires ${new Date(c.expiresAt).toLocaleDateString('en-IN')}` : 'No expiry'}

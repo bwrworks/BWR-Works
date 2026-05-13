@@ -13,27 +13,25 @@ export default function CartDrawer() {
   const [priceWarning, setPriceWarning] = useState(false)
 
 
-  // B-10: Batch-fetch fresh prices for all cart items using a single query
+  // B-10: CartContext auto-refreshes prices from listActive subscription.
+  // This is an additional informational check to warn the user.
   const productIds = items.map(i => i.productId)
   const freshPrices = useQuery(
     api.pricing.getBatchPrices,
     productIds.length > 0 ? { productIds } : 'skip'
   )
 
-  // Check if any prices have changed since the cart was saved
+  // Show a warning banner if any prices differ from what's in the cart
   useEffect(() => {
     if (!freshPrices || items.length === 0) return
-    let changed = false
     for (const item of items) {
       const fresh = freshPrices[item.productId]
       if (fresh && fresh !== item.unitPrice) {
-        changed = true
-        // Update the item in place via the context
-        updateQuantity(item.id, item.quantity) // Trigger re-render
+        setPriceWarning(true)
+        return
       }
     }
-    if (changed) setPriceWarning(true)
-  }, [freshPrices]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [freshPrices, items])
 
   // UX-7: Estimate GST
   const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
@@ -70,15 +68,6 @@ export default function CartDrawer() {
             <button
               className={styles.browseBtn}
               onClick={() => { setIsOpen(false); navigate('/products') }}
-              style={{
-                marginTop: 20, padding: '12px 28px',
-                fontFamily: 'var(--font-display)', fontWeight: 700,
-                fontSize: '0.75rem', letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                background: 'var(--ink)', color: 'var(--off-white)',
-                border: 'none', cursor: 'pointer',
-                transition: 'background 0.2s',
-              }}
             >
               Browse Collection →
             </button>

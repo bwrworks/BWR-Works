@@ -4,6 +4,7 @@ import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import { fmt, safe } from '../lib/formatters'
 import styles from './OrderTracking.module.css'
 
 const STATUS_STEPS = ['received', 'printing', 'shipped', 'delivered'] as const
@@ -59,14 +60,7 @@ export default function OrderTracking() {
   if (!order) return null
 
   const currentStep = STATUS_STEPS.indexOf(order.status as OrderStatus)
-  const fmt = (paise: number) =>
-    `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}`
-  const safe = (val: unknown): string => {
-    if (val === null || val === undefined) return ''
-    if (typeof val === 'string') return val
-    if (typeof val === 'number' || typeof val === 'boolean') return String(val)
-    try { return JSON.stringify(val) } catch { return '' }
-  }
+
 
   return (
     <div className={styles.page}>

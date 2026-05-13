@@ -46,7 +46,9 @@ export default function FeaturedDropPage() {
                 )}
               </h1>
               <p className={styles.description}>
-                {featured?.description || 'Loading featured product...'}
+                {featured === undefined
+                  ? ''
+                  : (featured?.description || 'Coming soon...')}
               </p>
               <div className={styles.tags}>
                 {featured?.category && <span className={styles.chip}>{featured.category}</span>}
@@ -54,7 +56,7 @@ export default function FeaturedDropPage() {
                 <span className={styles.chip}>Premium Finish</span>
               </div>
               {/* H-05: Price + direct CTA in hero */}
-              {featured?.price && (
+              {featured?.price != null && (
                 <div style={{ marginTop: 20 }}>
                   <span style={{
                     fontFamily: 'var(--font-display)', fontWeight: 900,
@@ -123,7 +125,7 @@ export default function FeaturedDropPage() {
               <h3 className={styles.boxTitle}>Purchase Details</h3>
               <div className={styles.priceRow}>
                 <div className={styles.price}>
-                  {featured?.price ? formatPrice(featured.price) : 'Custom'}
+                  {featured?.price != null ? formatPrice(featured.price) : 'Custom'}
                 </div>
                 <div className={styles.priceNote}>
                   Starting price<br />

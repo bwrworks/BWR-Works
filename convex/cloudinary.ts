@@ -72,6 +72,12 @@ export const uploadCustomerFile = action({
     const { maxSizeMB, allowedTypes } = fieldConfig.fileConfig;
 
     // 2. Server-side Type Validation
+    // Hard whitelist — regardless of what the product config allows,
+    // only accept genuine image MIME types to prevent SVG/HTML injection
+    const SAFE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!SAFE_MIME_TYPES.includes(args.fileType)) {
+      throw new Error(`Invalid file type. Only JPEG, PNG, and WebP images are allowed.`);
+    }
     if (!allowedTypes.includes(args.fileType)) {
       throw new Error(`Invalid file type. Server only allows: ${allowedTypes.join(", ")}`);
     }
@@ -105,7 +111,7 @@ export const uploadCustomerFile = action({
     try {
       const result: any = await cloudinary.uploader.upload(fileUri, {
         folder: "bwr-works/customer-uploads",
-        resource_type: "auto",
+        resource_type: "image",
         public_id: `upload_${Date.now()}_${args.fileName.replace(/[^a-zA-Z0-9]/g, '_')}`
       });
 

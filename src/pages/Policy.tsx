@@ -10,18 +10,17 @@ export default function Policy() {
   const policies = [
     {
       id: 'company',
-      icon: '🏢',
+      num: '01',
       title: 'Company Information',
       desc: 'BWR Works operates out of Bengaluru, India. We specialize in custom-made, high-quality personalized items.',
       bullets: [
         'Business Name: BWR Works',
-        'GSTIN: Registration Pending',
-        'Address: Bengaluru, Karnataka, India'
+        'Proudly made in Bengaluru, Karnataka, India'
       ]
     },
     {
       id: 'shipping',
-      icon: '📦',
+      num: '02',
       title: 'Shipping & Delivery',
       desc: 'Every BWR Works piece is crafted individually after your order is confirmed. Since nothing is pre-made, please allow 5–7 business days for crafting.',
       highlight: 'Made to Order · Ships within 7 business days',
@@ -36,7 +35,7 @@ export default function Policy() {
     },
     {
       id: 'returns',
-      icon: '🔄',
+      num: '03',
       title: 'Returns & Exchanges',
       desc: 'Because each piece is custom-made to your exact specifications, we cannot accept returns for change of mind or incorrect customisation details.',
       highlight: 'Custom products · Limited return eligibility',
@@ -50,13 +49,13 @@ export default function Policy() {
     },
     {
       id: 'cancellations',
-      icon: '⏱️',
+      num: '04',
       title: 'Cancellations',
       desc: 'Orders can be cancelled within 2 hours of placement if production hasn\'t started. Once crafting begins, cancellation is not possible as the product is custom-made. Refunds for eligible cancellations are processed within 5–7 business days.'
     },
     {
       id: 'privacy',
-      icon: '🔒',
+      num: '05',
       title: 'Privacy Policy',
       desc: 'Your privacy matters to us. We collect only the information necessary to fulfil your order and improve your experience.',
       subheading: 'What we collect vs what we don\'t do:',
@@ -99,7 +98,7 @@ export default function Policy() {
           {policies.map((p, i) => (
             <div key={p.id} className={`${styles.card} reveal reveal-delay-${i % 3}`}>
               <div className={styles.cardHeader}>
-                <span className={styles.cardIcon}>{p.icon}</span>
+                <span className={styles.cardIcon}>{p.num}</span>
                 <h2 className={styles.cardTitle}>{p.title}</h2>
               </div>
               {p.highlight && <div className={styles.highlight}>{p.highlight}</div>}

@@ -21,7 +21,7 @@ export default function Craft() {
   return (
     <div className={styles.page}>
       <SEO 
-        title="Our Craft | BWR Works" 
+        title="The Craft | Precision-Made in Bengaluru | BWR Works" 
         description="Discover how we hand-finish every BWR piece. We reject mass manufacturing to bring you premium, customized functional art."
       />
       <Navbar />

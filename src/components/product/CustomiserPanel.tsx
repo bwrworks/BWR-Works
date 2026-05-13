@@ -134,9 +134,18 @@ export default function CustomiserPanel({ config, productId, productName, produc
 
       {/* ── TRUST BADGES ── */}
       <div className={styles.badges}>
-        <div className={styles.badge}>🎨 Made to Order</div>
-        <div className={styles.badge}>📦 7-Day Delivery</div>
-        <div className={styles.badge}>⭐ Premium Packaging</div>
+        <div className={styles.badge}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Made to Order
+        </div>
+        <div className={styles.badge}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          7-Day Delivery
+        </div>
+        <div className={styles.badge}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Premium Packaging
+        </div>
       </div>
 
       {/* ── DEFAULT QUANTITY (when config has no qty field) ── */}
@@ -254,6 +263,18 @@ export default function CustomiserPanel({ config, productId, productName, produc
                 if (curr < (field.maxQty || 99)) set(field.fieldId, curr + 1)
               }}>+</button>
               {field.maxQty && <span className={styles.qtyMax}>Max {field.maxQty}</span>}
+            </div>
+          )}
+
+          {field.type === 'toggle' && field.label.toLowerCase().includes('lanyard') && (
+            <div className={styles.toggleWrap}>
+              <button type="button"
+                className={`${styles.toggle} ${styles.toggleOn}`}
+                disabled
+                style={{ opacity: 0.7, cursor: 'default' }}>
+                <div className={styles.toggleKnob} />
+              </button>
+              <span className={styles.togglePrice} style={{ color: '#22c55e' }}>Included Free</span>
             </div>
           )}
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAction, useMutation, useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
+import { formatPrice } from '../../lib/formatters'
 import styles from './PaymentButton.module.css'
 
 interface CartItem {
@@ -196,7 +197,7 @@ export default function PaymentButton({
     }
   }
 
-  const fmt = (p: number) => `₹${(p / 100).toLocaleString('en-IN')}`
+
 
   return (
     <div className={styles.wrapper}>
@@ -213,7 +214,7 @@ export default function PaymentButton({
             <div className={styles.modeName}>Pay Online</div>
             <div className={styles.modeDesc}>UPI · Cards · NetBanking · EMI</div>
           </div>
-          <div className={styles.modeAmount}>{fmt(total)}</div>
+          <div className={styles.modeAmount}>{formatPrice(total)}</div>
           <div className={`${styles.modeCheck} ${payMode === 'online' ? styles.modeCheckOn : ''}`} />
         </button>
 
@@ -227,7 +228,7 @@ export default function PaymentButton({
             <div className={styles.modeName}>Cash on Delivery</div>
             <div className={styles.modeDesc}>{codAdvancePercent}% advance now · Balance on delivery</div>
           </div>
-          <div className={styles.modeAmount}>{fmt(advanceAmount)} now</div>
+          <div className={styles.modeAmount}>{formatPrice(advanceAmount)} now</div>
           <div className={`${styles.modeCheck} ${payMode === 'cod' ? styles.modeCheckOn : ''}`} />
         </button>
       </div>
@@ -237,11 +238,11 @@ export default function PaymentButton({
         <div className={styles.codNote}>
           <div className={styles.codRow}>
             <span>Advance (pay now via Razorpay)</span>
-            <strong>{fmt(advanceAmount)}</strong>
+            <strong>{formatPrice(advanceAmount)}</strong>
           </div>
           <div className={styles.codRow}>
             <span>Balance (pay on delivery)</span>
-            <strong>{fmt(total - advanceAmount)}</strong>
+            <strong>{formatPrice(total - advanceAmount)}</strong>
           </div>
         </div>
       )}
@@ -266,9 +267,9 @@ export default function PaymentButton({
             Processing...
           </span>
         ) : payMode === 'cod' ? (
-          <span>Pay {fmt(advanceAmount)} Advance →</span>
+          <span>Pay {formatPrice(advanceAmount)} Advance →</span>
         ) : (
-          <span>Pay {fmt(total)} →</span>
+          <span>Pay {formatPrice(total)} →</span>
         )}
       </button>
 

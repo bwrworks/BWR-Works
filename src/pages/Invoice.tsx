@@ -1,58 +1,10 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useCms } from '../hooks/useCms'
 import { fmt, safe } from '../lib/formatters'
 import styles from './Invoice.module.css'
-
-/** Generate a simple Code128-style barcode as inline SVG */
-function Barcode({ value }: { value: string }) {
-  const bars = useMemo(() => {
-    // Simple encoding: each char -> binary stripe pattern
-    const result: boolean[] = []
-    for (let i = 0; i < value.length; i++) {
-      const code = value.charCodeAt(i)
-      // Convert char code to 8-bit binary stripes
-      for (let b = 7; b >= 0; b--) {
-        result.push(Boolean((code >> b) & 1))
-      }
-      result.push(false) // gap between chars
-    }
-    return result
-  }, [value])
-
-  const barWidth = 1.5
-  const height = 40
-  const totalWidth = bars.length * barWidth
-
-  return (
-    <svg width={totalWidth} height={height + 14} viewBox={`0 0 ${totalWidth} ${height + 14}`} style={{ display: 'block' }}>
-      {bars.map((on, i) => (
-        on && (
-          <rect
-            key={i}
-            x={i * barWidth}
-            y={0}
-            width={barWidth}
-            height={height}
-            fill="#111"
-          />
-        )
-      ))}
-      <text
-        x={totalWidth / 2}
-        y={height + 12}
-        textAnchor="middle"
-        fontSize="8"
-        fontFamily="monospace"
-        fill="#333"
-      >
-        {value}
-      </text>
-    </svg>
-  )
-}
 
 export default function Invoice() {
   const { orderId } = useParams<{ orderId: string }>()
@@ -190,8 +142,13 @@ export default function Invoice() {
 
         <div className={styles.totalsSection}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <Barcode value={order.orderId} />
-            <div className={styles.qrText}>Order ID</div>
+            <div style={{
+              fontFamily: 'monospace', fontSize: '0.85rem',
+              fontWeight: 700, color: '#111',
+              letterSpacing: '0.05em', padding: '8px 16px',
+              border: '1px solid #ddd', borderRadius: 4,
+            }}>{order.orderId}</div>
+            <div className={styles.qrText}>Order Reference</div>
           </div>
 
           <div className={styles.totalsTable}>

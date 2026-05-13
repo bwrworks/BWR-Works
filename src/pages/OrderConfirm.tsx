@@ -14,7 +14,9 @@ export default function OrderConfirm() {
   // UX-8: Fetch actual BWR order ID from DB
   const orders = useQuery(api.orders.getMyOrders)
   const matchedOrder = orders?.find(o => o.razorpayOrderId === rzpOrderId)
-  const displayRef = matchedOrder?.orderId || rzpOrderId.slice(-10).toUpperCase()
+  const displayRef = orders === undefined
+    ? '...'
+    : (matchedOrder?.orderId || rzpOrderId.slice(-10).toUpperCase())
 
   useEffect(() => { window.scrollTo(0, 0) }, [])
   useEffect(() => {

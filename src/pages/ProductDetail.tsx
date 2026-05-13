@@ -14,6 +14,7 @@ import styles from './ProductDetail.module.css'
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
   const product = useQuery(api.products.getBySlug, slug ? { slug } : 'skip')
+  const [copiedToast, setCopiedToast] = useState(false)
   
   // Fetch pristine base price from pricing engine
   const pricingData = useQuery(
@@ -68,10 +69,11 @@ export default function ProductDetail() {
         await navigator.share(shareData)
       } else {
         await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`)
-        alert('Link copied to clipboard!')
+        setCopiedToast(true)
+        setTimeout(() => setCopiedToast(false), 2000)
       }
     } catch (err) {
-      // Share failed silently
+      // Share cancelled or failed silently
     }
   }
 
@@ -103,7 +105,7 @@ export default function ProductDetail() {
         title={`${product.name} | BWR Works`}
         description={product.description}
         image={currentImage}
-        schema={productSchema}
+        schema={basePrice ? productSchema : undefined}
       />
       <Navbar />
       {/* ── BREADCRUMB BAR ── */}
@@ -125,7 +127,7 @@ export default function ProductDetail() {
               {currentImage ? (
                 <img
                   src={currentImage}
-                  alt={product.name}
+                  alt={`${product.name} — view ${selectedImage + 1}`}
                   className={styles.productImage}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
@@ -221,6 +223,17 @@ export default function ProductDetail() {
                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
               </svg>
             </button>
+            {copiedToast && (
+              <span style={{
+                position: 'absolute', top: '110%', right: 0,
+                fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+                color: '#22c55e', whiteSpace: 'nowrap',
+                animation: 'fadeIn 0.2s'
+              }}>
+                ✓ Copied!
+              </span>
+            )}
           </div>
           <p className={styles.tagline}>{product.shortTagline}</p>
 

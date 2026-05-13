@@ -303,3 +303,22 @@
   background: #222;
   transform: scale(1.02);
 }
+
+.browseBtn {
+  margin-top: 20px;
+  padding: 12px 28px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--off-white);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.browseBtn:hover {
+  background: #333;
+}

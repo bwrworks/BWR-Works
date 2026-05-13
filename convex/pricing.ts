@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 import { requireAdmin } from "./admin";
 
 // ═══════════════════════════════════════════════════
@@ -181,7 +182,7 @@ export const getBatchPrices = query({
       try {
         const pricing = await ctx.db
           .query("productPricing")
-          .withIndex("by_productId", (q) => q.eq("productId", pid as any))
+          .withIndex("by_productId", (q) => q.eq("productId", pid as Id<"products">))
           .first();
         results[pid] = pricing?.calculatedB2CPrice ?? null;
       } catch {
