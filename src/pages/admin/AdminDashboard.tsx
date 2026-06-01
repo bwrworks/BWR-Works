@@ -38,8 +38,9 @@ function BarChart({ data, color = 'var(--orange)' }: {
 // ── Donut-style status chart ──
 function StatusDonut({ byStatus }: { byStatus: Record<string, number> }) {
   const total = Object.values(byStatus).reduce((a, b) => a + b, 0)
+  // B&W/orange palette — orange = received (action needed), black = completed
   const colors: Record<string, string> = {
-    received: '#FF5C1A', printing: '#8B5CF6', shipped: '#0EA5E9', delivered: '#10B981'
+    received: '#FF5C1A', printing: '#555555', shipped: '#222222', delivered: '#111111'
   }
   const labels: Record<string, string> = {
     received: 'Received', printing: 'Crafting', shipped: 'Shipped', delivered: 'Delivered'
@@ -48,7 +49,7 @@ function StatusDonut({ byStatus }: { byStatus: Record<string, number> }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {Object.entries(byStatus).map(([status, count]) => (
         <div key={status} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: colors[status], flexShrink: 0 }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: colors[status], flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--ink)' }}>{labels[status]}</span>
@@ -56,7 +57,7 @@ function StatusDonut({ byStatus }: { byStatus: Record<string, number> }) {
                 {count} <span style={{ color: 'var(--muted)', fontWeight: 400 }}>({total ? Math.round((count / total) * 100) : 0}%)</span>
               </span>
             </div>
-            <div style={{ width: '100%', height: 5, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ width: '100%', height: 4, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{ width: `${total ? (count / total) * 100 : 0}%`, height: '100%', background: colors[status], borderRadius: 3, transition: 'width 0.6s ease' }} />
             </div>
           </div>
@@ -66,21 +67,20 @@ function StatusDonut({ byStatus }: { byStatus: Record<string, number> }) {
   )
 }
 
-function StatCard({ label, value, sub, color = 'var(--orange)', icon }: {
-  label: string; value: string; sub?: string; color?: string; icon?: string
+function StatCard({ label, value, sub, accent = false }: {
+  label: string; value: string; sub?: string; accent?: boolean
 }) {
   return (
-    <div className={styles.statCard} style={{ borderTop: `3px solid ${color}` }}>
-      {icon && <div style={{ fontSize: '1.4rem', marginBottom: 8 }}>{icon}</div>}
+    <div className={styles.statCard} style={{ borderTop: `3px solid ${accent ? 'var(--orange)' : '#111'}` }}>
       <div className={styles.statLabel}>{label}</div>
-      <div className={styles.statValue} style={{ color }}>{value}</div>
+      <div className={styles.statValue} style={{ color: accent ? 'var(--orange)' : '#111' }}>{value}</div>
       {sub && <div className={styles.statSub}>{sub}</div>}
     </div>
   )
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  received: '#FF5C1A', printing: '#8B5CF6', shipped: '#0EA5E9', delivered: '#10B981',
+  received: '#FF5C1A', printing: '#555555', shipped: '#222222', delivered: '#111111',
 }
 
 
@@ -151,16 +151,16 @@ export default function AdminDashboard() {
 
       {/* ── KPI STATS ── */}
       <div className={styles.statsGrid}>
-        <StatCard icon="💰" label="Today's Revenue" color="var(--orange)"
+        <StatCard accent label="Today's Revenue"
           value={fmt(stats.todayRevenue)}
           sub={`${stats.todayOrders} order${stats.todayOrders !== 1 ? 's' : ''} today`} />
-        <StatCard icon="📅" label="This Week" color="#0EA5E9"
+        <StatCard label="This Week"
           value={fmt(stats.weekRevenue)}
           sub={`${stats.weekOrders} orders this week`} />
-        <StatCard icon="📈" label="Total Revenue" color="#10B981"
+        <StatCard label="Total Revenue"
           value={fmt(stats.totalRevenue)}
           sub={`${stats.paidOrders} paid orders`} />
-        <StatCard icon="⏳" label="Pending Action" color="#F59E0B"
+        <StatCard label="Pending Action"
           value={String(stats.byStatus.received + stats.byStatus.printing)}
           sub="need dispatch" />
       </div>
@@ -194,7 +194,7 @@ export default function AdminDashboard() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginTop: 20 }}>
             {Object.entries(stats.byStatus).map(([s, c]) => (
               <Link key={s} to={`/admin/orders?status=${s}`} style={{ textDecoration: 'none' }}>
-                <div style={{ textAlign: 'center', padding: '10px 4px', background: '#F9FAFB', borderRadius: 4, border: `1px solid ${STATUS_COLOR[s]}30`, transition: 'all 0.15s', cursor: 'pointer' }}>
+                <div style={{ textAlign: 'center', padding: '10px 4px', background: '#F9FAFB', borderRadius: 4, border: '1px solid #E5E7EB', transition: 'all 0.15s', cursor: 'pointer' }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 700, color: STATUS_COLOR[s] }}>{c}</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.48rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>{s}</div>
                 </div>
@@ -211,22 +211,19 @@ export default function AdminDashboard() {
             <h2 className={styles.sectionTitle} style={{ marginBottom: 0 }}>Top Products by Units Sold</h2>
           </div>
           <div style={{ marginTop: 'var(--space-lg)' }}>
-            <BarChart data={topProducts} color="#8B5CF6" />
+            <BarChart data={topProducts} color="#111111" />
           </div>
         </div>
       )}
 
       {/* ── ANALYTICS NOTE ── */}
-      <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: 8, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span style={{ fontSize: '1.1rem' }}>📊</span>
-        <div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', fontWeight: 600, color: '#4338CA', letterSpacing: '0.08em' }}>WEBSITE TRAFFIC ANALYTICS</div>
-          <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.82rem', color: '#6366F1', marginTop: 2 }}>
-            Page views, sessions, and visitor data are available on{' '}
-            <a href="https://vercel.com/analytics" target="_blank" rel="noopener noreferrer" style={{ color: '#4338CA', fontWeight: 600 }}>
-              Vercel Analytics →
-            </a>
-          </div>
+      <div style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: 8, padding: '14px 20px' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', fontWeight: 600, color: '#111', letterSpacing: '0.08em' }}>WEBSITE TRAFFIC ANALYTICS</div>
+        <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.82rem', color: '#555', marginTop: 4 }}>
+          Page views, sessions, and visitor data are available on{' '}
+          <a href="https://vercel.com/analytics" target="_blank" rel="noopener noreferrer" style={{ color: '#FF5C1A', fontWeight: 600 }}>
+            Vercel Analytics →
+          </a>
         </div>
       </div>
 
