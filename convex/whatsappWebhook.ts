@@ -5,7 +5,7 @@ import { httpAction } from "./_generated/server";
  * When you configure the webhook in the Meta Developer Dashboard,
  * Meta sends a GET request with a challenge string that must be echoed back.
  */
-export const verifyWebhook = httpAction(async (ctx, request) => {
+export const verifyWebhook = httpAction(async (_ctx, request) => {
   const url = new URL(request.url);
   const mode = url.searchParams.get("hub.mode");
   const token = url.searchParams.get("hub.verify_token");
@@ -32,7 +32,7 @@ export const verifyWebhook = httpAction(async (ctx, request) => {
  * Handles incoming messages and status updates from the WhatsApp Business API.
  * This receives POST requests.
  */
-export const handleIncomingMessage = httpAction(async (ctx, request) => {
+export const handleIncomingMessage = httpAction(async (_ctx, request) => {
   try {
     const payload = await request.json();
     console.log("📥 Received WhatsApp Webhook event:", JSON.stringify(payload, null, 2));
