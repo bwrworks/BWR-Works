@@ -55,12 +55,12 @@ export const getAllWithStats = query({
 
 /** Get orders for a specific user — admin only */
 export const getOrdersForUser = query({
-  args: { userId: v.string() },
+  args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
     await requireAdmin(ctx);
     const orders = await ctx.db
       .query("orders")
-      .withIndex("by_userId", (q) => q.eq("userId", userId as any))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
     return orders.map((o) => ({
