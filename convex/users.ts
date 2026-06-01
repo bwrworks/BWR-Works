@@ -1,4 +1,5 @@
 import { query } from "./_generated/server";
+import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { requireAdmin } from "./admin";
 
@@ -48,6 +49,37 @@ export const getAllWithStats = query({
         totalOrders: userOrders.length,
         totalRevenue,
       };
+    }));
+  },
+});
+
+/** Get orders for a specific user — admin only */
+export const getOrdersForUser = query({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    await requireAdmin(ctx);
+    const orders = await ctx.db
+      .query("orders")
+      .withIndex("by_userId", (q) => q.eq("userId", userId as any))
+      .order("desc")
+      .collect();
+    return orders.map((o) => ({
+      _id: o._id,
+      orderId: o.orderId,
+      status: o.status,
+      paymentStatus: o.paymentStatus,
+      total: o.total,
+      subtotal: o.subtotal,
+      gstAmount: o.gstAmount,
+      discountAmount: o.discountAmount,
+      couponCode: o.couponCode,
+      paymentMode: o.paymentMode,
+      items: o.items.map((item) => ({
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      })),
+      _creationTime: o._creationTime,
     }));
   },
 });
