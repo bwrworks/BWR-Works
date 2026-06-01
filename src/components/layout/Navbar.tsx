@@ -49,7 +49,6 @@ export default function Navbar() {
           <li><Link to="/featured-drop" onClick={() => setMobileOpen(false)}>Featured Drop</Link></li>
           <li><Link to="/the-craft" onClick={() => setMobileOpen(false)}>The Craft</Link></li>
           <li><Link to="/contact" onClick={() => setMobileOpen(false)}>Contact</Link></li>
-          <li><Link to="/policy" onClick={() => setMobileOpen(false)}>Policies</Link></li>
           {/* Mobile only links */}
           <li className={styles.mobileOnly}>
             {isAuthenticated ? (
