@@ -3,6 +3,7 @@ import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { auth } from "./auth";
 import { razorpayWebhook } from "./webhookHandler";
+import { verifyWebhook, handleIncomingMessage } from "./whatsappWebhook";
 
 const http = httpRouter();
 
@@ -15,6 +16,21 @@ http.route({
   path: "/razorpay-webhook",
   method: "POST",
   handler: razorpayWebhook,
+});
+
+// ─────────────────────────────────────────────────
+// WHATSAPP API WEBHOOK
+// ─────────────────────────────────────────────────
+http.route({
+  path: "/whatsapp-webhook",
+  method: "GET",
+  handler: verifyWebhook,
+});
+
+http.route({
+  path: "/whatsapp-webhook",
+  method: "POST",
+  handler: handleIncomingMessage,
 });
 
 // ─────────────────────────────────────────────────

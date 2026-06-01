@@ -144,8 +144,8 @@ export default function AdminLayout() {
 
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
-        <div className={styles.logo}>
-          <span className={styles.logoText}>BW<span className={styles.logoR}>R</span></span>
+        <div className={styles.logo} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src="/BWR_Logo.svg" alt="BWR Logo" style={{ height: 28, width: 'auto' }} />
           <span className={styles.logoSub}>ADMIN</span>
           {/* Notification bell */}
           <button

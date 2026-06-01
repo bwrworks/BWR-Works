@@ -30,6 +30,7 @@ import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 import type * as webhookHandler from "../webhookHandler.js";
+import type * as whatsappWebhook from "../whatsappWebhook.js";
 
 import type {
   ApiFromModules,
@@ -60,6 +61,7 @@ declare const fullApi: ApiFromModules<{
   seed: typeof seed;
   users: typeof users;
   webhookHandler: typeof webhookHandler;
+  whatsappWebhook: typeof whatsappWebhook;
 }>;
 
 /**
