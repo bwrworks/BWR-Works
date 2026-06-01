@@ -1,79 +1,135 @@
 import { useState, useMemo } from 'react'
-import { useQuery } from 'convex/react'
+import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
-import { formatPrice, formatDate } from '../../lib/formatters'
+import { formatPrice, formatDate, safe } from '../../lib/formatters'
 
-type SortKey = 'name' | 'email' | 'totalOrders' | 'totalRevenue' | '_creationTime'
-type SortDir = 'asc' | 'desc'
-
-// ─── Strict B&W/Orange palette ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// PALETTE — strict B&W + orange only
+// ═══════════════════════════════════════════════════════════════════════════
 const C = {
-  orange:      '#FF5C1A',
-  orangeDim:   'rgba(255,92,26,0.12)',
-  orangeBorder:'rgba(255,92,26,0.35)',
-  black:       '#111111',
-  charcoal:    '#333333',
-  mid:         '#666666',
-  muted:       '#999999',
-  border:      '#E5E7EB',
-  borderLight: '#F3F4F6',
-  bg:          '#F9FAFB',
-  white:       '#FFFFFF',
+  orange:        '#FF5C1A',
+  orangeHover:   '#E04800',
+  orangeDim:     'rgba(255,92,26,0.10)',
+  orangeBorder:  'rgba(255,92,26,0.30)',
+  black:         '#111111',
+  charcoal:      '#333333',
+  mid:           '#666666',
+  muted:         '#9CA3AF',
+  border:        '#E5E7EB',
+  borderLight:   '#F3F4F6',
+  bg:            '#F9FAFB',
+  white:         '#FFFFFF',
+  redDim:        'rgba(180,20,20,0.08)',
+  redBorder:     'rgba(180,20,20,0.25)',
+  red:           '#B41414',
 }
 
-// ─── Status badges — orange / black tones only ───────────────────────────────
-const STATUS: Record<string, { label: string; color: string; bg: string }> = {
+// ═══════════════════════════════════════════════════════════════════════════
+// STATUS + PAYMENT BADGE STYLES
+// ═══════════════════════════════════════════════════════════════════════════
+const STATUS_S: Record<string, { label: string; color: string; bg: string }> = {
   received:  { label: 'RECEIVED',  color: C.orange,   bg: C.orangeDim },
-  printing:  { label: 'PRINTING',  color: C.charcoal, bg: '#F3F4F6'   },
-  shipped:   { label: 'SHIPPED',   color: C.black,    bg: '#EBEBEB'   },
+  printing:  { label: 'PRINTING',  color: '#555',     bg: '#EFEFEF'   },
+  shipped:   { label: 'SHIPPED',   color: C.black,    bg: '#E0E0E0'   },
   delivered: { label: 'DELIVERED', color: C.white,    bg: C.black     },
-  cancelled: { label: 'CANCELLED', color: C.white,    bg: '#444'      },
+}
+const PAY_S: Record<string, { label: string; color: string; bg: string }> = {
+  verified: { label: 'PAID',    color: C.charcoal, bg: '#E0E0E0'   },
+  pending:  { label: 'PENDING', color: C.orange,   bg: C.orangeDim },
+  failed:   { label: 'FAILED',  color: C.white,    bg: '#444'      },
 }
 
-const PAYMENT: Record<string, { label: string; color: string; bg: string }> = {
-  verified: { label: 'PAID',    color: C.black,  bg: '#E5E7EB' },
-  pending:  { label: 'PENDING', color: C.orange, bg: C.orangeDim },
-  failed:   { label: 'FAILED',  color: C.white,  bg: '#222'    },
+type SortKey      = 'name' | 'totalOrders' | 'totalRevenue' | '_creationTime' | 'lastOrderDate'
+type SortDir      = 'asc' | 'desc'
+type RoleFilter   = 'all' | 'admin' | 'customer'
+type ActFilter    = 'all' | 'active' | 'inactive'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function clip(text: string, cb: () => void) {
+  navigator.clipboard.writeText(text).then(cb).catch(() => {})
 }
 
-// ─── Shared badge ─────────────────────────────────────────────────────────────
+function exportCSV(rows: any[]) {
+  const hdr = ['Name', 'Email', 'Role', 'Total Orders', 'Revenue (INR)', 'Last Order', 'Joined']
+  const body = rows.map(u => [
+    `"${safe(u.name) || 'Unnamed'}"`,
+    `"${safe(u.email)}"`,
+    u.role || 'customer',
+    u.totalOrders,
+    ((u.totalRevenue || 0) / 100).toFixed(2),
+    u.lastOrderDate ? formatDate(u.lastOrderDate) : 'Never',
+    formatDate(u._creationTime),
+  ])
+  const csv = [hdr, ...body].map(r => r.join(',')).join('\n')
+  const a   = document.createElement('a')
+  a.href    = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }))
+  a.download = `bwr-users-${new Date().toISOString().slice(0, 10)}.csv`
+  document.body.appendChild(a); a.click(); document.body.removeChild(a)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BADGE PILL
+// ═══════════════════════════════════════════════════════════════════════════
 function Pill({ label, color, bg }: { label: string; color: string; bg: string }) {
   return (
     <span style={{
-      display: 'inline-block',
-      padding: '2px 7px',
-      borderRadius: 3,
-      background: bg,
-      color,
-      fontFamily: 'var(--font-mono)',
-      fontSize: '0.58rem',
-      fontWeight: 700,
-      letterSpacing: '0.1em',
+      display: 'inline-block', padding: '2px 7px', borderRadius: 3,
+      background: bg, color,
+      fontFamily: 'var(--font-mono)', fontSize: '0.56rem',
+      fontWeight: 700, letterSpacing: '0.1em',
     }}>
       {label}
     </span>
   )
 }
 
-// ─── Expanded order panel ─────────────────────────────────────────────────────
-function UserOrdersPanel({ userId, userName }: { userId: Id<'users'>; userName: string }) {
+// ═══════════════════════════════════════════════════════════════════════════
+// FILTER PILL BUTTON
+// ═══════════════════════════════════════════════════════════════════════════
+function FilterBtn({
+  label, active, activeColor = C.black, onClick,
+}: {
+  label: string; active: boolean; activeColor?: string; onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
+        letterSpacing: '0.07em', textTransform: 'uppercase', fontWeight: 600,
+        padding: '6px 11px', borderRadius: 5, cursor: 'pointer',
+        border: `1px solid ${active ? activeColor : C.border}`,
+        background: active ? activeColor : 'transparent',
+        color:      active ? C.white    : C.mid,
+        transition: 'all 0.14s',
+      }}
+    >
+      {label}
+    </button>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ORDER CARDS (inside expanded panel)
+// ═══════════════════════════════════════════════════════════════════════════
+function OrdersPanel({ userId }: { userId: Id<'users'> }) {
   const orders = useQuery(api.users.getOrdersForUser, { userId })
 
   if (orders === undefined) {
     return (
-      <div style={{ padding: '20px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '20px 0' }}>
         <div style={{
-          width: 16, height: 16, borderRadius: '50%',
-          border: `2px solid ${C.orangeBorder}`,
-          borderTopColor: C.orange,
-          animation: 'bwr-spin 0.7s linear infinite',
-          flexShrink: 0,
+          width: 14, height: 14, borderRadius: '50%',
+          border: `2px solid ${C.orangeBorder}`, borderTopColor: C.orange,
+          animation: 'bwrspin 0.7s linear infinite', flexShrink: 0,
         }} />
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: C.muted }}>
-          Loading orders for {userName}…
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: C.muted }}>
+          Loading orders…
         </span>
-        <style>{`@keyframes bwr-spin { to { transform: rotate(360deg); } }`}</style>
+        <style>{`@keyframes bwrspin{to{transform:rotate(360deg)}}`}</style>
       </div>
     )
   }
@@ -81,12 +137,10 @@ function UserOrdersPanel({ userId, userName }: { userId: Id<'users'>; userName: 
   if (orders.length === 0) {
     return (
       <div style={{
-        padding: '24px 0',
-        textAlign: 'center',
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.7rem',
-        color: C.muted,
-        letterSpacing: '0.1em',
+        padding: '28px 0', textAlign: 'center',
+        fontFamily: 'var(--font-mono)', fontSize: '0.68rem',
+        color: C.muted, letterSpacing: '0.1em',
+        border: `1px dashed ${C.border}`, borderRadius: 6,
       }}>
         NO ORDERS YET
       </div>
@@ -96,45 +150,35 @@ function UserOrdersPanel({ userId, userName }: { userId: Id<'users'>; userName: 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {orders.map(order => {
-        const ss = STATUS[order.status]          ?? STATUS.received
-        const ps = PAYMENT[order.paymentStatus]  ?? PAYMENT.pending
+        const ss = STATUS_S[order.status]       ?? STATUS_S.received
+        const ps = PAY_S[order.paymentStatus]   ?? PAY_S.pending
         return (
           <div key={order._id} style={{
             background: C.white,
             border: `1px solid ${C.border}`,
-            borderRadius: 6,
-            overflow: 'hidden',
+            borderRadius: 6, overflow: 'hidden',
           }}>
-            {/* Header */}
+            {/* Header row */}
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px 16px',
-              flexWrap: 'wrap',
-              gap: 8,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '9px 14px', background: C.bg,
               borderBottom: `1px solid ${C.borderLight}`,
-              background: C.bg,
+              flexWrap: 'wrap', gap: 8,
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
                 <span style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontWeight: 700,
-                  fontSize: '0.78rem',
-                  color: C.black,
+                  fontFamily: 'var(--font-mono)', fontWeight: 700,
+                  fontSize: '0.75rem', color: C.black,
                 }}>
                   {order.orderId}
                 </span>
                 <Pill label={ss.label} color={ss.color} bg={ss.bg} />
                 <Pill label={ps.label} color={ps.color} bg={ps.bg} />
               </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 800,
-                  fontSize: '0.95rem',
-                  color: C.black,
+                  fontFamily: 'var(--font-display)', fontWeight: 800,
+                  fontSize: '0.9rem', color: C.black,
                 }}>
                   {formatPrice(order.total)}
                 </span>
@@ -144,26 +188,15 @@ function UserOrdersPanel({ userId, userName }: { userId: Id<'users'>; userName: 
                   rel="noopener noreferrer"
                   onClick={e => e.stopPropagation()}
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.6rem',
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase' as const,
-                    color: C.orange,
-                    textDecoration: 'none',
-                    padding: '4px 10px',
-                    border: `1px solid ${C.orangeBorder}`,
-                    borderRadius: 4,
-                    fontWeight: 600,
-                    transition: 'all 0.15s',
+                    fontFamily: 'var(--font-mono)', fontSize: '0.56rem',
+                    letterSpacing: '0.06em', textTransform: 'uppercase',
+                    color: C.orange, textDecoration: 'none',
+                    padding: '3px 8px',
+                    border: `1px solid ${C.orangeBorder}`, borderRadius: 3,
+                    fontWeight: 600, transition: 'all 0.14s',
                   }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = C.orange
-                    e.currentTarget.style.color = C.white
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = 'transparent'
-                    e.currentTarget.style.color = C.orange
-                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = C.orange; e.currentTarget.style.color = C.white }}
+                  onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.color = C.orange }}
                 >
                   Invoice ↗
                 </a>
@@ -171,21 +204,16 @@ function UserOrdersPanel({ userId, userName }: { userId: Id<'users'>; userName: 
             </div>
 
             {/* Items */}
-            <div style={{ padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <div style={{ padding: '8px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
               {order.items.map((item, i) => (
-                <div key={i} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.82rem', color: C.charcoal }}>
-                    {/* Safely coerce productName to string to prevent React Error #130 */}
-                    {typeof item.productName === 'string' ? item.productName : String(item.productName ?? '—')}
-                    <span style={{ color: C.muted, marginLeft: 6, fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: C.charcoal }}>
+                    {safe(item.productName) || '—'}
+                    <span style={{ color: C.muted, marginLeft: 5, fontFamily: 'var(--font-mono)', fontSize: '0.66rem' }}>
                       ×{item.quantity}
                     </span>
                   </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: C.mid }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: C.mid }}>
                     {formatPrice(item.unitPrice * item.quantity)}
                   </span>
                 </div>
@@ -194,22 +222,15 @@ function UserOrdersPanel({ userId, userName }: { userId: Id<'users'>; userName: 
 
             {/* Footer meta */}
             <div style={{
-              padding: '6px 16px',
-              display: 'flex',
-              gap: 16,
-              flexWrap: 'wrap',
-              borderTop: `1px solid ${C.borderLight}`,
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.58rem',
-              color: C.muted,
-              letterSpacing: '0.05em',
+              padding: '5px 14px', borderTop: `1px solid ${C.borderLight}`,
+              display: 'flex', gap: 14, flexWrap: 'wrap',
+              fontFamily: 'var(--font-mono)', fontSize: '0.55rem',
+              color: C.muted, letterSpacing: '0.04em',
             }}>
               <span>{formatDate(order._creationTime)}</span>
               {order.paymentMode && <span>Via {order.paymentMode.toUpperCase()}</span>}
-              {order.couponCode && (
-                <span>Coupon: <strong style={{ color: C.mid }}>{order.couponCode}</strong></span>
-              )}
-              {order.gstAmount > 0 && <span>GST: {formatPrice(order.gstAmount)}</span>}
+              {order.couponCode  && <span>Coupon: {safe(order.couponCode)}</span>}
+              {order.gstAmount > 0 && <span>GST {formatPrice(order.gstAmount)}</span>}
             </div>
           </div>
         )
@@ -218,51 +239,428 @@ function UserOrdersPanel({ userId, userName }: { userId: Id<'users'>; userName: 
   )
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// EXPANDED PANEL (profile card + orders)
+// ═══════════════════════════════════════════════════════════════════════════
+type UserRow = {
+  _id:           Id<'users'>
+  name?:         string | null
+  email?:        string | null
+  role?:         string | null
+  _creationTime: number
+  totalOrders:   number
+  totalRevenue:  number
+  lastOrderDate?: number | null
+}
+
+function ExpandedPanel({
+  user,
+  onRoleChange,
+}: {
+  user: UserRow
+  onRoleChange: (uid: Id<'users'>, role: 'admin' | 'customer') => Promise<void>
+}) {
+  const [confirmRole, setConfirmRole]   = useState(false)
+  const [copiedEmail, setCopiedEmail]   = useState(false)
+  const [roleLoading, setRoleLoading]   = useState(false)
+
+  const name  = typeof user.name  === 'string' ? user.name.trim()  : ''
+  const email = typeof user.email === 'string' ? user.email.trim() : ''
+  const isAdmin = user.role === 'admin'
+  const avgOrder = user.totalOrders > 0 ? Math.round(user.totalRevenue / user.totalOrders) : 0
+
+  const handleCopy = () => {
+    if (!email) return
+    clip(email, () => { setCopiedEmail(true); setTimeout(() => setCopiedEmail(false), 2000) })
+  }
+
+  const handleRoleConfirm = async () => {
+    setRoleLoading(true)
+    await onRoleChange(user._id, isAdmin ? 'customer' : 'admin')
+    setRoleLoading(false)
+    setConfirmRole(false)
+  }
+
+  const metaRow = (label: string, val: string) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{
+        fontFamily: 'var(--font-mono)', fontSize: '0.52rem',
+        letterSpacing: '0.1em', color: C.muted, textTransform: 'uppercase',
+      }}>
+        {label}
+      </div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: C.charcoal }}>
+        {val}
+      </div>
+    </div>
+  )
+
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'minmax(260px, 280px) 1fr',
+      gap: 18,
+      padding: '20px 24px 24px',
+      background: C.bg,
+      borderTop: `2px solid ${C.orange}`,
+    }}>
+
+      {/* ── LEFT: User profile card ───────────────────────────────── */}
+      <div style={{
+        background: C.white,
+        border: `1px solid ${C.border}`,
+        borderRadius: 8,
+        padding: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+        alignSelf: 'start',
+      }}>
+        {/* Avatar + name */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 60, height: 60, borderRadius: '50%',
+            background: C.black,
+            border: `3px solid ${C.orange}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-display)', fontWeight: 800,
+            fontSize: '1.1rem', color: C.white, letterSpacing: '0.04em',
+          }}>
+            {(name || email || '?').substring(0, 2).toUpperCase()}
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              fontFamily: 'var(--font-body)', fontWeight: 700,
+              fontSize: '0.95rem', color: C.black, marginBottom: 5,
+            }}>
+              {name || 'Unnamed'}
+            </div>
+            {isAdmin
+              ? <Pill label="ADMIN"    color={C.orange} bg={C.orangeDim}   />
+              : <Pill label="CUSTOMER" color={C.mid}    bg={C.borderLight} />
+            }
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: C.borderLight }} />
+
+        {/* Email row */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.52rem',
+            letterSpacing: '0.1em', color: C.muted, textTransform: 'uppercase',
+          }}>
+            Email
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: C.charcoal,
+              flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {email || '—'}
+            </span>
+            {email && (
+              <button
+                onClick={handleCopy}
+                style={{
+                  flexShrink: 0,
+                  fontFamily: 'var(--font-mono)', fontSize: '0.52rem',
+                  fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+                  padding: '3px 8px', borderRadius: 3, cursor: 'pointer',
+                  background:  copiedEmail ? C.black : 'transparent',
+                  color:       copiedEmail ? C.white : C.mid,
+                  border:      `1px solid ${copiedEmail ? C.black : C.border}`,
+                  transition: 'all 0.18s',
+                }}
+              >
+                {copiedEmail ? 'Copied' : 'Copy'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Member since */}
+        {metaRow('Member Since', formatDate(user._creationTime))}
+
+        {/* Stats 2×2 grid */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
+          background: C.bg, borderRadius: 6,
+          border: `1px solid ${C.borderLight}`,
+          padding: 12,
+        }}>
+          {[
+            { label: 'Orders',     val: String(user.totalOrders) },
+            { label: 'Revenue',    val: user.totalOrders > 0 ? formatPrice(user.totalRevenue) : '—' },
+            { label: 'Avg Order',  val: user.totalOrders > 0 ? formatPrice(avgOrder)           : '—' },
+            { label: 'Last Order', val: user.lastOrderDate      ? formatDate(user.lastOrderDate) : 'Never' },
+          ].map(s => (
+            <div key={s.label} style={{ textAlign: 'center' }}>
+              <div style={{
+                fontFamily: 'var(--font-display)', fontWeight: 800,
+                fontSize: '0.88rem', color: C.black, marginBottom: 2,
+              }}>
+                {s.val}
+              </div>
+              <div style={{
+                fontFamily: 'var(--font-mono)', fontSize: '0.5rem',
+                color: C.muted, letterSpacing: '0.07em', textTransform: 'uppercase',
+              }}>
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: C.borderLight }} />
+
+        {/* Role action */}
+        {!confirmRole ? (
+          <button
+            onClick={() => setConfirmRole(true)}
+            style={{
+              width: '100%', padding: '9px 0',
+              fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+              fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
+              borderRadius: 5, cursor: 'pointer', transition: 'all 0.15s',
+              background: isAdmin ? 'transparent' : C.black,
+              color:       isAdmin ? C.charcoal   : C.white,
+              border:      `1px solid ${isAdmin ? C.border : C.black}`,
+            }}
+            onMouseEnter={e => {
+              if (isAdmin) { e.currentTarget.style.borderColor = C.red; e.currentTarget.style.color = C.red }
+              else         { e.currentTarget.style.background = C.charcoal }
+            }}
+            onMouseLeave={e => {
+              if (isAdmin) { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.charcoal }
+              else         { e.currentTarget.style.background = C.black }
+            }}
+          >
+            {isAdmin ? 'Remove Admin Access' : 'Make Admin'}
+          </button>
+        ) : (
+          <div style={{
+            background:    isAdmin ? C.redDim  : C.orangeDim,
+            border:        `1px solid ${isAdmin ? C.redBorder : C.orangeBorder}`,
+            borderRadius:  5, padding: '12px',
+          }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+              color: isAdmin ? C.red : C.orange,
+              fontWeight: 700, letterSpacing: '0.06em', marginBottom: 10,
+            }}>
+              {isAdmin ? 'Remove admin access?' : 'Grant admin access?'}
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button
+                onClick={handleRoleConfirm}
+                disabled={roleLoading}
+                style={{
+                  flex: 1, padding: '7px 0',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+                  fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+                  background: isAdmin ? C.red   : C.black,
+                  color:      C.white,
+                  border:     'none', borderRadius: 4, cursor: roleLoading ? 'wait' : 'pointer',
+                  opacity:    roleLoading ? 0.6 : 1,
+                }}
+              >
+                {roleLoading ? '…' : 'Confirm'}
+              </button>
+              <button
+                onClick={() => setConfirmRole(false)}
+                disabled={roleLoading}
+                style={{
+                  flex: 1, padding: '7px 0',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+                  fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+                  background: 'transparent', color: C.mid,
+                  border: `1px solid ${C.border}`, borderRadius: 4, cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── RIGHT: Order history ──────────────────────────────────── */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+            letterSpacing: '0.14em', color: C.orange,
+            textTransform: 'uppercase', fontWeight: 700,
+          }}>
+            Order History
+          </span>
+          {user.totalOrders > 0 && (
+            <span style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
+              background: C.orangeDim, color: C.orange,
+              padding: '1px 7px', borderRadius: 3, fontWeight: 700,
+            }}>
+              {user.totalOrders}
+            </span>
+          )}
+          {user.totalRevenue > 0 && (
+            <span style={{
+              marginLeft: 'auto',
+              fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+              color: C.mid,
+            }}>
+              {formatPrice(user.totalRevenue)} total
+            </span>
+          )}
+        </div>
+        <OrdersPanel userId={user._id} />
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COLUMN HEADER (sortable)
+// ═══════════════════════════════════════════════════════════════════════════
+function ColHead({
+  label, active, dir, onSort,
+}: {
+  label: string; sortKey?: SortKey; active: boolean; dir: SortDir; onSort?: () => void
+}) {
+  return (
+    <div
+      onClick={onSort}
+      style={{
+        fontFamily: 'var(--font-mono)', fontSize: '0.57rem',
+        letterSpacing: '0.1em', textTransform: 'uppercase',
+        color:      active ? C.black  : C.muted,
+        fontWeight: active ? 700      : 400,
+        cursor:     onSort ? 'pointer': 'default',
+        display: 'flex', alignItems: 'center', gap: 4,
+        userSelect: 'none',
+      }}
+    >
+      {label}
+      {onSort && (
+        <span style={{ opacity: active ? 1 : 0.3, fontSize: '0.6rem' }}>
+          {active ? (dir === 'asc' ? '↑' : '↓') : '↕'}
+        </span>
+      )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN PAGE
+// ═══════════════════════════════════════════════════════════════════════════
 export default function AdminUsers() {
-  const users = useQuery(api.users.getAllWithStats)
-  const [search, setSearch]         = useState('')
-  const [sortKey, setSortKey]       = useState<SortKey>('_creationTime')
-  const [sortDir, setSortDir]       = useState<SortDir>('desc')
-  const [expandedUser, setExpanded] = useState<string | null>(null)
+  const users      = useQuery(api.users.getAllWithStats)
+  const updateRole = useMutation(api.users.updateUserRole)
+
+  const [search,      setSearch]      = useState('')
+  const [sortKey,     setSortKey]     = useState<SortKey>('_creationTime')
+  const [sortDir,     setSortDir]     = useState<SortDir>('desc')
+  const [roleFilter,  setRoleFilter]  = useState<RoleFilter>('all')
+  const [actFilter,   setActFilter]   = useState<ActFilter>('all')
+  const [expandedId,  setExpanded]    = useState<string | null>(null)
+  const [toast,       setToast]       = useState<{ msg: string; ok: boolean } | null>(null)
+
+  const showToast = (msg: string, ok = true) => {
+    setToast({ msg, ok })
+    setTimeout(() => setToast(null), 3500)
+  }
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
     else { setSortKey(key); setSortDir('desc') }
   }
 
+  const handleRoleChange = async (uid: Id<'users'>, role: 'admin' | 'customer') => {
+    try {
+      await updateRole({ targetUserId: uid, role })
+      showToast(role === 'admin' ? 'User promoted to Admin.' : 'Admin access removed.', true)
+    } catch (e: any) {
+      showToast(e?.message ?? 'Something went wrong.', false)
+    }
+  }
+
   const filtered = useMemo(() => {
     if (!users) return []
     const q = search.toLowerCase().trim()
-    let list = q
-      ? users.filter(u =>
-          (u.name || '').toLowerCase().includes(q) ||
-          (u.email || '').toLowerCase().includes(q)
-        )
-      : [...users]
+    let list = [...users]
+
+    if (q) {
+      list = list.filter(u =>
+        (u.name  || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q)
+      )
+    }
+    if (roleFilter !== 'all') {
+      list = list.filter(u => (u.role || 'customer') === roleFilter)
+    }
+    if (actFilter === 'active')   list = list.filter(u => u.totalOrders > 0)
+    if (actFilter === 'inactive') list = list.filter(u => u.totalOrders === 0)
 
     list.sort((a, b) => {
-      let av: string | number = 0
-      let bv: string | number = 0
+      let av: string | number = 0, bv: string | number = 0
       switch (sortKey) {
         case 'name':          av = (a.name || '').toLowerCase(); bv = (b.name || '').toLowerCase(); break
-        case 'email':         av = (a.email || '').toLowerCase(); bv = (b.email || '').toLowerCase(); break
-        case 'totalOrders':   av = a.totalOrders;   bv = b.totalOrders;   break
-        case 'totalRevenue':  av = a.totalRevenue;  bv = b.totalRevenue;  break
-        case '_creationTime': av = a._creationTime; bv = b._creationTime; break
+        case 'totalOrders':   av = a.totalOrders;       bv = b.totalOrders;       break
+        case 'totalRevenue':  av = a.totalRevenue;      bv = b.totalRevenue;      break
+        case 'lastOrderDate': av = a.lastOrderDate || 0; bv = b.lastOrderDate || 0; break
+        case '_creationTime': av = a._creationTime;     bv = b._creationTime;     break
       }
       if (av < bv) return sortDir === 'asc' ? -1 : 1
       if (av > bv) return sortDir === 'asc' ?  1 : -1
       return 0
     })
     return list
-  }, [users, search, sortKey, sortDir])
+  }, [users, search, roleFilter, actFilter, sortKey, sortDir])
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (users === undefined) {
     return (
       <div>
         <div style={{ marginBottom: 24 }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.18em', color: C.orange, textTransform: 'uppercase', marginBottom: 4 }}>
+            Admin · User Management
+          </div>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.7rem', fontWeight: 800, color: C.black, margin: 0 }}>
+            All Users
+          </h1>
+        </div>
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: 48, textAlign: 'center' }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: '50%',
+            border: `2px solid ${C.orangeBorder}`, borderTopColor: C.orange,
+            animation: 'bwrspin 0.7s linear infinite', margin: '0 auto 14px',
+          }} />
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: C.muted }}>Loading users…</div>
+          <style>{`@keyframes bwrspin{to{transform:rotate(360deg)}}`}</style>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Aggregate stats ───────────────────────────────────────────────────────
+  const totalRevenue = users.reduce((s, u) => s + u.totalRevenue, 0)
+  const totalOrders  = users.reduce((s, u) => s + u.totalOrders,  0)
+  const adminCount   = users.filter(u => u.role === 'admin').length
+  const activeCount  = users.filter(u => u.totalOrders > 0).length
+
+  const GRID_COLS = '2.2fr 1fr 90px 110px 110px 44px'
+
+  return (
+    <div>
+      {/* ── Page header ───────────────────────────────────────────── */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
+        marginBottom: 24, flexWrap: 'wrap', gap: 12,
+      }}>
+        <div>
           <div style={{
             fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
             letterSpacing: '0.18em', color: C.orange,
@@ -270,86 +668,67 @@ export default function AdminUsers() {
           }}>
             Admin · User Management
           </div>
-          <h1 style={{
-            fontFamily: 'var(--font-display)', fontSize: '1.7rem',
-            fontWeight: 800, color: C.black, margin: 0,
-          }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.7rem', fontWeight: 800, color: C.black, margin: 0 }}>
             All Users
           </h1>
         </div>
-        <div style={{
-          background: C.white, borderRadius: 10,
-          border: `1px solid ${C.border}`,
-          padding: 40, textAlign: 'center',
-        }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: '50%',
-            border: `2px solid ${C.orangeBorder}`,
-            borderTopColor: C.orange,
-            animation: 'bwr-spin 0.7s linear infinite',
-            margin: '0 auto 14px',
-          }} />
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: C.muted }}>
-            Loading users…
-          </div>
-          <style>{`@keyframes bwr-spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      </div>
-    )
-  }
 
-  const totalRevenue = users.reduce((s, u) => s + u.totalRevenue, 0)
-  const totalOrders  = users.reduce((s, u) => s + u.totalOrders, 0)
-  const adminCount   = users.filter(u => u.role === 'admin').length
-
-  // ── Stats strip ──────────────────────────────────────────────────────────
-  const stats = [
-    { label: 'Total Users',   value: String(users.length)         },
-    { label: 'Total Orders',  value: String(totalOrders)          },
-    { label: 'Total Revenue', value: formatPrice(totalRevenue)    },
-    { label: 'Admins',        value: String(adminCount)           },
-  ]
-
-  return (
-    <div>
-      {/* Page header */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
-          letterSpacing: '0.18em', color: C.orange,
-          textTransform: 'uppercase', marginBottom: 4,
-        }}>
-          Admin · User Management
-        </div>
-        <h1 style={{
-          fontFamily: 'var(--font-display)', fontSize: '1.7rem',
-          fontWeight: 800, color: C.black, margin: 0,
-        }}>
-          All Users
-        </h1>
+        <button
+          onClick={() => exportCSV(filtered)}
+          style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+            letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700,
+            padding: '9px 16px', borderRadius: 6, cursor: 'pointer',
+            background: 'transparent', color: C.black,
+            border: `1px solid ${C.border}`, transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = C.black; e.currentTarget.style.color = C.white; e.currentTarget.style.borderColor = C.black }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.black; e.currentTarget.style.borderColor = C.border }}
+        >
+          Export CSV ↓
+        </button>
       </div>
 
-      {/* Stats strip */}
+      {/* ── Toast ─────────────────────────────────────────────────── */}
+      {toast && (
+        <div style={{
+          marginBottom: 16, padding: '10px 16px', borderRadius: 6,
+          background: toast.ok ? C.black : C.red, color: C.white,
+          fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.04em',
+          transition: 'opacity 0.3s',
+        }}>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* ── Stats strip ───────────────────────────────────────────── */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: 12, marginBottom: 24,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+        gap: 12, marginBottom: 20,
       }}>
-        {stats.map(s => (
+        {[
+          { label: 'Registered',    value: String(users.length),              accent: true  },
+          { label: 'Active Buyers', value: `${activeCount} / ${users.length}`,accent: false },
+          { label: 'Total Revenue', value: formatPrice(totalRevenue),          accent: false },
+          { label: 'All Orders',    value: String(totalOrders),                accent: false },
+          { label: 'Admin Accounts',value: String(adminCount),                 accent: false },
+        ].map((s) => (
           <div key={s.label} style={{
             background: C.white,
             border: `1px solid ${C.border}`,
-            borderRadius: 8,
-            padding: '16px 20px',
+            borderTop: `3px solid ${s.accent ? C.orange : C.border}`,
+            borderRadius: 8, padding: '14px 18px',
           }}>
             <div style={{
               fontFamily: 'var(--font-display)', fontWeight: 800,
-              fontSize: '1.2rem', color: C.black, marginBottom: 4,
+              fontSize: '1.2rem', color: s.accent ? C.orange : C.black,
+              marginBottom: 4,
             }}>
               {s.value}
             </div>
             <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+              fontFamily: 'var(--font-mono)', fontSize: '0.57rem',
               color: C.muted, letterSpacing: '0.08em', textTransform: 'uppercase',
             }}>
               {s.label}
@@ -358,216 +737,163 @@ export default function AdminUsers() {
         ))}
       </div>
 
-      {/* Controls + table */}
-      <div style={{
-        background: C.white,
-        border: `1px solid ${C.border}`,
-        borderRadius: 10,
-        overflow: 'hidden',
-      }}>
-        {/* Search + sort bar */}
+      {/* ── Table card ────────────────────────────────────────────── */}
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, overflow: 'hidden' }}>
+
+        {/* Filters bar */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          padding: '14px 20px',
-          borderBottom: `1px solid ${C.borderLight}`,
-          flexWrap: 'wrap',
+          padding: '14px 20px', borderBottom: `1px solid ${C.borderLight}`,
+          display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center',
         }}>
           <input
             type="text"
-            placeholder="Search by name or email…"
+            placeholder="Search name or email…"
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{
-              flex: '1 1 240px', minWidth: 180,
-              padding: '9px 14px',
+              flex: '1 1 220px', minWidth: 150,
+              padding: '8px 12px',
               fontFamily: 'var(--font-body)', fontSize: '0.84rem',
               background: C.bg, border: `1px solid ${C.border}`,
               color: C.black, borderRadius: 6, outline: 'none',
               transition: 'border-color 0.15s', boxSizing: 'border-box',
             }}
-            onFocus={e  => e.currentTarget.style.borderColor = C.orange}
-            onBlur={e   => e.currentTarget.style.borderColor = C.border}
+            onFocus={e => e.currentTarget.style.borderColor = C.orange}
+            onBlur={e  => e.currentTarget.style.borderColor = C.border}
           />
 
-          {/* Sort pills */}
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            {([
-              ['_creationTime', 'Joined'],
-              ['totalRevenue',  'Revenue'],
-              ['totalOrders',   'Orders'],
-              ['name',          'Name'],
-            ] as [SortKey, string][]).map(([key, label]) => {
-              const active = sortKey === key
-              return (
-                <button
-                  key={key}
-                  onClick={() => handleSort(key)}
-                  style={{
-                    fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
-                    letterSpacing: '0.08em', textTransform: 'uppercase',
-                    background: active ? C.black : C.bg,
-                    color:      active ? C.white : C.mid,
-                    border:    `1px solid ${active ? C.black : C.border}`,
-                    padding: '6px 12px', borderRadius: 5,
-                    cursor: 'pointer', transition: 'all 0.15s', fontWeight: 600,
-                  }}
-                >
-                  {label} {active ? (sortDir === 'asc' ? '↑' : '↓') : <span style={{ opacity: 0.3 }}>↕</span>}
-                </button>
-              )
-            })}
+          {/* Role filter */}
+          <div style={{ display: 'flex', gap: 3 }}>
+            <FilterBtn label="All Roles"  active={roleFilter === 'all'}      onClick={() => setRoleFilter('all')}      />
+            <FilterBtn label="Admins"     active={roleFilter === 'admin'}     onClick={() => setRoleFilter('admin')}    />
+            <FilterBtn label="Customers"  active={roleFilter === 'customer'}  onClick={() => setRoleFilter('customer')} />
           </div>
 
-          <div style={{
-            marginLeft: 'auto',
-            fontFamily: 'var(--font-mono)', fontSize: '0.63rem',
-            color: C.muted, whiteSpace: 'nowrap',
-          }}>
+          {/* Activity filter */}
+          <div style={{ display: 'flex', gap: 3 }}>
+            <FilterBtn label="All"        active={actFilter === 'all'}      activeColor={C.orange} onClick={() => setActFilter('all')}      />
+            <FilterBtn label="Has Orders" active={actFilter === 'active'}   activeColor={C.orange} onClick={() => setActFilter('active')}   />
+            <FilterBtn label="No Orders"  active={actFilter === 'inactive'} activeColor={C.orange} onClick={() => setActFilter('inactive')} />
+          </div>
+
+          <div style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: C.muted, whiteSpace: 'nowrap' }}>
             {filtered.length} of {users.length}
           </div>
         </div>
 
         {/* Column headers */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2.5fr 1.8fr 90px 120px 50px',
+          display: 'grid', gridTemplateColumns: GRID_COLS,
           padding: '8px 20px',
-          background: C.bg,
-          borderBottom: `1px solid ${C.border}`,
+          background: C.bg, borderBottom: `1px solid ${C.border}`,
         }}>
-          {['User', 'Email', 'Orders', 'Revenue', ''].map((h, i) => (
-            <div key={i} style={{
-              fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
-              letterSpacing: '0.12em', color: C.muted,
-              textTransform: 'uppercase', padding: '2px 0',
-            }}>
-              {h}
-            </div>
-          ))}
+          <ColHead label="User"        sortKey="_creationTime" active={sortKey === 'name'}          dir={sortDir} onSort={() => handleSort('name')}          />
+          <ColHead label="Role"                                active={false}                        dir={sortDir}                                             />
+          <ColHead label="Orders"      sortKey="totalOrders"  active={sortKey === 'totalOrders'}    dir={sortDir} onSort={() => handleSort('totalOrders')}    />
+          <ColHead label="Revenue"     sortKey="totalRevenue" active={sortKey === 'totalRevenue'}   dir={sortDir} onSort={() => handleSort('totalRevenue')}   />
+          <ColHead label="Last Order"  sortKey="lastOrderDate"active={sortKey === 'lastOrderDate'}  dir={sortDir} onSort={() => handleSort('lastOrderDate')}  />
+          <ColHead label=""                                    active={false}                        dir={sortDir}                                             />
         </div>
 
         {/* Rows */}
         <div>
           {filtered.map((u, idx) => {
-            const isExpanded = expandedUser === u._id
-            // Safe initials — always a plain string, no JSX
-            const displayName  = typeof u.name === 'string' && u.name.trim() ? u.name.trim() : ''
-            const displayEmail = typeof u.email === 'string' ? u.email : ''
-            const initials = (displayName || displayEmail || '?').substring(0, 2).toUpperCase()
+            const isExp   = expandedId === u._id
+            const name    = typeof u.name  === 'string' ? u.name.trim()  : ''
+            const email   = typeof u.email === 'string' ? u.email.trim() : ''
+            const initials= (name || email || '?').substring(0, 2).toUpperCase()
+            const isAdmin = u.role === 'admin'
 
             return (
-              <div
-                key={u._id}
-                style={{ borderBottom: idx < filtered.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}
-              >
+              <div key={u._id} style={{ borderBottom: idx < filtered.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
+
                 {/* Clickable row */}
                 <div
                   role="button"
                   tabIndex={0}
-                  onClick={() => setExpanded(isExpanded ? null : u._id)}
-                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setExpanded(isExpanded ? null : u._id) }}
+                  onClick={() => setExpanded(isExp ? null : u._id)}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setExpanded(isExp ? null : u._id) }}
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: '2.5fr 1.8fr 90px 120px 50px',
-                    padding: '14px 20px',
-                    cursor: 'pointer',
-                    background: isExpanded ? '#FAFAFA' : C.white,
-                    transition: 'background 0.15s',
-                    alignItems: 'center',
-                    outline: 'none',
+                    display: 'grid', gridTemplateColumns: GRID_COLS,
+                    padding: '13px 20px', cursor: 'pointer', alignItems: 'center',
+                    background: isExp ? '#F5F5F5' : C.white,
+                    transition: 'background 0.12s', outline: 'none',
                   }}
-                  onMouseEnter={e => { if (!isExpanded) e.currentTarget.style.background = C.bg }}
-                  onMouseLeave={e => { if (!isExpanded) e.currentTarget.style.background = C.white }}
+                  onMouseEnter={e => { if (!isExp) e.currentTarget.style.background = C.bg   }}
+                  onMouseLeave={e => { if (!isExp) e.currentTarget.style.background = C.white }}
                 >
                   {/* User info */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                    {/* Avatar — black/orange only */}
                     <div style={{
-                      width: 36, height: 36, borderRadius: '50%',
+                      width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
                       background: C.black,
-                      border: isExpanded ? `2px solid ${C.orange}` : `2px solid transparent`,
+                      border: `2px solid ${isExp ? C.orange : 'transparent'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontFamily: 'var(--font-display)', fontWeight: 800,
-                      fontSize: '0.7rem', color: C.white,
-                      flexShrink: 0, letterSpacing: '0.04em',
+                      fontSize: '0.72rem', color: C.white, letterSpacing: '0.04em',
                       transition: 'border-color 0.15s',
                     }}>
                       {initials}
                     </div>
-
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{
-                          fontFamily: 'var(--font-body)', fontWeight: 600,
-                          fontSize: '0.88rem', color: C.black,
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        }}>
-                          {/* Always a plain string — no JSX inside a text span */}
-                          {displayName || 'Unnamed'}
-                        </span>
-                        {!displayName && (
-                          <span style={{
-                            fontFamily: 'var(--font-mono)', fontSize: '0.55rem',
-                            color: C.muted, fontStyle: 'italic',
-                          }}>
-                            (no name)
-                          </span>
-                        )}
-                        {u.role === 'admin' && (
-                          <span style={{
-                            fontFamily: 'var(--font-mono)', fontSize: '0.52rem',
-                            letterSpacing: '0.1em', textTransform: 'uppercase',
-                            background: C.orangeDim, color: C.orange,
-                            padding: '1px 6px', borderRadius: 3, fontWeight: 700,
-                            flexShrink: 0,
-                          }}>
-                            Admin
-                          </span>
-                        )}
+                      <div style={{
+                        fontFamily: 'var(--font-body)', fontWeight: 600,
+                        fontSize: '0.88rem', color: C.black,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {name || 'Unnamed'}
                       </div>
                       <div style={{
-                        fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
-                        color: C.muted, marginTop: 2,
+                        fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: C.muted,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        marginTop: 1,
                       }}>
-                        Joined {formatDate(u._creationTime)}
+                        {email || '—'}
                       </div>
                     </div>
                   </div>
 
-                  {/* Email */}
-                  <div style={{
-                    fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
-                    color: C.mid,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    paddingRight: 12,
-                  }}>
-                    {displayEmail || '—'}
+                  {/* Role */}
+                  <div>
+                    {isAdmin
+                      ? <Pill label="ADMIN"    color={C.orange} bg={C.orangeDim}   />
+                      : <Pill label="CUSTOMER" color={C.muted}  bg={C.borderLight} />
+                    }
+                    <div style={{
+                      fontFamily: 'var(--font-mono)', fontSize: '0.56rem',
+                      color: C.muted, marginTop: 3,
+                    }}>
+                      Since {formatDate(u._creationTime)}
+                    </div>
                   </div>
 
                   {/* Orders */}
-                  <div style={{
-                    fontFamily: 'var(--font-display)', fontWeight: 700,
-                    fontSize: '1rem',
-                    color: u.totalOrders > 0 ? C.black : C.border,
-                  }}>
-                    {u.totalOrders}
-                    <span style={{
-                      fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
-                      color: C.muted, marginLeft: 3, fontWeight: 400,
+                  <div>
+                    <div style={{
+                      fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.95rem',
+                      color: u.totalOrders > 0 ? C.black : C.border,
                     }}>
+                      {u.totalOrders}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: C.muted }}>
                       {u.totalOrders === 1 ? 'order' : 'orders'}
-                    </span>
+                    </div>
                   </div>
 
                   {/* Revenue */}
                   <div style={{
-                    fontFamily: 'var(--font-display)', fontWeight: 800,
-                    fontSize: '0.92rem',
-                    color: u.totalRevenue > 0 ? C.black : C.border,
+                    fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '0.88rem',
+                    color: u.totalRevenue > 0 ? C.orange : C.border,
                   }}>
                     {formatPrice(u.totalRevenue)}
+                  </div>
+
+                  {/* Last order */}
+                  <div style={{
+                    fontFamily: 'var(--font-mono)', fontSize: '0.64rem',
+                    color: u.lastOrderDate ? C.charcoal : C.muted,
+                  }}>
+                    {u.lastOrderDate ? formatDate(u.lastOrderDate) : 'Never'}
                   </div>
 
                   {/* Expand toggle */}
@@ -575,59 +901,36 @@ export default function AdminUsers() {
                     <div style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       width: 26, height: 26, borderRadius: 5,
-                      background: isExpanded ? C.black : C.bg,
-                      border: `1px solid ${isExpanded ? C.black : C.border}`,
-                      color: isExpanded ? C.white : C.mid,
-                      fontSize: '0.7rem',
-                      transition: 'all 0.2s',
-                      transform: isExpanded ? 'rotate(180deg)' : 'none',
+                      background: isExp ? C.black : C.bg,
+                      border: `1px solid ${isExp ? C.black : C.border}`,
+                      color: isExp ? C.white : C.mid,
+                      fontSize: '0.68rem', transition: 'all 0.2s',
+                      transform: isExp ? 'rotate(180deg)' : 'none',
                     }}>
                       ▼
                     </div>
                   </div>
                 </div>
 
-                {/* Expanded orders panel */}
-                {isExpanded && (
-                  <div style={{
-                    padding: '16px 20px 20px',
-                    background: C.bg,
-                    borderTop: `1px solid ${C.border}`,
-                  }}>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14,
-                    }}>
-                      <span style={{
-                        fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
-                        letterSpacing: '0.14em', color: C.orange,
-                        textTransform: 'uppercase', fontWeight: 700,
-                      }}>
-                        Order History
-                      </span>
-                      {u.totalOrders > 0 && (
-                        <span style={{
-                          fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
-                          background: C.orangeDim, color: C.orange,
-                          padding: '1px 7px', borderRadius: 3, fontWeight: 600,
-                        }}>
-                          {u.totalOrders}
-                        </span>
-                      )}
-                    </div>
-                    <UserOrdersPanel userId={u._id} userName={displayName || displayEmail || 'User'} />
-                  </div>
+                {/* Expanded panel */}
+                {isExp && (
+                  <ExpandedPanel user={u} onRoleChange={handleRoleChange} />
                 )}
               </div>
             )
           })}
 
+          {/* Empty state */}
           {filtered.length === 0 && (
             <div style={{
-              textAlign: 'center', padding: '48px 20px',
+              padding: '52px 20px', textAlign: 'center',
               fontFamily: 'var(--font-mono)', fontSize: '0.72rem',
               color: C.muted, letterSpacing: '0.08em',
             }}>
-              {search ? `No users matching "${search}"` : 'No users found'}
+              {search || roleFilter !== 'all' || actFilter !== 'all'
+                ? `No users match your current filters`
+                : 'No users registered yet'
+              }
             </div>
           )}
         </div>
