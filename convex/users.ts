@@ -32,7 +32,7 @@ export const getAllWithStats = query({
     return await Promise.all(users.map(async (u) => {
       const userOrders = await ctx.db
         .query("orders")
-        .withIndex("by_userId", (q) => q.eq("userId", u._id))
+        .withIndex("by_userId", (q) => q.eq("userId", u._id as unknown as string))
         .collect();
 
       const totalRevenue = userOrders
@@ -60,7 +60,7 @@ export const getOrdersForUser = query({
     await requireAdmin(ctx);
     const orders = await ctx.db
       .query("orders")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId as unknown as string))
       .order("desc")
       .collect();
     return orders.map((o) => ({
