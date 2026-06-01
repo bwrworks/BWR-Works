@@ -1,8 +1,8 @@
 .footer {
-  background: var(--surface);
+  background: var(--layout-bg);
   border-top: 1px solid rgba(245, 240, 232, 0.1);
   padding: 60px;
-  color: var(--off-white);
+  color: var(--layout-text);
 }
 
 .inner {
@@ -61,7 +61,7 @@
 }
 
 .links a:hover {
-  color: var(--off-white);
+  color: var(--layout-text);
 }
 
 .bottom {

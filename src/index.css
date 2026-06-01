@@ -19,6 +19,21 @@ html {
   overflow-x: hidden;
 }
 
+:root {
+  --layout-bg: rgba(17, 17, 17, 0.95);
+  --layout-text: var(--white);
+}
+
+.theme-light {
+  --layout-bg: rgba(245, 240, 232, 0.95); /* subtle-off-white */
+  --layout-text: var(--ink);
+}
+
+.theme-dark {
+  --layout-bg: rgba(17, 17, 17, 0.95); /* ink */
+  --layout-text: var(--white);
+}
+
 body {
   background: var(--white);
   color: var(--black-soft);

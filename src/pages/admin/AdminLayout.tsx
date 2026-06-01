@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuthActions } from '@convex-dev/auth/react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
-import brandLogo from '../../assets/bwr-brand.svg'
+import Logo from '../../components/ui/Logo'
 import styles from './AdminLayout.module.css'
 
 const NAV_ITEMS = [
@@ -146,7 +146,7 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.logo} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={brandLogo} alt="BWR Logo" style={{ height: 28, width: 'auto' }} />
+          <Logo style={{ height: 28, width: 'auto', color: 'var(--ink)' }} />
           <span className={styles.logoSub}>ADMIN</span>
           {/* Notification bell */}
           <button
