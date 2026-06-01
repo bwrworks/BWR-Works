@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useRef } from 'react'
+import { AlertTriangle } from 'lucide-react'
 import styles from './Toast.module.css'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
@@ -80,7 +81,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {confirmState && (
         <div className={styles.confirmOverlay}>
           <div className={styles.confirmBox}>
-            <div className={styles.confirmIcon}>⚠️</div>
+            <div className={styles.confirmIcon}><AlertTriangle size={32} /></div>
             <p className={styles.confirmMessage}>{confirmState.message}</p>
             <div className={styles.confirmActions}>
               <button className={styles.confirmCancel} onClick={() => handleConfirm(false)}>Cancel</button>

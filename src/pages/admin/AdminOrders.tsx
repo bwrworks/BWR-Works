@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
+import { Printer } from 'lucide-react'
 import { api } from '../../../convex/_generated/api'
 import { Link, useSearchParams } from 'react-router-dom'
 import { fmt, safe } from '../../lib/formatters'
@@ -174,7 +175,7 @@ export default function AdminOrders() {
 
                   <div style={{ display: 'flex', gap: '16px', marginTop: '16px', alignItems: 'center' }}>
                     <Link to={`/invoice/${order.orderId}`} target="_blank" className={styles.statusBtn} style={{ background: '#333', color: '#fff', textDecoration: 'none', padding: '6px 12px' }}>
-                      🖨️ Print Invoice
+                      <Printer size={16} style={{marginRight:'6px'}}/> Print Invoice
                     </Link>
                   </div>
                 </div>

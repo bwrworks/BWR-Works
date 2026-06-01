@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useAction } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { useToast } from '../../context/ToastContext'
+import { Package, AlertTriangle } from 'lucide-react'
 import styles from './AdminDashboard.module.css'
 
 
@@ -116,7 +117,7 @@ function ProductCard({ product, onEdit }: { product: any; onEdit: (p: any) => vo
       <div style={{ width: 80, height: 80, background: '#F3F4F6', borderRadius: 6, flexShrink: 0, overflow: 'hidden' }}>
         {product.images?.[0]
           ? <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>📦</div>
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}><Package size={48} /></div>
         }
       </div>
       <div style={{ flex: 1, minWidth: 200 }}>
@@ -244,7 +245,7 @@ function CreateProductForm({ onClose }: { onClose: () => void }) {
 
           {error && (
             <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: 14, fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: '#DC2626' }}>
-              ⚠️ {error}
+              <div style={{display:'flex', alignItems:'center', gap:'6px'}}><AlertTriangle size={16} /> {error}</div>
             </div>
           )}
         </div>
@@ -347,7 +348,7 @@ export default function AdminProducts() {
         <div className={styles.loading}>Loading products...</div>
       ) : products.length === 0 ? (
         <div className={styles.empty}>
-          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📦</div>
+          <div style={{ marginBottom: 12, color: 'var(--muted)' }}><Package size={48} /></div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 700, marginBottom: 8, color: 'var(--ink)' }}>No products yet</div>
           <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'var(--muted)', marginBottom: 20 }}>Click "+ Add Product" to add your first product to the store</div>
           <button className={styles.btnPrimary} onClick={() => setShowCreate(true)}>+ Add First Product</button>

@@ -4,6 +4,7 @@ import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useCms } from '../hooks/useCms'
 import { fmt, safe } from '../lib/formatters'
+import { Printer } from 'lucide-react'
 import Logo from '../components/ui/Logo'
 import styles from './Invoice.module.css'
 
@@ -44,7 +45,7 @@ export default function Invoice() {
           <button className={styles.btnSecondary} onClick={() => window.history.back()}>← Back</button>
         </div>
         <div className={styles.actionRight}>
-          <button className={styles.btnPrint} onClick={handlePrint}>🖨️ Print Invoice</button>
+          <button className={styles.btnPrint} onClick={handlePrint} style={{display:'flex', alignItems:'center', gap:'8px'}}><Printer size={18} /> Print Invoice</button>
         </div>
       </div>
 

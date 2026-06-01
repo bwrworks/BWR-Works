@@ -2,6 +2,7 @@ import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import SEO from '../components/layout/SEO'
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { Mail } from 'lucide-react'
 import styles from './Policy.module.css'
 
 export default function Policy() {
@@ -133,7 +134,7 @@ export default function Policy() {
               We aim to respond within 24 hours.
             </p>
           </div>
-          <div className={styles.contactVisual}>✉️</div>
+          <div className={styles.contactVisual}><Mail size={32} /></div>
         </div>
       </div>
 

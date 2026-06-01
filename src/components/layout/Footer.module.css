@@ -32,7 +32,8 @@
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--layout-text);
+  opacity: 0.7;
   line-height: 1.8;
 }
 
@@ -55,12 +56,14 @@
 .links a {
   font-family: var(--font-body);
   font-size: 1rem;
-  color: var(--muted);
+  color: var(--layout-text);
+  opacity: 0.8;
   text-decoration: none;
-  transition: color var(--transition-base);
+  transition: opacity var(--transition-base), color var(--transition-base);
 }
 
 .links a:hover {
+  opacity: 1;
   color: var(--layout-text);
 }
 

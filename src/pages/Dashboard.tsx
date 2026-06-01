@@ -8,16 +8,17 @@ import AddressForm from '../components/checkout/AddressForm'
 import { AdminQuickPanel } from '../components/dashboard/AdminQuickPanel'
 import { Avatar } from '../components/dashboard/Avatar'
 import { SupportTab } from '../components/dashboard/SupportTab'
+import { Settings, Package, Printer, Mail, Flame, MapPin, Hourglass, CheckCircle, ClipboardList, PartyPopper, User, Banknote } from 'lucide-react'
 import { fmt } from '../lib/formatters'
 import styles from './Dashboard.module.css'
 
-const STATUS_META: Record<string, { label: string; color: string; icon: string }> = {
-  pending:   { label: 'Payment Pending', color: '#F59E0B', icon: '⏳' },
-  paid:      { label: 'Payment Received', color: '#3B82F6', icon: '✅' },
-  received:  { label: 'Order Received', color: '#FF5C1A', icon: '📝' },
-  printing:  { label: 'Crafting Now',     color: '#8B5CF6', icon: '⚙️' },
-  shipped:   { label: 'Shipped',          color: '#0EA5E9', icon: '📦' },
-  delivered: { label: 'Delivered',        color: '#10B981', icon: '🎉' },
+const STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  pending:   { label: 'Payment Pending', color: '#F59E0B', icon: <Hourglass size={16} /> },
+  paid:      { label: 'Payment Received', color: '#3B82F6', icon: <CheckCircle size={16} /> },
+  received:  { label: 'Order Received', color: '#FF5C1A', icon: <ClipboardList size={16} /> },
+  printing:  { label: 'Crafting Now',     color: '#8B5CF6', icon: <Settings size={16} /> },
+  shipped:   { label: 'Shipped',          color: '#0EA5E9', icon: <Package size={16} /> },
+  delivered: { label: 'Delivered',        color: '#10B981', icon: <PartyPopper size={16} /> },
 }
 
 export default function Dashboard() {
@@ -105,28 +106,28 @@ export default function Dashboard() {
             {/* ── CUSTOMER STATS ROW ── */}
             <div className={styles.statsRow}>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>📦</div>
+                <div className={styles.statIcon}><Package size={24} /></div>
                 <div className={styles.statInfo}>
                   <div className={styles.statValue}>{orders?.length ?? '—'}</div>
                   <div className={styles.statLabel}>Total Orders</div>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>🖨️</div>
+                <div className={styles.statIcon}><Printer size={24} /></div>
                 <div className={styles.statInfo}>
                   <div className={styles.statValue}>{activeOrders.length}</div>
                   <div className={styles.statLabel}>In Progress</div>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>💰</div>
+                <div className={styles.statIcon}><Banknote size={24} /></div>
                 <div className={styles.statInfo}>
                   <div className={styles.statValue}>{orders ? fmt(totalSpend) : '—'}</div>
                   <div className={styles.statLabel}>Total Spent {isGstEnabled ? '(incl. GST)' : ''}</div>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>📍</div>
+                <div className={styles.statIcon}><MapPin size={24} /></div>
                 <div className={styles.statInfo}>
                   <div className={styles.statValue}>{addresses?.length ?? '—'}</div>
                   <div className={styles.statLabel}>Saved Addresses</div>
@@ -142,9 +143,9 @@ export default function Dashboard() {
                   className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
                   onClick={() => setActiveTab(tab)}
                 >
-                  {tab === 'orders' && '📦 My Orders'}
-                  {tab === 'support' && '✉️ Support'}
-                  {tab === 'profile' && '👤 Profile & Addresses'}
+                  {tab === 'orders' && <div style={{display:'flex', alignItems:'center', gap:'6px'}}><Package size={16} /> My Orders</div>}
+                  {tab === 'support' && <div style={{display:'flex', alignItems:'center', gap:'6px'}}><Mail size={16} /> Support</div>}
+                  {tab === 'profile' && <div style={{display:'flex', alignItems:'center', gap:'6px'}}><User size={16} /> Profile & Addresses</div>}
                 </button>
               ))}
             </div>
@@ -158,7 +159,7 @@ export default function Dashboard() {
             {/* Active Orders */}
             {activeOrders.length > 0 && (
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>🔥 Active Orders</h2>
+                <h2 className={styles.sectionTitle} style={{display:'flex', alignItems:'center', gap:'8px'}}><Flame size={24} /> Active Orders</h2>
                 <div className={styles.orderGrid}>
                   {activeOrders.map(order => {
                     const meta = STATUS_META[order.status] || STATUS_META.received
@@ -220,7 +221,7 @@ export default function Dashboard() {
             {/* Past Orders */}
             {pastOrders.length > 0 && (
               <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>📋 Order History</h2>
+                <h2 className={styles.sectionTitle} style={{display:'flex', alignItems:'center', gap:'8px'}}><ClipboardList size={24} /> Order History</h2>
                 <div className={styles.historyTable}>
                   <div className={styles.historyHead}>
                     <span>Order ID</span><span>Items</span><span>Total</span><span>Date</span><span>Status</span><span></span>
@@ -237,7 +238,7 @@ export default function Dashboard() {
                         </span>
                       </span>
                       <span style={{ display: 'flex', gap: '12px' }}>
-                        <Link to={`/invoice/${order.orderId}`} target="_blank" className={styles.historyLink} title="Print Invoice">🖨️</Link>
+                        <Link to={`/invoice/${order.orderId}`} target="_blank" className={styles.historyLink} title="Print Invoice"><Printer size={16} /></Link>
                         <Link to={`/order/${order.orderId}`} className={styles.historyLink}>View →</Link>
                       </span>
                     </div>
@@ -249,7 +250,7 @@ export default function Dashboard() {
             {/* Empty */}
             {(orders || []).length === 0 && (
               <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>📦</div>
+                <div className={styles.emptyIcon}><Package size={48} color="var(--muted)" /></div>
                 <h3 className={styles.emptyTitle}>No orders yet</h3>
                 <p className={styles.emptyText}>Your custom pieces will appear here once you place an order.</p>
                 <Link to="/products" className={styles.emptyBtn}>Start Shopping →</Link>
@@ -324,7 +325,7 @@ export default function Dashboard() {
                         <p className={styles.addrText}>{addr.line1}</p>
                         {addr.line2 && <p className={styles.addrText}>{addr.line2}</p>}
                         <p className={styles.addrText}>{addr.city}, {addr.state} — {addr.pincode}</p>
-                        <p className={styles.addrPhone}>📱 {addr.phone}</p>
+                        <p className={styles.addrPhone} style={{display:'flex', alignItems:'center', gap:'4px'}}><MapPin size={14} /> {addr.phone}</p>
                         <div className={styles.addrActions}>
                           <button className={styles.addrDelete} onClick={() => deleteAddress({ id: addr._id })}>Remove</button>
                         </div>

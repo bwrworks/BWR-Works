@@ -4,6 +4,7 @@ import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
 import { Link } from 'react-router-dom'
 import { ThreadView } from './ThreadView'
+import { Mail } from 'lucide-react'
 import styles from '../../pages/Dashboard.module.css'
 
 export function SupportTab() {
@@ -29,7 +30,7 @@ export function SupportTab() {
     return (
       <div className={styles.tabContent}>
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>✉️</div>
+          <div className={styles.emptyIcon}><Mail size={48} color="var(--muted)" /></div>
           <h3 className={styles.emptyTitle}>No support requests</h3>
           <p className={styles.emptyText}>When you submit a query via the Contact page, your conversation thread will appear here.</p>
           <Link to="/contact" className={styles.emptyBtn}>Contact Us →</Link>
@@ -40,7 +41,7 @@ export function SupportTab() {
 
   return (
     <div className={styles.tabContent}>
-      <h2 className={styles.sectionTitle}>✉️ My Support Threads</h2>
+      <h2 className={styles.sectionTitle} style={{display:'flex', alignItems:'center', gap:'8px'}}><Mail size={24} /> My Support Threads</h2>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
         {inquiries.map(inq => (

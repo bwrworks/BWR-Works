@@ -4,28 +4,30 @@ import { useAuthActions } from '@convex-dev/auth/react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import Logo from '../../components/ui/Logo'
+import { Package, Printer, Settings, Tag, Mail, PenTool, AlertTriangle, LayoutDashboard, Users, Star } from 'lucide-react'
 import styles from './AdminLayout.module.css'
 
 const NAV_ITEMS = [
-  { path: '/admin', label: 'Dashboard', icon: '◈', exact: true },
-  { path: '/admin/orders', label: 'Orders', icon: '📦' },
-  { path: '/admin/products', label: 'Products', icon: '🖨️' },
-  { path: '/admin/pricing', label: 'Pricing Engine', icon: '⚙️' },
-  { path: '/admin/coupons', label: 'Coupons', icon: '🏷️' },
-  { path: '/admin/inventory', label: 'Inventory', icon: '📊' },
-  { path: '/admin/inquiries', label: 'Inquiries', icon: '✉️' },
-  { path: '/admin/users', label: 'Users', icon: '👥' },
-  { path: '/admin/content', label: 'Content CMS', icon: '✏️' },
+  { path: '/admin', label: 'Dashboard', icon: <LayoutDashboard size={16} />, exact: true },
+  { path: '/admin/orders', label: 'Orders', icon: <Package size={16} /> },
+  { path: '/admin/products', label: 'Products', icon: <Printer size={16} /> },
+  { path: '/admin/pricing', label: 'Pricing Engine', icon: <Settings size={16} /> },
+  { path: '/admin/coupons', label: 'Coupons', icon: <Tag size={16} /> },
+  { path: '/admin/inventory', label: 'Inventory', icon: <AlertTriangle size={16} /> },
+  { path: '/admin/inquiries', label: 'Inquiries', icon: <Mail size={16} /> },
+  { path: '/admin/users', label: 'Users', icon: <Users size={16} /> },
+  { path: '/admin/reviews', label: 'Reviews', icon: <Star size={16} /> },
+  { path: '/admin/content', label: 'Content CMS', icon: <PenTool size={16} /> },
 ]
 
 function NotificationPanel({ onClose }: { onClose: () => void }) {
   const items = useQuery(api.adminNotifications.getNotificationItems)
 
-  const typeIcons: Record<string, string> = {
-    order: '📦',
-    inquiry: '✉️',
-    stock: '⚠️',
-    payment: '💳',
+  const typeIcons: Record<string, React.ReactNode> = {
+    order: <Package size={16} />,
+    inquiry: <Mail size={16} />,
+    stock: <AlertTriangle size={16} />,
+    payment: <span style={{ fontSize: '1rem' }}>💳</span>,
   }
 
   const typeColors: Record<string, string> = {

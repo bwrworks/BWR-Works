@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { Printer } from 'lucide-react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import { fmt, safe } from '../lib/formatters'
@@ -86,7 +87,7 @@ export default function OrderTracking() {
                 letterSpacing: '1px'
               }}
             >
-              Print Invoice 🖨️
+              <Printer size={16} /> Print Invoice
             </Link>
           </div>
         </div>

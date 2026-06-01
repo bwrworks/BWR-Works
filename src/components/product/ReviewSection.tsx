@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
+import { PenLine } from 'lucide-react'
 import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
 
@@ -107,7 +108,7 @@ export default function ReviewSection({ productId }: Props) {
         </div>
       ) : reviews && (
         <div className={styles.emptyReviews}>
-          <span>✍️</span>
+          <span><PenLine size={16} /></span>
           Be the first to review this product!
         </div>
       )}
@@ -120,7 +121,7 @@ export default function ReviewSection({ productId }: Props) {
           onClick={() => setShowForm(true)}
           style={{ width: '100%', padding: '16px', borderRadius: 12 }}
         >
-          ✍️ Write a Review
+          <PenLine size={18} /> Write a Review
         </button>
       ) : (
         <div className={styles.formCard}>

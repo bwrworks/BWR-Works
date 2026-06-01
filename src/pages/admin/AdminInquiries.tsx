@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useAction } from 'convex/react'
+import { Mail } from 'lucide-react'
 import { api } from '../../../convex/_generated/api'
 import { useToast } from '../../context/ToastContext'
 import styles from './AdminDashboard.module.css'
@@ -118,7 +119,7 @@ export default function AdminInquiries() {
             <div className={styles.loading}>Loading inquiries...</div>
           ) : inquiries.length === 0 ? (
             <div className={styles.empty} style={{ padding: '60px 20px' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>✉️</div>
+              <div style={{ marginBottom: 12, color:'var(--muted)' }}><Mail size={48} /></div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: 700, color: 'var(--ink)' }}>All Caught Up</div>
               <div style={{ fontFamily: 'var(--font-body)', fontSize: '0.85rem', color: 'var(--muted)', marginTop: 8 }}>No inquiries in this category.</div>
             </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAction, useMutation, useQuery } from 'convex/react'
+import { AlertTriangle } from 'lucide-react'
 import { api } from '../../../convex/_generated/api'
 import { formatPrice } from '../../lib/formatters'
 import styles from './PaymentButton.module.css'
@@ -250,7 +251,7 @@ export default function PaymentButton({
       {/* Error — user-friendly only, never raw server messages */}
       {error && (
         <div className={styles.errorBox}>
-          <span>⚠️ {error}</span>
+          <span style={{display:'flex', alignItems:'center', gap:'6px'}}><AlertTriangle size={16} /> {error}</span>
         </div>
       )}
 

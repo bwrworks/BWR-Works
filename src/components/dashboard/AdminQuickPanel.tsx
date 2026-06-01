@@ -1,18 +1,19 @@
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { Link } from 'react-router-dom'
+import { Package, Rocket, Clock, Users, Truck, IndianRupee } from 'lucide-react'
 import styles from '../../pages/Dashboard.module.css'
 
 export function AdminQuickPanel() {
   const stats = useQuery(api.admin.getDashboardStats)
 
   const statCards = [
-    { icon: '📦', label: 'Total Orders', value: stats?.totalOrders ?? '—', color: '#FF5C1A' },
-    { icon: '⏳', label: 'Pending Payment', value: stats?.pendingPayment ?? '—', color: '#F59E0B' },
-    { icon: '🚀', label: 'To Dispatch', value: stats?.toDispatch ?? '—', color: '#8B5CF6' },
-    { icon: '👥', label: 'Total Users', value: stats?.totalUsers ?? '—', color: '#0EA5E9' },
-    { icon: '🚚', label: 'Shipped', value: stats?.shipped ?? '—', color: '#10B981' },
-    { icon: '💰', label: 'Revenue', value: stats ? `₹${((stats.totalRevenue ?? 0) / 100).toLocaleString('en-IN')}` : '—', color: '#10B981' },
+    { icon: <Package size={20} />, label: 'Total Orders', value: stats?.totalOrders ?? '—', color: '#FF5C1A' },
+    { icon: <Clock size={20} />, label: 'Pending Payment', value: stats?.pendingPayment ?? '—', color: '#F59E0B' },
+    { icon: <Rocket size={20} />, label: 'To Dispatch', value: stats?.toDispatch ?? '—', color: '#8B5CF6' },
+    { icon: <Users size={20} />, label: 'Total Users', value: stats?.totalUsers ?? '—', color: '#0EA5E9' },
+    { icon: <Truck size={20} />, label: 'Shipped', value: stats?.shipped ?? '—', color: '#10B981' },
+    { icon: <IndianRupee size={20} />, label: 'Revenue', value: stats ? `₹${((stats.totalRevenue ?? 0) / 100).toLocaleString('en-IN')}` : '—', color: '#10B981' },
   ]
 
   const STATUS_CONFIG = {
