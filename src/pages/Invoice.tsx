@@ -4,6 +4,7 @@ import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { useCms } from '../hooks/useCms'
 import { fmt, safe } from '../lib/formatters'
+import brandLogo from '../assets/bwr-brand.svg'
 import styles from './Invoice.module.css'
 
 export default function Invoice() {
@@ -51,7 +52,7 @@ export default function Invoice() {
       <div className={styles.invoicePage}>
         <div className={styles.header}>
           <div className={styles.companyInfo}>
-            <img src="/BWR_Logo.svg" alt="BWR WORKS" style={{ height: 40, width: 'auto', marginBottom: 12 }} />
+            <img src={brandLogo} alt="BWR WORKS" style={{ height: 40, width: 'auto', marginBottom: 12 }} />
             <p className={styles.companyDetail}>Made in Bengaluru</p>
             {cms('invoice', 'gstin', '[Enter GST in Admin → Content]') !== '[Enter GST in Admin → Content]' && (
               <p className={styles.companyDetail}>GSTIN: {cms('invoice', 'gstin', '')}</p>
