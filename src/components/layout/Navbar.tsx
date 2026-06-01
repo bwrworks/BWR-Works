@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { useConvexAuth } from 'convex/react'
 import SearchOverlay from '../ui/SearchOverlay'
+import Logo from '../ui/Logo'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
@@ -39,8 +40,8 @@ export default function Navbar() {
   return (
     <>
       <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
-        <Link to="/" className={styles.logo}>
-          B.W.<span className={styles.logoAccent}>R</span> <span className={styles.logoWorks}>Works</span>
+        <Link to="/" className={styles.logo} aria-label="BWR Works">
+          <Logo style={{ height: '42px', width: 'auto', display: 'block' }} />
         </Link>
 
         <ul className={`${styles.links} ${mobileOpen ? styles.linksOpen : ''}`}>

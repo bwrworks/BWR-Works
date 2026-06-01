@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useCms } from '../../hooks/useCms'
+import Logo from '../ui/Logo'
 import styles from './Footer.module.css'
 
 export default function Footer() {
@@ -9,8 +10,8 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div>
-          <div className={styles.brandName}>
-            BW<span>R</span>
+          <div className={styles.brandName} style={{ marginBottom: '16px' }}>
+            <Logo style={{ height: '42px', width: 'auto', display: 'block' }} />
           </div>
           <div className={styles.tagline}>
             Black &amp; White Rogue<br />
