@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import { useScrollReveal } from '../hooks/useScrollReveal'
+import { Link } from 'react-router-dom'
 import styles from './Contact.module.css'
 
 const FAQS = [
@@ -14,7 +15,7 @@ const FAQS = [
   },
   {
     q: 'Can I request a custom design not on the website?',
-    a: 'Yes. Select "Custom Bulk Order / B2B" in the contact form opposite. We regularly design entirely new functional objects for corporate gifting and bulk hospitality orders.'
+    a: 'Yes! For individual unique custom print requests, go to our Custom Print page to submit reference images and details. For corporate gifting or bulk B2B orders, please use the contact form opposite.'
   },
   {
     q: 'Do you offer returns or refunds?',
@@ -104,6 +105,16 @@ export default function Contact() {
               GOT SOMETHING<br />
               <span className={styles.outline}>IN MIND?</span>
             </h1>
+
+            <div style={{ background: 'rgba(255, 92, 26, 0.1)', border: '1px solid rgba(255, 92, 26, 0.3)', borderRadius: 6, padding: '16px 20px', marginBottom: 28, textAlign: 'left' }} className="reveal-left reveal-delay-2">
+              <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--orange)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 4 }}>One-Off Custom Prints</span>
+              <p style={{ fontSize: '0.85rem', color: '#c5b8b0', margin: '0 0 12px 0', lineHeight: 1.5 }}>
+                If you want a single unique custom print (with reference photos and custom details), you can request it directly through your account.
+              </p>
+              <Link to="/custom-print" style={{ color: '#fff', textDecoration: 'underline', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'var(--font-mono)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                Request Custom Print →
+              </Link>
+            </div>
 
             {isSuccess ? (
               <div className={styles.successBox}>

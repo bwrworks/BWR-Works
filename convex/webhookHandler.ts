@@ -68,20 +68,45 @@ export const razorpayWebhook = httpAction(async (ctx, request) => {
     const { order_id, id: payment_id, amount } = event.payload.payment.entity;
 
     try {
-      const order = await ctx.runMutation(internal.orders.markOrderPaid, {
-        razorpayOrderId: order_id,
-        razorpayPaymentId: payment_id,
-      });
+      let resolved = false;
 
-      await ctx.runMutation(internal.orders.recordPayment, {
-        orderId: order.orderId,
-        razorpayOrderId: order_id,
-        razorpayPaymentId: payment_id,
-        signature,
-        amount,
-      });
+      // 1. Try standard order
+      try {
+        const order = await ctx.runMutation(internal.orders.markOrderPaid, {
+          razorpayOrderId: order_id,
+          razorpayPaymentId: payment_id,
+        });
+        await ctx.runMutation(internal.orders.recordPayment, {
+          orderId: order.orderId,
+          razorpayOrderId: order_id,
+          razorpayPaymentId: payment_id,
+          signature,
+          amount,
+        });
+        resolved = true;
+      } catch (err) {
+        // ignore and fall through to custom print check
+      }
 
+      // 2. Try custom print request
+      if (!resolved) {
+        const customPrint = await ctx.runMutation(internal.customPrints.markCustomPrintPaid, {
+          razorpayOrderId: order_id,
+          razorpayPaymentId: payment_id,
+        });
+        await ctx.runMutation(internal.orders.recordPayment, {
+          orderId: customPrint.customPrintId,
+          razorpayOrderId: order_id,
+          razorpayPaymentId: payment_id,
+          signature,
+          amount,
+        });
+        resolved = true;
+      }
 
+      if (!resolved) {
+        throw new Error(`No catalog order or custom print order found matching razorpayOrderId: ${order_id}`);
+      }
     } catch (err) {
       console.error("Webhook processing error:", err);
       return new Response("Processing error", { status: 500 });

@@ -57,6 +57,26 @@
   flex-wrap: wrap;
 }
 
+.customPrint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  padding: 16px 32px;
+  transition: background 0.2s, transform 0.2s;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  text-decoration: none;
+}
+
+.customPrint:hover { background: #e04a10; transform: scale(1.04); }
+
 .whatsapp {
   display: flex;
   align-items: center;

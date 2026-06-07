@@ -27,6 +27,8 @@ import AdminUsers from './pages/admin/AdminUsers'
 import AdminInventory from './pages/admin/AdminInventory'
 import AdminInquiries from './pages/admin/AdminInquiries'
 import PricingCalculator from './pages/admin/PricingCalculator'
+import CustomPrint from './pages/CustomPrint'
+import AdminCustomOrders from './pages/admin/AdminCustomOrders'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import WhatsAppFloat from './components/ui/WhatsAppFloat'
@@ -53,6 +55,7 @@ function AnimatedRoutes() {
         <Route path="/order-confirm" element={<AuthGuard><OrderConfirm /></AuthGuard>} />
         <Route path="/order/:orderId" element={<AuthGuard><OrderTracking /></AuthGuard>} />
         <Route path="/invoice/:orderId" element={<AuthGuard><Invoice /></AuthGuard>} />
+        <Route path="/custom-print" element={<AuthGuard><CustomPrint /></AuthGuard>} />
 
         {/* ── ADMIN ROUTES (nested under AdminLayout) ── */}
         <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
@@ -66,6 +69,7 @@ function AnimatedRoutes() {
           <Route path="inventory" element={<AdminInventory />} />
           <Route path="inquiries" element={<AdminInquiries />} />
           <Route path="pricing" element={<PricingCalculator />} />
+          <Route path="custom-orders" element={<AdminCustomOrders />} />
         </Route>
 
         {/* ── 404 CATCH-ALL ── */}

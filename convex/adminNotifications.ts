@@ -21,17 +21,22 @@ export const getNotificationCounts = query({
     const allInquiries = await ctx.db.query("inquiries").collect();
     const newInquiries = allInquiries.filter(i => i.status === "new");
 
+    // 2.5 New custom print requests
+    const allCustom = await ctx.db.query("customPrints").collect();
+    const newCustomRequests = allCustom.filter(r => r.status === "requested");
+
     // 3. Low stock products
     const allProducts = await ctx.db.query("products").collect();
     const lowStock = allProducts.filter(p => (p.stock ?? 0) <= 5 && p.isActive);
     const outOfStock = allProducts.filter(p => (p.stock ?? 0) === 0 && p.isActive);
 
-    const totalAttention = newOrders.length + newInquiries.length + outOfStock.length + pendingPayments.length;
+    const totalAttention = newOrders.length + newInquiries.length + outOfStock.length + pendingPayments.length + newCustomRequests.length;
 
     return {
       newOrders: newOrders.length,
       pendingPayments: pendingPayments.length,
       newInquiries: newInquiries.length,
+      newCustomRequests: newCustomRequests.length,
       lowStock: lowStock.length,
       outOfStock: outOfStock.length,
       totalAttention,
@@ -98,6 +103,20 @@ export const getNotificationItems = query({
         time: inq.createdAt,
         link: "/admin/inquiries",
         urgent: false,
+      });
+    }
+
+    // New custom print requests
+    const allCustoms = await ctx.db.query("customPrints").order("desc").collect();
+    for (const req of allCustoms.filter(r => r.status === "requested").slice(0, 5)) {
+      items.push({
+        id: req._id,
+        type: "inquiry",
+        title: `Custom Print — ${req.customPrintId}`,
+        subtitle: `${req.name} requested quote`,
+        time: req.createdAt,
+        link: "/admin/custom-orders",
+        urgent: true,
       });
     }
 

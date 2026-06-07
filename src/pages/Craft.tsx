@@ -139,9 +139,10 @@ export default function Craft() {
       <section className={styles.sectionLight}>
         <div className="container" style={{ textAlign: 'center' }}>
           <h2 className={styles.ctaTitle}>{cms('about', 'tagline', 'Experience the Craft')}</h2>
-          <p className={styles.ctaSub}>Every order is made specifically for you.</p>
-          <div className={styles.ctaActions}>
+          <p className={styles.ctaSub}>Every order is made specifically for you. Got a custom unique design in mind?</p>
+          <div className={styles.ctaActions} style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '24px' }}>
             <Link to="/products" className={styles.btnPrimary}>View Collection →</Link>
+            <Link to="/custom-print" className={styles.btnPrimary} style={{ background: 'var(--orange)', borderColor: 'var(--orange)', color: '#fff' }}>Request Custom Print →</Link>
           </div>
         </div>
       </section>

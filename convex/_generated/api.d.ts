@@ -17,6 +17,7 @@ import type * as auth_ResendOTP from "../auth/ResendOTP.js";
 import type * as cloudinary from "../cloudinary.js";
 import type * as cms from "../cms.js";
 import type * as coupons from "../coupons.js";
+import type * as customPrints from "../customPrints.js";
 import type * as http from "../http.js";
 import type * as inquiries from "../inquiries.js";
 import type * as notifications from "../notifications.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   cloudinary: typeof cloudinary;
   cms: typeof cms;
   coupons: typeof coupons;
+  customPrints: typeof customPrints;
   http: typeof http;
   inquiries: typeof inquiries;
   notifications: typeof notifications;

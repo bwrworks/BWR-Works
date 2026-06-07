@@ -27,6 +27,7 @@ interface GlobalDefaults {
   b2cMarginPercent: number
   gstPercent: number
   codAdvancePercent: number
+  customPrintExtraCost?: number
   b2bMarginSlabs: { minQty: number; maxQty: number; marginPercent: number }[]
 }
 
@@ -79,6 +80,7 @@ const DEFAULT_GLOBALS: GlobalDefaults = {
   b2cMarginPercent: 60,
   gstPercent: 18,
   codAdvancePercent: 50,
+  customPrintExtraCost: 500,
   b2bMarginSlabs: [
     { minQty: 1, maxQty: 20, marginPercent: 50 },
     { minQty: 21, maxQty: 100, marginPercent: 37 },
@@ -127,6 +129,7 @@ export default function PricingCalculator() {
         b2cMarginPercent: dbDefaults.b2cMarginPercent,
         gstPercent: dbDefaults.gstPercent,
         codAdvancePercent: dbDefaults.codAdvancePercent ?? 50,
+        customPrintExtraCost: dbDefaults.customPrintExtraCost ?? 500,
         b2bMarginSlabs: dbDefaults.b2bMarginSlabs,
       })
     }
@@ -364,6 +367,15 @@ export default function PricingCalculator() {
                 />
               </div>
             )}
+            <div className={styles.field}>
+              <label className={styles.fieldLabel}>Custom Print Extra Fee (₹)</label>
+              <input
+                type="number"
+                className={styles.fieldInput}
+                value={globals.customPrintExtraCost ?? 500}
+                onChange={e => updateGlobal('customPrintExtraCost', Number(e.target.value))}
+              />
+            </div>
           </div>
 
           {/* B2B Volume Slabs */}

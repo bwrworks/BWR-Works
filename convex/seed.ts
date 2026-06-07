@@ -17,8 +17,8 @@ export const seedPricingDefaults = mutation({
     // Check if already seeded
     const existing = await ctx.db.query("pricingDefaults").first();
     if (existing) {
-      await ctx.db.patch(existing._id, { codAdvancePercent: 50 });
-      return { message: "Already seeded, patched with codAdvancePercent", id: existing._id };
+      await ctx.db.patch(existing._id, { codAdvancePercent: 50, customPrintExtraCost: 500 });
+      return { message: "Already seeded, patched defaults", id: existing._id };
     }
 
     const id = await ctx.db.insert("pricingDefaults", {
@@ -60,6 +60,7 @@ export const seedPricingDefaults = mutation({
       // ── GST & COD ──
       gstPercent: 18,
       codAdvancePercent: 50,
+      customPrintExtraCost: 500,
 
       updatedAt: Date.now(),
       updatedBy: "system-seed",

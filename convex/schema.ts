@@ -127,6 +127,7 @@ export default defineSchema({
     ),
     gstPercent: v.number(),
     codAdvancePercent: v.optional(v.number()),
+    customPrintExtraCost: v.optional(v.number()),
     updatedAt: v.number(),
     updatedBy: v.string(),
   }),
@@ -373,6 +374,74 @@ export default defineSchema({
     timestamp: v.number(),
     resendEmailId: v.optional(v.string()), // dedup incoming webhooks
   }).index("by_inquiryId", ["inquiryId"]),
+
+  // ─────────────────────────────────────────────────
+  // CUSTOM PRINTS
+  // ─────────────────────────────────────────────────
+  customPrints: defineTable({
+    customPrintId: v.string(), // "BWR-CUST-xxxx"
+    userId: v.string(),
+    name: v.string(),
+    email: v.string(),
+    phone: v.optional(v.string()),
+    description: v.string(),
+    images: v.array(v.string()), // Cloudinary URLs
+    status: v.union(
+      v.literal("requested"), // initial state when submitted
+      v.literal("quoted"), // admin has calculated and offered a price
+      v.literal("ordered"), // user paid, moves to preparation/production
+      v.literal("printing"), // in printing phase
+      v.literal("shipped"), // shipped
+      v.literal("delivered") // delivered
+    ),
+    pricing: v.optional(
+      v.object({
+        materialWeightGrams: v.number(),
+        printTimeMinutes: v.number(),
+        labourTimeMinutes: v.number(),
+        packagingCost: v.number(), // override or default
+        customPrintExtraCost: v.number(), // the extra price (saved at the time of quoting, from defaults or customized)
+        subtotal: v.number(), // subtotal in paise
+        gstAmount: v.number(), // GST in paise
+        total: v.number(), // total in paise
+        costBreakdown: v.object({
+          material: v.number(),
+          electricity: v.number(),
+          machine: v.number(),
+          consumables: v.number(),
+          design: v.number(),
+          labour: v.number(),
+          packaging: v.number(),
+          overheads: v.number(),
+          riskBuffer: v.number(),
+          trueCost: v.number(),
+          margin: v.number(),
+          sellingPrice: v.number(),
+        }),
+      })
+    ),
+    razorpayOrderId: v.optional(v.string()), // Razorpay order ID if generated for checkout
+    razorpayPaymentId: v.optional(v.string()), // Razorpay payment ID after payment
+    addressSnapshot: v.optional(
+      v.object({
+        name: v.string(),
+        line1: v.string(),
+        line2: v.optional(v.string()),
+        city: v.string(),
+        state: v.string(),
+        pincode: v.string(),
+        phone: v.string(),
+      })
+    ),
+    trackingNumber: v.optional(v.string()),
+    adminNotes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_customPrintId", ["customPrintId"])
+    .index("by_userId", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_razorpayOrderId", ["razorpayOrderId"]),
 
   // ─────────────────────────────────────────────────
   // COUNTERS — Atomic sequential IDs (orders, inquiries)

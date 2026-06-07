@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthActions } from '@convex-dev/auth/react'
-import { useQuery, useMutation } from 'convex/react'
+import { useQuery, useMutation, useAction } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Navbar from '../components/layout/Navbar'
 import AddressForm from '../components/checkout/AddressForm'
@@ -21,6 +21,27 @@ const STATUS_META: Record<string, { label: string; color: string; icon: React.Re
   delivered: { label: 'Delivered',        color: '#10B981', icon: <PartyPopper size={16} /> },
 }
 
+const CUSTOM_STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  requested: { label: 'Awaiting Quote', color: '#94A3B8', icon: <Hourglass size={16} /> },
+  quoted:    { label: 'Quote Ready',    color: '#FF5C1A', icon: <Banknote size={16} /> },
+  ordered:   { label: 'Paid & Queued',  color: '#3B82F6', icon: <CheckCircle size={16} /> },
+  printing:  { label: 'Crafting Now',   color: '#8B5CF6', icon: <Settings size={16} /> },
+  shipped:   { label: 'Shipped',        color: '#0EA5E9', icon: <Package size={16} /> },
+  delivered: { label: 'Delivered',      color: '#10B981', icon: <PartyPopper size={16} /> },
+}
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise(resolve => {
+    if (document.getElementById('razorpay-script')) return resolve(true)
+    const script = document.createElement('script')
+    script.id = 'razorpay-script'
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const { signOut } = useAuthActions()
@@ -28,15 +49,25 @@ export default function Dashboard() {
   const user = useQuery(api.users.current)
   const addresses = useQuery(api.addresses.getMyAddresses)
   const orders = useQuery(api.orders.getMyOrders)
+  const customPrints = useQuery(api.customPrints.getMyCustomPrints)
   const deleteAddress = useMutation(api.addresses.deleteAddress)
+  const prepareCustomPrintPayment = useAction(api.customPrints.prepareCustomPrintPayment)
   const pricingDefaults = useQuery(api.pricing.getPricingDefaults)
   const isGstEnabled = pricingDefaults ? pricingDefaults.gstPercent > 0 : false
 
-  const [activeTab, setActiveTab] = useState<'orders' | 'support' | 'profile'>('orders')
+  const [activeTab, setActiveTab] = useState<'orders' | 'custom-prints' | 'support' | 'profile'>('orders')
   const [showAddressForm, setShowAddressForm] = useState(false)
 
-
-  useEffect(() => { window.scrollTo(0, 0) }, [])
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    
+    // Auto-select tab if redirected
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    if (tab === 'custom-prints' || tab === 'orders' || tab === 'support' || tab === 'profile') {
+      setActiveTab(tab as any)
+    }
+  }, [])
 
   const handleLogout = async () => {
     await signOut()
@@ -137,13 +168,14 @@ export default function Dashboard() {
 
             {/* ── TABS ── */}
             <div className={styles.tabs}>
-              {(['orders', 'support', 'profile'] as const).map(tab => (
+              {(['orders', 'custom-prints', 'support', 'profile'] as const).map(tab => (
                 <button
                   key={tab}
                   className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
                   onClick={() => setActiveTab(tab)}
                 >
                   {tab === 'orders' && <div style={{display:'flex', alignItems:'center', gap:'6px'}}><Package size={16} /> My Orders</div>}
+                  {tab === 'custom-prints' && <div style={{display:'flex', alignItems:'center', gap:'6px'}}><Printer size={16} /> Custom Prints</div>}
                   {tab === 'support' && <div style={{display:'flex', alignItems:'center', gap:'6px'}}><Mail size={16} /> Support</div>}
                   {tab === 'profile' && <div style={{display:'flex', alignItems:'center', gap:'6px'}}><User size={16} /> Profile & Addresses</div>}
                 </button>
@@ -259,6 +291,15 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* ── TAB: CUSTOM PRINTS ── */}
+        {activeTab === 'custom-prints' && (
+          <CustomPrintsTab 
+            customPrints={customPrints}
+            addresses={addresses}
+            preparePayment={prepareCustomPrintPayment}
+          />
+        )}
+
         {/* ── TAB: SUPPORT ── */}
         {activeTab === 'support' && <SupportTab />}
 
@@ -343,6 +384,244 @@ export default function Dashboard() {
           </div>
         )}
 
+      </div>
+    </div>
+  )
+}
+
+function CustomPrintsTab({
+  customPrints,
+  addresses,
+  preparePayment,
+}: {
+  customPrints: any[] | undefined
+  addresses: any[] | undefined
+  preparePayment: any
+}) {
+  const [paymentLoading, setPaymentLoading] = useState<string | null>(null)
+  const [selectedAddressId, setSelectedAddressId] = useState<Record<string, string>>({})
+  const [error, setError] = useState<Record<string, string>>({})
+
+  if (customPrints === undefined) {
+    return (
+      <div className={styles.tabContent}>
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>
+          Loading your custom requests...
+        </div>
+      </div>
+    )
+  }
+
+  if (customPrints.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <div className={styles.emptyIcon}><Printer size={48} color="var(--muted)" /></div>
+        <h3 className={styles.emptyTitle}>No custom prints requested</h3>
+        <p className={styles.emptyText}>Have a unique design idea? Request a custom 3D print and we'll craft it for you.</p>
+        <Link to="/custom-print" className={styles.emptyBtn}>Request Custom Print →</Link>
+      </div>
+    )
+  }
+
+  const handlePay = async (req: any) => {
+    const reqId = req.customPrintId
+    const addrId = selectedAddressId[reqId] || (addresses && addresses.find(a => a.isDefault)?._id) || (addresses && addresses[0]?._id)
+
+    if (!addrId) {
+      setError(prev => ({ ...prev, [reqId]: 'Please add and select a delivery address in your profile.' }))
+      return
+    }
+
+    const selectedAddr = addresses?.find(a => a._id === addrId)
+    if (!selectedAddr) return
+
+    setPaymentLoading(reqId)
+    setError(prev => ({ ...prev, [reqId]: '' }))
+
+    try {
+      // 1. Load Razorpay script
+      const loaded = await loadRazorpayScript()
+      if (!loaded) {
+        throw new Error('Could not load payment gateway. Check your connection.')
+      }
+
+      // 2. Prepare payment on backend (creates Razorpay order and returns options)
+      const rzpOrder = await preparePayment({
+        customPrintId: req.customPrintId,
+        address: {
+          name: selectedAddr.name,
+          line1: selectedAddr.line1,
+          line2: selectedAddr.line2 || undefined,
+          city: selectedAddr.city,
+          state: selectedAddr.state,
+          pincode: selectedAddr.pincode,
+          phone: selectedAddr.phone,
+        }
+      })
+
+      // 3. Open Razorpay modal
+      const rzp = new window.Razorpay({
+        key: rzpOrder.keyId,
+        amount: rzpOrder.amount,
+        currency: rzpOrder.currency,
+        name: 'BWR Works',
+        description: `Custom Print ${req.customPrintId}`,
+        image: '/logo.png',
+        order_id: rzpOrder.razorpayOrderId,
+        prefill: { name: selectedAddr.name, contact: selectedAddr.phone },
+        theme: { color: '#FF5C1A' },
+        modal: { ondismiss: () => setPaymentLoading(null) },
+        handler: () => {
+          // Refresh page upon success
+          window.location.reload()
+        }
+      })
+      rzp.open()
+    } catch (err: any) {
+      console.error(err)
+      setError(prev => ({ ...prev, [reqId]: err?.message || 'Payment initiation failed.' }))
+      setPaymentLoading(null)
+    }
+  }
+
+  return (
+    <div className={styles.tabContent}>
+      <div className={styles.orderGrid}>
+        {customPrints.map(req => {
+          const meta = CUSTOM_STATUS_META[req.status] || CUSTOM_STATUS_META.requested
+          const activeAddrId = selectedAddressId[req.customPrintId] || (addresses && addresses.find(a => a.isDefault)?._id) || (addresses && addresses[0]?._id) || ''
+          const reqError = error[req.customPrintId]
+
+          return (
+            <div key={req._id} className={styles.orderCard} style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: 'auto' }}>
+              <div className={styles.orderCardTop}>
+                <div>
+                  <div className={styles.orderIdLabel}>REQUEST ID</div>
+                  <div className={styles.orderId}>{req.customPrintId}</div>
+                </div>
+                <div className={styles.statusBadge} style={{ background: meta.color + '20', color: meta.color, borderColor: meta.color + '40' }}>
+                  {meta.icon} {meta.label}
+                </div>
+              </div>
+
+              {/* Description & Thumbs */}
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.88rem', color: '#eaeaea', lineHeight: 1.5, margin: '0 0 12px 0', whiteSpace: 'pre-wrap' }}>
+                  {req.description}
+                </p>
+                {req.images && req.images.length > 0 && (
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {req.images.map((img: string, i: number) => (
+                      <a key={i} href={img} target="_blank" rel="noopener noreferrer">
+                        <img src={img} alt="reference" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--line)' }} />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Pricing & Checkout Block */}
+              {req.status === 'quoted' && req.pricing && (
+                <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--line)', padding: '16px', borderRadius: '6px', marginTop: 'auto' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>QUOTED PRICE:</span>
+                    <strong style={{ fontSize: '1.2rem', color: 'var(--orange)' }}>{fmt(req.pricing.total)}</strong>
+                  </div>
+
+                  {addresses && addresses.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label style={{ fontSize: '0.7rem', fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>SHIPPING ADDRESS:</label>
+                      <select
+                        value={activeAddrId}
+                        onChange={e => setSelectedAddressId(prev => ({ ...prev, [req.customPrintId]: e.target.value }))}
+                        style={{ background: 'var(--ink)', color: '#fff', border: '1px solid var(--line)', padding: '8px', borderRadius: '4px', fontSize: '0.85rem' }}
+                      >
+                        {addresses.map(a => (
+                          <option key={a._id} value={a._id}>
+                            {a.name} - {a.line1}, {a.city}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>No saved addresses. Please add one under the "Profile & Addresses" tab first.</span>
+                    </div>
+                  )}
+
+                  {reqError && (
+                    <div style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '10px', fontFamily: 'var(--font-mono)' }}>
+                      ⚠️ {reqError}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => handlePay(req)}
+                    disabled={paymentLoading === req.customPrintId || !activeAddrId}
+                    style={{
+                      width: '100%',
+                      background: 'var(--orange)',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '12px',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                      marginTop: '14px',
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-display)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      fontSize: '0.85rem'
+                    }}
+                  >
+                    {paymentLoading === req.customPrintId ? 'Processing...' : `Pay & Order →`}
+                  </button>
+                </div>
+              )}
+
+              {/* Progress Milestones for Active Orders */}
+              {['ordered', 'printing', 'shipped', 'delivered'].includes(req.status) && (
+                <div style={{ borderTop: '1px solid var(--line)', paddingTop: '16px', marginTop: 'auto' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '8px' }}>
+                    <span>ORDER TOTAL: {req.pricing ? fmt(req.pricing.total) : '—'}</span>
+                    <span>{new Date(req.updatedAt).toLocaleDateString('en-IN')}</span>
+                  </div>
+
+                  {/* Tracking number display */}
+                  {req.trackingNumber && (
+                    <div style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.02)', padding: '8px 12px', borderRadius: '4px', border: '1px solid var(--line)', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontFamily: 'var(--font-mono)', display: 'block' }}>TRACKING NUMBER</span>
+                      <strong style={{ color: 'var(--orange)' }}>{req.trackingNumber}</strong>
+                    </div>
+                  )}
+
+                  {/* Mini timeline */}
+                  <div className={styles.miniTimeline} style={{ marginTop: '12px' }}>
+                    {['ordered', 'printing', 'shipped', 'delivered'].map((step, i) => {
+                      const steps = ['ordered', 'printing', 'shipped', 'delivered']
+                      const currentIdx = steps.indexOf(req.status)
+                      const isDone = i <= currentIdx
+                      return (
+                        <div key={step} className={styles.miniStep}>
+                          <div className={`${styles.miniDot} ${isDone ? styles.miniDotDone : ''}`} title={step} />
+                          {i < 3 && <div className={`${styles.miniLine} ${isDone && i < currentIdx ? styles.miniLineDone : ''}`} />}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Notes */}
+              {req.adminNotes && (
+                <div style={{ background: 'rgba(255,92,26,0.05)', padding: '10px 14px', borderRadius: '4px', borderLeft: '3px solid var(--orange)', fontSize: '0.8rem' }}>
+                  <span style={{ fontWeight: 700, display: 'block', marginBottom: '2px', color: 'var(--orange)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>DESIGN TEAM UPDATE</span>
+                  <p style={{ margin: 0, color: '#eaeaea' }}>{req.adminNotes}</p>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

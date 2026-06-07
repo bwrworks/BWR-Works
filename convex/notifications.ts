@@ -448,3 +448,259 @@ export const sendWhatsAppStatusUpdate = action({
     return { whatsappUrl, phone: fullPhone };
   },
 });
+
+// ─────────────────────────────────────────────────
+// CUSTOM PRINT NOTIFICATION EMAILS
+// ─────────────────────────────────────────────────
+
+/** Notify user + admin of new custom print request */
+export const sendCustomPrintRequestConfirmationEmail = action({
+  args: {
+    customerEmail: v.string(),
+    customerName: v.string(),
+    customPrintId: v.string(),
+    description: v.string(),
+    images: v.array(v.string()),
+  },
+  handler: async (_ctx, { customerEmail, customerName, customPrintId, description, images }) => {
+    const resend = getResend();
+
+    // 1. Send confirmation to user
+    const { error: customerError } = await resend.emails.send({
+      from: FROM_SUPPORT,
+      replyTo: REPLY_TO_SUPPORT,
+      to: customerEmail,
+      subject: `Custom Print Request Received — ${customPrintId}`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+          </div>
+          <div style="padding:32px;">
+            <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Request Received 🛠️</h1>
+            <p style="color:#888;font-size:14px;margin:0 0 24px;">Hi ${esc(customerName)}, we have received your custom print request. Our design team will review it and send you a price quotation shortly.</p>
+            <div style="background:#F5F0E8;padding:16px;border-radius:4px;margin-bottom:24px;">
+              <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Request ID</div>
+              <div style="font-size:18px;font-weight:700;color:#111;">${customPrintId}</div>
+            </div>
+            <h3 style="font-size:14px;color:#111;text-transform:uppercase;margin:0 0 8px;">Your Description</h3>
+            <p style="color:#444;font-size:14px;line-height:1.6;background:#f9f9f9;padding:12px;border-left:3px solid #FF5C1A;margin:0 0 24px;">${esc(description)}</p>
+            ${images.length > 0 ? `
+              <h3 style="font-size:14px;color:#111;text-transform:uppercase;margin:0 0 12px;">Reference Images (${images.length})</h3>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+                ${images.map(img => `<img src="${img}" style="width:100px;height:100px;object-fit:cover;border:1px solid #E8E3DB;border-radius:4px;" />`).join("")}
+              </div>
+            ` : ""}
+            <a href="${SITE_URL}/dashboard" style="display:inline-block;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+              Go to Dashboard →
+            </a>
+          </div>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+          </div>
+        </div>
+      </body></html>`,
+    });
+
+    // 2. Notify Admin
+    if (ADMIN_EMAIL) {
+      await resend.emails.send({
+        from: FROM_SUPPORT,
+        replyTo: customerEmail,
+        to: ADMIN_EMAIL,
+        subject: `[ADMIN ALERT] New Custom Print Request: ${customPrintId}`,
+        html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+          <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+            <div style="background:#111;padding:24px 32px;">
+              <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            </div>
+            <div style="padding:28px 32px;">
+              <h2>New Custom Request ${customPrintId}</h2>
+              <p>Customer: <strong>${esc(customerName)}</strong> (${customerEmail})</p>
+              <p>Description: <em>"${esc(description)}"</em></p>
+              ${images.length > 0 ? `
+                <p>Attached Photos:</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+                  ${images.map(img => `<a href="${img}" target="_blank"><img src="${img}" style="width:120px;height:120px;object-fit:cover;border:1px solid #ddd;border-radius:4px;" /></a>`).join("")}
+                </div>
+              ` : ""}
+              <a href="${SITE_URL}/admin/custom-orders" style="display:inline-block;margin-top:20px;background:#111;color:#fff;text-decoration:none;padding:12px 24px;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Review & Quote in Admin →</a>
+            </div>
+          </div>
+        </body></html>`,
+      }).catch(err => console.error("[Resend Error] Notify admin custom request failed:", err));
+    }
+
+    if (customerError) console.error("[Resend Error] sendCustomPrintRequestConfirmationEmail failed:", customerError);
+
+    return { sent: !customerError };
+  },
+});
+
+/** Notify customer of ready quotation */
+export const sendCustomPrintQuoteEmail = action({
+  args: {
+    customerEmail: v.string(),
+    customerName: v.string(),
+    customPrintId: v.string(),
+    total: v.number(),
+  },
+  handler: async (_ctx, { customerEmail, customerName, customPrintId, total }) => {
+    const resend = getResend();
+    const totalRupees = (total / 100).toLocaleString("en-IN");
+
+    const { error } = await resend.emails.send({
+      from: FROM_ORDERS,
+      replyTo: REPLY_TO_SUPPORT,
+      to: customerEmail,
+      subject: `Quote Ready: Custom Print ${customPrintId} — BWR Works`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+          </div>
+          <div style="padding:32px;">
+            <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Quote Ready 💸</h1>
+            <p style="color:#444;font-size:14px;line-height:1.6;margin:0 0 24px;">Hi ${esc(customerName)}, we have reviewed your design files and compiled a cost quotation. You can now proceed to checkout and payment.</p>
+            <div style="background:#F5F0E8;padding:16px;border-radius:4px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Request ID</div>
+                <div style="font-size:18px;font-weight:700;color:#111;">${customPrintId}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Price (incl. GST)</div>
+                <div style="font-size:22px;font-weight:800;color:#FF5C1A;">₹${totalRupees}</div>
+              </div>
+            </div>
+            <a href="${SITE_URL}/dashboard" style="display:inline-block;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+              View Quote & Checkout →
+            </a>
+          </div>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Bengaluru · Precision Crafted.</p>
+          </div>
+        </div>
+      </body></html>`,
+    });
+
+    if (error) console.error("[Resend Error] sendCustomPrintQuoteEmail failed:", error);
+    return { sent: !error };
+  },
+});
+
+/** Notify customer and admin of order paid and confirmed */
+export const sendCustomPrintPaidEmail = action({
+  args: {
+    customerEmail: v.string(),
+    customerName: v.string(),
+    customPrintId: v.string(),
+    total: v.number(),
+  },
+  handler: async (_ctx, { customerEmail, customerName, customPrintId, total }) => {
+    const resend = getResend();
+    const totalRupees = (total / 100).toLocaleString("en-IN");
+
+    // 1. Send confirmation to user
+    const { error: customerError } = await resend.emails.send({
+      from: FROM_ORDERS,
+      replyTo: REPLY_TO_ORDERS,
+      to: customerEmail,
+      subject: `Order Confirmed: Custom Print ${customPrintId}`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+          </div>
+          <div style="padding:32px;">
+            <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Order Confirmed ✅</h1>
+            <p style="color:#888;font-size:14px;margin:0 0 24px;">Hi ${esc(customerName)}, we have verified your payment. Your custom print order has been added to our fabrication queue!</p>
+            <div style="background:#F5F0E8;padding:16px;border-radius:4px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Order ID</div>
+                <div style="font-size:16px;font-weight:700;color:#111;">${customPrintId}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Amount Paid</div>
+                <div style="font-size:18px;font-weight:800;color:#FF5C1A;">₹${totalRupees}</div>
+              </div>
+            </div>
+            <a href="${SITE_URL}/dashboard" style="display:inline-block;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+              Track Order Status →
+            </a>
+          </div>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+          </div>
+        </div>
+      </body></html>`,
+    });
+
+    // 2. Alert Admin
+    if (ADMIN_EMAIL) {
+      await resend.emails.send({
+        from: FROM_SUPPORT,
+        replyTo: customerEmail,
+        to: ADMIN_EMAIL,
+        subject: `[ADMIN UPDATE] Paid Custom Order: ${customPrintId}`,
+        html: `<!DOCTYPE html><html><body>
+          <h3>Payment Verified for Custom Order ${customPrintId}</h3>
+          <p>Customer: <strong>${esc(customerName)}</strong> (${customerEmail})</p>
+          <p>Amount: ₹${totalRupees}</p>
+          <p>This custom print needs to be added to the printer queue.</p>
+          <a href="${SITE_URL}/admin/custom-orders" style="display:inline-block;padding:10px 20px;background:#111;color:#fff;text-decoration:none;">Open Custom Orders →</a>
+        </body></html>`,
+      }).catch(err => console.error("[Resend Error] Notify admin paid failed:", err));
+    }
+
+    if (customerError) console.error("[Resend Error] sendCustomPrintPaidEmail failed:", customerError);
+    return { sent: !customerError };
+  },
+});
+
+/** Notify customer of custom print status progression */
+export const sendCustomPrintStatusEmail = action({
+  args: {
+    customerEmail: v.string(),
+    customerName: v.string(),
+    customPrintId: v.string(),
+    newStatus: v.string(),
+    trackingNumber: v.optional(v.string()),
+  },
+  handler: async (_ctx, { customerEmail, customerName, customPrintId, newStatus, trackingNumber }) => {
+    const resend = getResend();
+
+    const statusMessages: Record<string, string> = {
+      printing: "Your custom order has entered production! We are currently 3D printing and post-processing your custom piece.",
+      shipped: `Your custom order has been dispatched! ${trackingNumber ? `Tracking number: <strong>${esc(trackingNumber)}</strong>` : ""}`,
+      delivered: "Your custom order has been delivered! We hope you love your unique piece. 🎉",
+    };
+    const message = statusMessages[newStatus] || `Your custom print status has been updated to: ${newStatus}`;
+
+    const { error } = await resend.emails.send({
+      from: FROM_ORDERS,
+      replyTo: REPLY_TO_SUPPORT,
+      to: customerEmail,
+      subject: `Custom Order ${customPrintId} Update — ${newStatus.toUpperCase()}`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+          </div>
+          <div style="padding:32px;">
+            <h1 style="font-size:22px;color:#111;margin:0 0 16px;">Order Update — ${customPrintId}</h1>
+            <p style="color:#444;font-size:14px;line-height:1.7;">Hi ${esc(customerName)}, ${message}</p>
+            <a href="${SITE_URL}/dashboard" style="display:inline-block;margin-top:20px;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+              View Dashboard Status →
+            </a>
+          </div>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+          </div>
+        </div>
+      </body></html>`,
+    });
+
+    if (error) console.error("[Resend Error] sendCustomPrintStatusEmail failed:", error);
+    return { sent: !error };
+  },
+});

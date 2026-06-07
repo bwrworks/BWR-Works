@@ -4,12 +4,13 @@ import { useAuthActions } from '@convex-dev/auth/react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import Logo from '../../components/ui/Logo'
-import { Package, Printer, Settings, Tag, Mail, PenTool, AlertTriangle, LayoutDashboard, Users, Star } from 'lucide-react'
+import { Package, Printer, Settings, Tag, Mail, PenTool, AlertTriangle, LayoutDashboard, Users, Star, Sparkles } from 'lucide-react'
 import styles from './AdminLayout.module.css'
 
 const NAV_ITEMS = [
   { path: '/admin', label: 'Dashboard', icon: <LayoutDashboard size={16} />, exact: true },
   { path: '/admin/orders', label: 'Orders', icon: <Package size={16} /> },
+  { path: '/admin/custom-orders', label: 'Custom Orders', icon: <Sparkles size={16} /> },
   { path: '/admin/products', label: 'Products', icon: <Printer size={16} /> },
   { path: '/admin/pricing', label: 'Pricing Engine', icon: <Settings size={16} /> },
   { path: '/admin/coupons', label: 'Coupons', icon: <Tag size={16} /> },
@@ -194,6 +195,15 @@ export default function AdminLayout() {
                   minWidth: 20, height: 20, borderRadius: 10,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>{counts!.newOrders}</span>
+              )}
+              {/* Badge for custom orders */}
+              {item.path === '/admin/custom-orders' && (counts?.newCustomRequests ?? 0) > 0 && (
+                <span style={{
+                  marginLeft: 'auto', background: '#FF5C1A', color: '#fff',
+                  fontSize: '0.6rem', fontFamily: 'var(--font-mono)', fontWeight: 700,
+                  minWidth: 20, height: 20, borderRadius: 10,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>{counts!.newCustomRequests}</span>
               )}
               {/* Badge for inquiries */}
               {item.path === '/admin/inquiries' && (counts?.newInquiries ?? 0) > 0 && (

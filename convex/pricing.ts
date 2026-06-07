@@ -15,7 +15,7 @@ import { requireAdmin } from "./admin";
  * THE CORE FORMULA
  * Calculates cost breakdown for a single unit of a product
  */
-function calculateCostBreakdown(
+export function calculateCostBreakdown(
   defaults: {
     materialCostPerKg: number;
     electricityCostPerHour: number;
@@ -249,6 +249,7 @@ export const savePricingDefaults = mutation({
     ),
     gstPercent: v.number(),
     codAdvancePercent: v.number(),
+    customPrintExtraCost: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
