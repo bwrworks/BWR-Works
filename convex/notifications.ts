@@ -122,7 +122,7 @@ export const sendOrderConfirmationEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Order Confirmed ✅</h1>
@@ -196,7 +196,7 @@ export const sendStatusUpdateEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:22px;color:#111;margin:0 0 16px;">Order Update — ${orderId}</h1>
@@ -253,7 +253,7 @@ export const sendContactFormEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:24px 32px;">
-            <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:28px;display:block;" />
           </div>
           <div style="padding:28px 32px;">
             <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
@@ -279,7 +279,7 @@ export const sendContactFormEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:20px;color:#111;margin:0 0 16px;">Hi ${esc(name)}, we received your message!</h1>
@@ -337,7 +337,7 @@ export const sendAdminReplyEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
         <div style="max-width:560px;margin:20px auto;border:1px solid #eaeaea;border-radius:8px;overflow:hidden;">
           <div style="background:#111;padding:24px 32px;text-align:center;">
-            <div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:28px;display:block;margin:0 auto;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:18px;color:#111;margin:0 0 20px;">Hi ${esc(customerName)},</h1>
@@ -474,7 +474,7 @@ export const sendCustomPrintRequestConfirmationEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Request Received 🛠️</h1>
@@ -512,7 +512,7 @@ export const sendCustomPrintRequestConfirmationEmail = action({
         html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
           <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
             <div style="background:#111;padding:24px 32px;">
-              <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+              <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:28px;display:block;" />
             </div>
             <div style="padding:28px 32px;">
               <h2>New Custom Request ${customPrintId}</h2>
@@ -558,7 +558,7 @@ export const sendCustomPrintRequestUpdatedEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Request Updated ⚙️</h1>
@@ -633,7 +633,7 @@ export const sendCustomPrintQuoteEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Quote Ready 💸</h1>
@@ -685,7 +685,7 @@ export const sendCustomPrintPaidEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Order Confirmed ✅</h1>
@@ -760,7 +760,7 @@ export const sendCustomPrintStatusEmail = action({
       html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
           <div style="background:#111;padding:28px 32px;">
-            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+            <img src="${SITE_URL}/logo.png" alt="BWR Works" style="height:32px;display:block;" />
           </div>
           <div style="padding:32px;">
             <h1 style="font-size:22px;color:#111;margin:0 0 16px;">Order Update — ${customPrintId}</h1>

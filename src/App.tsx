@@ -56,6 +56,7 @@ function AnimatedRoutes() {
         <Route path="/order/:orderId" element={<AuthGuard><OrderTracking /></AuthGuard>} />
         <Route path="/invoice/:orderId" element={<AuthGuard><Invoice /></AuthGuard>} />
         <Route path="/custom-print" element={<AuthGuard><CustomPrint /></AuthGuard>} />
+        <Route path="/custom-print/:customPrintId" element={<AuthGuard><CustomPrint /></AuthGuard>} />
 
         {/* ── ADMIN ROUTES (nested under AdminLayout) ── */}
         <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
