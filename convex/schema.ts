@@ -413,6 +413,7 @@ export default defineSchema({
           labour: v.number(),
           packaging: v.number(),
           overheads: v.number(),
+          subtotalCost: v.number(),
           riskBuffer: v.number(),
           trueCost: v.number(),
           margin: v.number(),
