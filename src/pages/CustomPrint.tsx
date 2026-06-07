@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useMutation } from 'convex/react'
+import { useMutation, useAction } from 'convex/react'
 import { api } from '../../convex/_generated/api'
-import { uploadToCloudinary } from '../lib/cloudinary'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import SEO from '../components/layout/SEO'
@@ -14,6 +13,7 @@ export default function CustomPrint() {
   useScrollReveal()
   const navigate = useNavigate()
   const createRequest = useMutation(api.customPrints.createCustomPrintRequest)
+  const uploadFile = useAction(api.cloudinary.uploadCustomPrintFile)
 
   const [description, setDescription] = useState('')
   const [files, setFiles] = useState<File[]>([])
@@ -94,10 +94,27 @@ export default function CustomPrint() {
     try {
       const uploadedUrls: string[] = []
       
-      // Upload each file to Cloudinary
+      // Upload each file to Cloudinary via backend action
       for (let i = 0; i < files.length; i++) {
         setUploadProgress(Math.round(((i) / files.length) * 100))
-        const url = await uploadToCloudinary(files[i])
+        
+        // Convert file to base64
+        const base64Data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.readAsDataURL(files[i])
+          reader.onload = () => {
+            const result = reader.result as string
+            const base64 = result.split(',')[1]
+            resolve(base64)
+          }
+          reader.onerror = error => reject(error)
+        })
+
+        const url = await uploadFile({
+          base64Data,
+          fileName: files[i].name,
+          fileType: files[i].type,
+        })
         uploadedUrls.push(url)
       }
       setUploadProgress(100)
