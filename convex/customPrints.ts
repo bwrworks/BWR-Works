@@ -71,6 +71,54 @@ export const createCustomPrintRequest = mutation({
   },
 });
 
+/** Update an existing custom print request (customer-facing) */
+export const updateCustomPrintRequest = mutation({
+  args: {
+    customPrintId: v.string(),
+    description: v.string(),
+    images: v.array(v.string()), // Cloudinary URLs
+  },
+  handler: async (ctx, { customPrintId, description, images }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Must be logged in to update a request.");
+
+    const req = await ctx.db
+      .query("customPrints")
+      .withIndex("by_customPrintId", (q) => q.eq("customPrintId", customPrintId))
+      .first();
+
+    if (!req) throw new Error("Request not found.");
+    if (req.userId !== userId) throw new Error("Access denied.");
+
+    // Only allow editing if NOT yet paid (status must be requested or quoted)
+    if (!["requested", "quoted"].includes(req.status)) {
+      throw new Error("Cannot edit a request that has already been paid and processed.");
+    }
+
+    // Update the request, and reset status to "requested" so admin can re-review/re-quote
+    await ctx.db.patch(req._id, {
+      description,
+      images,
+      status: "requested", 
+      pricing: undefined, // Clear out the previous quote/pricing breakdown since specifications changed
+      razorpayOrderId: undefined, // Clear order ID
+      updatedAt: Date.now(),
+    });
+
+    // Schedule email alerts for request update (non-blocking)
+    await ctx.scheduler.runAfter(0, api.notifications.sendCustomPrintRequestUpdatedEmail, {
+      customerEmail: req.email,
+      customerName: req.name,
+      customPrintId,
+      description,
+      images,
+    });
+
+    return customPrintId;
+  },
+});
+
+
 /** List the authenticated customer's custom print requests */
 export const getMyCustomPrints = query({
   args: {},

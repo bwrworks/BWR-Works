@@ -402,6 +402,16 @@ function CustomPrintsTab({
   const [selectedAddressId, setSelectedAddressId] = useState<Record<string, string>>({})
   const [error, setError] = useState<Record<string, string>>({})
 
+  const updateCustomPrint = useMutation(api.customPrints.updateCustomPrintRequest)
+  const uploadFile = useAction(api.cloudinary.uploadCustomPrintFile)
+
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editDescription, setEditDescription] = useState('')
+  const [editImages, setEditImages] = useState<string[]>([])
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [savingId, setSavingId] = useState<string | null>(null)
+
   if (customPrints === undefined) {
     return (
       <div className={styles.tabContent}>
@@ -492,6 +502,149 @@ function CustomPrintsTab({
           const activeAddrId = selectedAddressId[req.customPrintId] || (addresses && addresses.find(a => a.isDefault)?._id) || (addresses && addresses[0]?._id) || ''
           const reqError = error[req.customPrintId]
 
+          if (editingId === req.customPrintId) {
+            return (
+              <div key={req._id} className={styles.orderCard} style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: 'auto', border: '1px solid var(--orange)' }}>
+                <div className={styles.orderCardTop}>
+                  <div>
+                    <div className={styles.orderIdLabel}>EDIT REQUEST</div>
+                    <div className={styles.orderId}>{req.customPrintId}</div>
+                  </div>
+                  <button 
+                    onClick={() => setEditingId(null)}
+                    style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}
+                  >
+                    ✕ Cancel
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.7rem', fontFamily: 'var(--font-mono)', color: 'var(--muted)', textTransform: 'uppercase' }}>Description *</label>
+                    <textarea
+                      value={editDescription}
+                      onChange={e => setEditDescription(e.target.value)}
+                      rows={4}
+                      style={{ background: 'var(--ink)', color: '#fff', border: '1px solid var(--line)', padding: '10px', borderRadius: '4px', fontSize: '0.85rem', resize: 'vertical', fontFamily: 'var(--font-body)', outline: 'none' }}
+                      required
+                      disabled={savingId === req.customPrintId || isUploading}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={{ fontSize: '0.7rem', fontFamily: 'var(--font-mono)', color: 'var(--muted)', textTransform: 'uppercase' }}>Reference Photos (Max 3)</label>
+                    
+                    {/* Current images */}
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {editImages.map((img: string, i: number) => (
+                        <div key={i} style={{ position: 'relative', width: '60px', height: '60px' }}>
+                          <img src={img} alt="reference" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--line)' }} />
+                          <button
+                            type="button"
+                            onClick={() => setEditImages(prev => prev.filter((_, j) => j !== i))}
+                            style={{ position: 'absolute', top: '-4px', right: '-4px', width: '16px', height: '16px', borderRadius: '50%', background: 'var(--error)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* File input */}
+                    {editImages.length < 3 && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={async (e) => {
+                            if (!e.target.files) return;
+                            const newFiles = Array.from(e.target.files);
+                            if (editImages.length + newFiles.length > 3) {
+                              alert("Max 3 reference images allowed.");
+                              return;
+                            }
+                            setIsUploading(true);
+                            setUploadProgress(0);
+                            try {
+                              const uploaded: string[] = [...editImages];
+                              for (let i = 0; i < newFiles.length; i++) {
+                                setUploadProgress(Math.round((i / newFiles.length) * 100));
+                                
+                                // base64 conversion
+                                const base64Data = await new Promise<string>((resolve, reject) => {
+                                  const reader = new FileReader();
+                                  reader.readAsDataURL(newFiles[i]);
+                                  reader.onload = () => {
+                                    const result = reader.result as string;
+                                    const base64 = result.split(',')[1];
+                                    resolve(base64);
+                                  };
+                                  reader.onerror = err => reject(err);
+                                });
+
+                                const url = await uploadFile({
+                                  base64Data,
+                                  fileName: newFiles[i].name,
+                                  fileType: newFiles[i].type,
+                                });
+                                uploaded.push(url);
+                              }
+                              setEditImages(uploaded);
+                            } catch (err: any) {
+                              alert("File upload failed: " + (err.message || err));
+                            } finally {
+                              setIsUploading(false);
+                              setUploadProgress(100);
+                            }
+                          }}
+                          disabled={isUploading || savingId === req.customPrintId}
+                          style={{ fontSize: '0.75rem', color: 'var(--muted)' }}
+                        />
+                        {isUploading && <span style={{ fontSize: '0.7rem', color: 'var(--orange)' }}>Uploading {uploadProgress}%...</span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                  <button
+                    onClick={async () => {
+                      if (!editDescription.trim()) {
+                        alert("Description is required.");
+                        return;
+                      }
+                      setSavingId(req.customPrintId);
+                      try {
+                        await updateCustomPrint({
+                          customPrintId: req.customPrintId,
+                          description: editDescription,
+                          images: editImages,
+                        });
+                        setEditingId(null);
+                      } catch (err: any) {
+                        alert("Failed to update request: " + (err.message || err));
+                      } finally {
+                        setSavingId(null);
+                      }
+                    }}
+                    disabled={savingId === req.customPrintId || isUploading}
+                    style={{ flex: 1, background: 'var(--orange)', color: '#fff', border: 'none', padding: '10px', borderRadius: '4px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'var(--font-display)', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+                  >
+                    {savingId === req.customPrintId ? 'Saving...' : 'Save Updates'}
+                  </button>
+                  <button
+                    onClick={() => setEditingId(null)}
+                    disabled={savingId === req.customPrintId || isUploading}
+                    style={{ background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--line)', padding: '10px', borderRadius: '4px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'var(--font-display)', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            );
+          }
+
           return (
             <div key={req._id} className={styles.orderCard} style={{ display: 'flex', flexDirection: 'column', gap: '16px', height: 'auto' }}>
               <div className={styles.orderCardTop}>
@@ -510,13 +663,38 @@ function CustomPrintsTab({
                   {req.description}
                 </p>
                 {req.images && req.images.length > 0 && (
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                     {req.images.map((img: string, i: number) => (
                       <a key={i} href={img} target="_blank" rel="noopener noreferrer">
                         <img src={img} alt="reference" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--line)' }} />
                       </a>
                     ))}
                   </div>
+                )}
+                {['requested', 'quoted'].includes(req.status) && (
+                  <button
+                    onClick={() => {
+                      setEditingId(req.customPrintId)
+                      setEditDescription(req.description)
+                      setEditImages(req.images || [])
+                    }}
+                    style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      color: 'var(--orange)',
+                      border: '1px solid var(--orange)',
+                      padding: '6px 12px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem',
+                      fontFamily: 'var(--font-mono)',
+                      cursor: 'pointer',
+                      marginTop: '4px',
+                      transition: 'all 0.15s',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em'
+                    }}
+                  >
+                    ✏️ Edit Request
+                  </button>
                 )}
               </div>
 

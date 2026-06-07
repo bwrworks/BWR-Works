@@ -537,6 +537,82 @@ export const sendCustomPrintRequestConfirmationEmail = action({
   },
 });
 
+/** Notify user + admin of updated custom print request */
+export const sendCustomPrintRequestUpdatedEmail = action({
+  args: {
+    customerEmail: v.string(),
+    customerName: v.string(),
+    customPrintId: v.string(),
+    description: v.string(),
+    images: v.array(v.string()),
+  },
+  handler: async (_ctx, { customerEmail, customerName, customPrintId, description, images }) => {
+    const resend = getResend();
+
+    // 1. Send to user
+    const { error: customerError } = await resend.emails.send({
+      from: FROM_SUPPORT,
+      replyTo: REPLY_TO_SUPPORT,
+      to: customerEmail,
+      subject: `Custom Print Request Updated — ${customPrintId}`,
+      html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#fff;border:1px solid #E8E3DB;">
+          <div style="background:#111;padding:28px 32px;">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:2px;">BW<span style="color:#FF5C1A;">R</span> WORKS</div>
+          </div>
+          <div style="padding:32px;">
+            <h1 style="font-size:24px;color:#111;margin:0 0 8px;">Request Updated ⚙️</h1>
+            <p style="color:#888;font-size:14px;margin:0 0 24px;">Hi ${esc(customerName)}, you have successfully updated your custom print request. Our design team will review the new details shortly.</p>
+            <div style="background:#F5F0E8;padding:16px;border-radius:4px;margin-bottom:24px;">
+              <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase;">Request ID</div>
+              <div style="font-size:18px;font-weight:700;color:#111;">${customPrintId}</div>
+            </div>
+            <h3 style="font-size:14px;color:#111;text-transform:uppercase;margin:0 0 8px;">Updated Description</h3>
+            <p style="color:#444;font-size:14px;line-height:1.6;background:#f9f9f9;padding:12px;border-left:3px solid #FF5C1A;margin:0 0 24px;">${esc(description)}</p>
+            ${images.length > 0 ? `
+              <h3 style="font-size:14px;color:#111;text-transform:uppercase;margin:0 0 12px;">New Reference Images (${images.length})</h3>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+                ${images.map(img => `<img src="${img}" style="width:100px;height:100px;object-fit:cover;border:1px solid #E8E3DB;border-radius:4px;" />`).join("")}
+              </div>
+            ` : ""}
+            <a href="${SITE_URL}/dashboard" style="display:inline-block;background:#FF5C1A;color:#fff;text-decoration:none;padding:14px 28px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+              Go to Dashboard →
+            </a>
+          </div>
+          <div style="padding:20px 32px;border-top:1px solid #E8E3DB;text-align:center;">
+            <p style="color:#aaa;font-size:11px;margin:0;">BWR Works · Made in Bengaluru · Never mass-made.</p>
+          </div>
+        </div>
+      </body></html>`,
+    });
+
+    // 2. Alert Admin
+    if (ADMIN_EMAIL) {
+      await resend.emails.send({
+        from: FROM_SUPPORT,
+        replyTo: customerEmail,
+        to: ADMIN_EMAIL,
+        subject: `[ADMIN ALERT] Custom Print Request Updated: ${customPrintId}`,
+        html: `<!DOCTYPE html><html><body>
+          <h2>Custom Request ${customPrintId} Has Been Updated</h2>
+          <p>Customer: <strong>${esc(customerName)}</strong> (${customerEmail})</p>
+          <p>New Description: <em>"${esc(description)}"</em></p>
+          ${images.length > 0 ? `
+            <p>New Reference Photos:</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+              ${images.map(img => `<a href="${img}" target="_blank"><img src="${img}" style="width:120px;height:120px;object-fit:cover;border:1px solid #ddd;border-radius:4px;" /></a>`).join("")}
+            </div>
+          ` : ""}
+          <a href="${SITE_URL}/admin/custom-orders" style="display:inline-block;margin-top:20px;background:#111;color:#fff;text-decoration:none;padding:12px 24px;font-size:12px;letter-spacing:1px;text-transform:uppercase;">Review & Quote in Admin →</a>
+        </body></html>`,
+      }).catch(err => console.error("[Resend Error] Notify admin custom update failed:", err));
+    }
+
+    if (customerError) console.error("[Resend Error] sendCustomPrintRequestUpdatedEmail failed:", customerError);
+    return { sent: !customerError };
+  },
+});
+
 /** Notify customer of ready quotation */
 export const sendCustomPrintQuoteEmail = action({
   args: {
